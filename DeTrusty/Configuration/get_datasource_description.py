@@ -1,5 +1,7 @@
 __author__ = "Philipp D. Rohde"
 
+import os.path
+
 
 def get_datasource_description(endpoints):
     """At this point in time, only the endpoint URLs are stored.
@@ -11,4 +13,7 @@ def get_datasource_description(endpoints):
 
 
 def parse_datasource_file(datasource_file):
-    return [e.strip() for e in open(datasource_file, 'r').readlines()]
+    if os.path.isfile(datasource_file):
+        return [e.strip() for e in open(datasource_file, 'r').readlines()]
+    else:
+        return []
