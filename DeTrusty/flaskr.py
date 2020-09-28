@@ -63,7 +63,7 @@ def sparql():
         if len(app.config['DATASOURCE_DESCRIPTION']) == 1:
             endpoint_url = app.config['DATASOURCE_DESCRIPTION'][0][0][1:-1]
             RDFWrapper.contact_source(endpoint_url, query.query_string, output)
-        else:
+        elif len(app.config['DATASOURCE_DESCRIPTION']) > 1:
             queues = []
             for endpoint in app.config['DATASOURCE_DESCRIPTION']:
                 result_queue = Queue()
@@ -83,6 +83,9 @@ def sparql():
                 Xdistinct(query.variables).execute(queues[0], None, output)
             else:
                 output = queues[0]
+        else:
+            return jsonify({"result": [],
+                            "error": "No data sources set up. Please, configure your data sources first."})
 
         result = []
         r = output.get()
