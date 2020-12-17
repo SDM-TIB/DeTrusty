@@ -1,9 +1,12 @@
 """
 Created on Dec 11, 2013
+
 Implements the Xdistinct operator.
 The intermediate results are represented in a queue.
+
 @author: Maribel Acosta Deibe
 """
+
 from multiprocessing import Queue
 
 

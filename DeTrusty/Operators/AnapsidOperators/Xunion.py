@@ -1,14 +1,18 @@
 """
 Created on Jul 10, 2011
+
 Implements the Xunion operator.
 The intermediate results are represented in a queue.
+
 @author: Maribel Acosta Deibe
 """
+
 from multiprocessing import Queue
-from multiprocessing.queues import Empty
+from queue import Empty
+from DeTrusty.Operators.Union import _Union
 
 
-class Xunion(object):
+class Xunion(_Union):
 
     def __init__(self, vars_left, vars_right):
         self.left = Queue()
@@ -37,7 +41,7 @@ class Xunion(object):
         # print "left", hex(id(left)), "right", hex(id(right)), "out", hex(id(out))
 
         # Identify the kind of union to perform.
-        if self.vars_left == self.vars_right:
+        if (self.vars_left == self.vars_right):
             self.sameVariables()
         else:
             self.differentVariables()
@@ -99,10 +103,10 @@ class Xunion(object):
         while (not (tuple1 == "EOF") or not (tuple2 == "EOF")):
 
             # Get tuple from left queue, and concatenate with empty tuple.
-            if not (tuple1 == "EOF"):
+            if (not (tuple1 == "EOF")):
                 try:
                     tuple1 = self.left.get(False)
-                    if not (tuple1 == "EOF"):
+                    if (not (tuple1 == "EOF")):
                         res = {}
                         res.update(v1)
                         res.update(tuple1)
@@ -114,10 +118,10 @@ class Xunion(object):
                     pass
 
             # Get tuple from right queue, and concatenate with empty tuple.
-            if not (tuple2 == "EOF"):
+            if (not (tuple2 == "EOF")):
                 try:
                     tuple2 = self.right.get(False)
-                    if not (tuple2 == "EOF"):
+                    if (not (tuple2 == "EOF")):
                         res = {}
                         res.update(v2)
                         res.update(tuple2)

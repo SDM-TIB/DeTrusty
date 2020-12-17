@@ -1,11 +1,16 @@
-FROM python:3.6.12-slim-buster
+FROM python:3.8.6-slim-buster
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
-COPY requirements.txt /DeTrusty/requirements.txt
-RUN pip3 install --upgrade pip && pip3 install -r /DeTrusty/requirements.txt
+ENV VERSION="0.2.0"
 
+# install dependencies
+COPY requirements.txt /DeTrusty/requirements.txt
+RUN pip3 install --upgrade --no-cache-dir pip setuptools gunicorn && pip3 install -r /DeTrusty/requirements.txt
+
+# copy the source code into the container
 COPY . /DeTrusty
 RUN cd /DeTrusty && python3 setup.py install && mkdir -p Config
 WORKDIR /DeTrusty/DeTrusty
 
-ENTRYPOINT ["python3", "flaskr.py"]
+# start the Flask app
+ENTRYPOINT ["bash", "-c", "cd /DeTrusty/DeTrusty; gunicorn --workers 4 --timeout 300 --graceful-timeout 300 --bind 0.0.0.0:5000 flaskr:app"]
