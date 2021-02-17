@@ -1,23 +1,16 @@
 __author__ = "Philipp D. Rohde"
 
 from flask import Flask, Response, request, jsonify
-import traceback
+from DeTrusty import get_logger
 from DeTrusty.Molecule.MTManager import ConfigFile
 from DeTrusty.Decomposer.Decomposer import Decomposer
 from DeTrusty.Decomposer.Planner import Planner
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 from multiprocessing import Queue
-import logging
 import time
 import os
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+logger = get_logger(__name__)
 
 app = Flask(__name__)
 app.config['VERSION'] = os.environ.get("VERSION")
@@ -71,6 +64,7 @@ def sparql():
     except Exception as e:
         logger.exception(e)
         import sys
+        import traceback
         exc_type, exc_value, exc_traceback = sys.exc_info()
         emsg = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
         return jsonify({"result": [], "error": str(emsg)})

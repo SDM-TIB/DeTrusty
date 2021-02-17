@@ -1,15 +1,8 @@
 import urllib.parse
 import urllib.request
-import logging
+from DeTrusty import get_logger
 
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+logger = get_logger(__name__)
 
 
 def contact_source(server, query, queue, buffersize=16384, limit=-1):
