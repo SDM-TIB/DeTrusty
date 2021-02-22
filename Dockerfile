@@ -5,7 +5,7 @@ ENV VERSION="0.2.0"
 
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
-RUN pip3 install --upgrade --no-cache-dir pip setuptools gunicorn && pip3 install -r /DeTrusty/requirements.txt
+RUN pip3 install --upgrade --no-cache-dir pip==21.0.1 setuptools==53.0.0 gunicorn==20.0.4 && pip3 install -r /DeTrusty/requirements.txt
 
 # copy the source code into the container
 COPY . /DeTrusty
