@@ -4,7 +4,6 @@ import getopt, sys
 from pprint import pprint
 import json
 import logging
-import time
 import urllib.parse as urlparse
 from http import HTTPStatus
 import requests
@@ -245,7 +244,6 @@ def get_typed_concepts(endpoint, tq, limit=-1, types=[]):
 
 
 def get_rdfs_ranges(referer, p, limit=-1):
-
     RDFS_RANGES = " SELECT DISTINCT ?range" \
                   "  WHERE{ <" + p + "> <http://www.w3.org/2000/01/rdf-schema#range> ?range. " \
                                      "} "
@@ -294,7 +292,6 @@ def get_rdfs_ranges(referer, p, limit=-1):
 
 
 def find_instance_range(referer, t, p, limit=-1):
-
     INSTANCE_RANGES = " SELECT DISTINCT ?r WHERE{ ?s a <" + t + ">. " \
                         " ?s <" + p + "> ?pt. " \
                         " ?pt a ?r . } "
@@ -391,7 +388,6 @@ def get_predicates(referer, t, limit=-1):
 
 
 def get_preds_of_random_instances(referer, t, limit=-1):
-
     """
     get a union of predicated from 'randomly' selected 10 entities from the first 100 subjects returned
 
@@ -660,7 +656,7 @@ if __name__ == "__main__":
             print("Endpoints file should have at least one url")
             sys.exit(1)
 
-        endpoints = [e.strip('\n') for e in endpoints]
+        endpoints = [e for e in [e.strip('\n') for e in endpoints] if e]
         if not endpointsAccessible(endpoints):
             print("None of the endpoints can be accessed. Please check if you write URLs properly!")
             sys.exit(1)
