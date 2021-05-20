@@ -85,9 +85,9 @@ Example output for the above query (shortened to two results):
 'cardinality' is the number (integer) of results retrieved,
 'execution_time' (float) gives the time in seconds the query engine has spent collecting the results,
 'output_version' (string) indicates the version number of the output format, i.e., to differentiate the current output from possibly changed output in the future,
-'variables' (list) returns a list of the variables found in the query,
-'result' is a list of dictionaries containing the results of the query, using the variables as keys;
-metadata about the result verification is included in the key '\_\_meta\_\_'.
+'vars' (list) in 'head' returns a list of the variables found in the query,
+'bindings' in 'results' is a list of dictionaries containing the results of the query, using the variables as keys. The type and value of the binding of the variable are returned in 'type' and 'value', respectively.
+Metadata about the result verification is included in the key '\_\_meta\_\_'.
 The current version returns all results as verified as can be seen in the key 'is_verified' of the metadata.
 
 **If you want to query private data that is stored in a Solid Pod, you need to use the SPARQL 1.1 Service clause and add additional information to your request:**
