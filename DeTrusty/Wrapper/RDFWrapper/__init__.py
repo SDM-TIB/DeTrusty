@@ -1,15 +1,10 @@
+import re
 import urllib.parse
 import urllib.request
-import logging
 
+from DeTrusty import get_logger
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+logger = get_logger(__name__)
 
 
 def contact_source(server, query, queue, buffersize=16384, limit=-1):
@@ -21,7 +16,7 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1):
     cardinality = 0
 
     referer = server
-    server = server.split("http://")[1]
+    server = re.split("https?://", server)[1]
     if '/' in server:
         (server, path) = server.split("/", 1)
     else:
@@ -85,13 +80,13 @@ def contact_source_aux(referer, server, path, port, query, queue):
                         for key, props in x.items():
                             # Handle typed-literals and language tags
                             suffix = ''
-                            if props['type'] == 'typed-literal':
-                                if isinstance(props['datatype'], bytes):
-                                    suffix = "^^<" + props['datatype'].decode('utf-8') + ">"
-                                else:
-                                    suffix = "^^<" + props['datatype'] + ">"
-                            elif "xml:lang" in props:
-                                suffix = '@' + props['xml:lang']
+#                            if props['type'] == 'typed-literal':
+#                                if isinstance(props['datatype'], bytes):
+#                                    suffix = "^^<" + props['datatype'].decode('utf-8') + ">"
+#                                else:
+#                                    suffix = "^^<" + props['datatype'] + ">"
+#                            elif "xml:lang" in props:
+#                                suffix = '@' + props['xml:lang']
                             try:
                                 if isinstance(props['value'], bytes):
                                     x[key] = props['value'].decode('utf-8') + suffix
@@ -103,16 +98,16 @@ def contact_source_aux(referer, server, path, port, query, queue):
                         queue.put(x)
                         cardinality += 1
                     # Every tuple is added to the queue.
-                    #for elem in reslist:
-                        # print elem
-                        #queue.put(elem)
+                    # for elem in reslist:
+                    # print elem
+                    # queue.put(elem)
 
             else:
-                print("the source " + str(server) + " answered in " + res.getheader("content-type") + " format, instead of"
-                       + " the JSON format required, then that answer will be ignored")
+                logger.error("the source " + str(server) + " answered in " + res.getheader(
+                    "content-type") + " format, instead of"
+                      + " the JSON format required, then that answer will be ignored")
     except Exception as e:
         logger.error("Exception while sending request to ", referer, "msg:", e)
-        print("Exception while sending request to ", referer, "msg:", e)
 
     # print "b - ", b
     # print server, query, len(reslist)

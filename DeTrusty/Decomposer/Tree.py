@@ -1,6 +1,3 @@
-import math
-import heapq
-import string
 import abc
 
 
@@ -71,7 +68,9 @@ class Tree(object):
 
 class Node(Tree):
 
-    def __init__(self, l, r, filters=[]):
+    def __init__(self, l, r, filters=None):
+        if filters is None:
+            filters = []
         self.left = l
         self.right = r
         self.vars = unify(l.vars, r.vars, l.dict)
@@ -161,7 +160,9 @@ def getDegree(vars0, dict0):
 
 class Leaf(Tree):
 
-    def __init__(self, s, vs, dc, filter=[]):
+    def __init__(self, s, vs, dc, filter=None):
+        if filter is None:
+            filter = []
         self.vars = vs
         self.dict = dc
         self.size = 1
@@ -304,7 +305,9 @@ def sort(lss):
     return lo
 
 
-def createLeafs(lss, filters=[]):
+def createLeafs(lss, filters=None):
+    if filters is None:
+        filters = []
     d = dict()
     for s in lss:
         l = s.getVars()
@@ -362,7 +365,9 @@ def updateFilters(node, filters):
         return Node(node.left, node.right, node.filters + filters)
 
 
-def makeNode(l, r, filters=[]):
+def makeNode(l, r, filters=None):
+    if filters is None:
+        filters = []
     if l.constantPercentage() > r.constantPercentage():
         n = Node(l, r, filters)
     else:
@@ -370,7 +375,9 @@ def makeNode(l, r, filters=[]):
     return n
 
 
-def makeBushyTree(ss, filters=[]):
+def makeBushyTree(ss, filters=None):
+    if filters is None:
+        filters = []
     (d, pq) = createLeafs(ss, filters)
 
     others = []
@@ -407,7 +414,9 @@ def makeBushyTree(ss, filters=[]):
         return None
 
 
-def makeNaiveTree(ss, filters=[]):
+def makeNaiveTree(ss, filters=None):
+    if filters is None:
+        filters = []
     (_, pq) = createLeafs(ss)
     while len(pq) > 1:
         l = pq.pop(0)
@@ -422,7 +431,9 @@ def makeNaiveTree(ss, filters=[]):
         return None
 
 
-def makeLLTree(ss, filters=[]):
+def makeLLTree(ss, filters=None):
+    if filters is None:
+        filters = []
     (_, pq) = createLeafs(ss)
     while len(pq) > 1:
         l = pq.pop(0)

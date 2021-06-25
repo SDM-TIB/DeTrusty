@@ -6,12 +6,11 @@ xsd = "http://www.w3.org/2001/XMLSchema#"
 
 class Service(object):
 
-    def __init__(self, endpoint, triples, limit=-1, filter_nested=[]):
-        endpoint = endpoint[1:len(endpoint)-1]
+    def __init__(self, endpoint, triples, limit=-1, filter_nested=None):
         self.endpoint = endpoint
         self.triples = triples
         self.filters = []
-        self.filter_nested = filter_nested# TODO: this is used to store the filters from NestedLoop operators
+        self.filter_nested = filter_nested if filter_nested is not None else []  # TODO: this is used to store the filters from NestedLoop operators
         self.limit = limit  # TODO: This arg was added in order to integrate contactSource with incremental calls (16/12/2013)
         #self.filters_vars = set(filter_vars)
 
@@ -86,7 +85,7 @@ class Service(object):
         return x + "SERVICE <" + self.endpoint + "> { \n" + triples_str + filters_str + "\n" + x + "}"
 
     def show2(self, x):
-        def pp (t):
+        def pp(t):
             return t.show2(x + "    ")
         if isinstance(self.triples, list):
             triples_str = " . \n".join(map(pp, self.triples))

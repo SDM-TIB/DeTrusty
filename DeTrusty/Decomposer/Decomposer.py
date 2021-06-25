@@ -3,7 +3,6 @@ __author__ = 'Kemele M. Endris'
 import logging
 
 import DeTrusty.Decomposer.utils as utils
-from DeTrusty.Sparql.Parser import queryParser
 from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock
 from DeTrusty.Decomposer import Tree
 
@@ -18,19 +17,24 @@ logger.addHandler(handler)
 
 class Decomposer(object):
 
-    def __init__(self, query, config, tempType="MULDER", joinstarslocally=True):
+    def __init__(self, query, config, tempType="MULDER", joinstarslocally=True, sparql_one_dot_one=False):
         self.tempType = tempType
-        self.query = queryParser.parse(query)
+        self.sparql_one_dot_one = sparql_one_dot_one
+        if not self.sparql_one_dot_one:
+            from DeTrusty.Sparql.Parser import queryParser
+            self.query = queryParser.parse(query)
+        else:
+            from DeTrusty.Sparql.Parser import queryParser1_1
+            self.query = queryParser1_1.parse(query)
         self.prefixes = utils.getPrefs(self.query.prefs)
         self.config = config
         self.joinlocally = joinstarslocally
 
     def decompose(self):
-        groups = self.decomposeUnionBlock(self.query.body)
-        if groups is None:
+        groups = self.decomposeUnionBlock(self.query.body) if not self.sparql_one_dot_one else self.query.body
+        if groups is None or not groups:
             return None
-        if groups == []:
-            return None
+
         self.query.body = groups
         logger.info('Decomposition obtained')
         logger.info(self.query)
@@ -799,24 +803,18 @@ class Decomposer(object):
 
         return JoinBlock(pl, filters=jb.filters)
 
-    def makePlanAux(self, ls, filters=[]):
+    def makePlanAux(self, ls, filters=None):
+        if filters is None:
+            filters = []
         return self.makeBushyTree(ls, filters)
 
-    def makeBushyTree(self, ls, filters=[]):
+    def makeBushyTree(self, ls, filters=None):
+        if filters is None:
+            filters = []
         return Tree.makeBushyTree(ls, filters)
 
     def makeNaiveTree(self, ls):
         return Tree.makeNaiveTree(ls)
 
-    def makeLeftLinealTree(self, ls):
+    def makeLeftLinearTree(self, ls):
         return Tree.makeLLTree(ls)
-
-#
-# if __name__ == '__main__':
-#     from mulder.molecule.MTManager import Arango
-#     for q in os.listdir("/home/kemele/git/Ontario/testqueries/bsbm/"):
-#         print "============", q, "=================="
-#         query = open("/home/kemele/git/Ontario/testqueries/bsbm/"+q).read()
-#         config = Arango("/home/kemele/git/Ontario/config/bsbm.json")
-#         dc = MediatorDecomposer(query, config)
-#         print dc.decompose()
