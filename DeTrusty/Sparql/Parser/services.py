@@ -7,7 +7,7 @@ xsd = "http://www.w3.org/2001/XMLSchema#"
 class Service(object):
 
     def __init__(self, endpoint, triples, limit=-1, filter_nested=None):
-        self.endpoint = endpoint
+        self.endpoint = endpoint[1:len(endpoint) - 1]
         self.triples = triples
         self.filters = []
         self.filter_nested = filter_nested if filter_nested is not None else []  # TODO: this is used to store the filters from NestedLoop operators
