@@ -27,6 +27,43 @@ def version():
     return Response('DeTrusty v' + app.config['VERSION'] + "\n", mimetype='text/plain')
 
 
+def run_query(query: str, sparql_one_dot_one: bool = False, config: ConfigFile = app.config['CONFIG']):
+    re_https = re.compile("https?://")
+
+    start_time = time.time()
+    decomposer = Decomposer(query, config, sparql_one_dot_one=sparql_one_dot_one)
+    decomposed_query = decomposer.decompose()
+
+    if decomposed_query is None:
+        return {"results": {}, "error": "The query cannot be answered by the endpoints in the federation."}
+
+    planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
+    plan = planner.createPlan()
+
+    output = Queue()
+    plan.execute(output)
+
+    result = []
+    r = output.get()
+    card = 0
+    while r != 'EOF':
+        card += 1
+        res = {}
+        for key, value in r.items():
+            res[key] = {"value": value, "type": "uri" if re_https.match(value) else "literal"}
+        res['__meta__'] = {"is_verified": True}
+
+        result.append(res)
+        r = output.get()
+    end_time = time.time()
+
+    return {"head": {"vars": decomposed_query.variables()},
+                    "cardinality": card,
+                    "results": {"bindings": result},
+                    "execution_time": end_time - start_time,
+                    "output_version": "2.0"}
+
+
 @app.route('/sparql', methods=['POST'])
 def sparql():
     """Retrieves a SPARQL query and returns the result."""
@@ -36,40 +73,7 @@ def sparql():
             return jsonify({"result": [], "error": "No query passed."})
         sparql1_1 = request.values.get("sparql1_1", False)
 
-        # execute the query
-        start_time = time.time()
-        decomposer = Decomposer(query, app.config['CONFIG'], sparql_one_dot_one=sparql1_1)
-        decomposed_query = decomposer.decompose()
-
-        if decomposed_query is None:
-            return jsonify({"results": {}, "error": "The query cannot be answered by the endpoints in the federation."})
-
-        planner = Planner(decomposed_query, True, contact_source, 'RDF', app.config['CONFIG'])
-        plan = planner.createPlan()
-
-        output = Queue()
-        plan.execute(output)
-
-        result = []
-        r = output.get()
-        card = 0
-        while r != 'EOF':
-            card += 1
-            logger.info("result:" + str(r))
-            res = {}
-            for key, value in r.items():
-                res[key] = {"value": value, "type": "uri" if re_https.match(value) else "literal"}
-            res['__meta__'] = {"is_verified": True}
-
-            result.append(res)
-            r = output.get()
-        end_time = time.time()
-
-        return jsonify({"head": {"vars": decomposed_query.variables()},
-                        "cardinality": card,
-                        "results": {"bindings": result},
-                        "execution_time": end_time - start_time,
-                        "output_version": "2.0"})
+        return jsonify(run_query(query, sparql1_1))
     except Exception as e:
         logger.exception(e)
         import sys

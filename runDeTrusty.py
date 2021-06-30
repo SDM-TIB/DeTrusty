@@ -10,57 +10,21 @@ from DeTrusty.Decomposer.Decomposer import Decomposer
 from DeTrusty.Decomposer.Planner import Planner
 from DeTrusty.Molecule.MTManager import ConfigFile
 from DeTrusty.Wrapper.RDFWrapper import contact_source
+from DeTrusty.flaskr import run_query
 
 logger = get_logger(__name__)
 
 
-def run_query(query: str, sparql_one_dot_one: bool = False):
-    config = ConfigFile('./Config/rdfmts.json')
-    re_https = re.compile("https?://")
-
-    start_time = time.time()
-    decomposer = Decomposer(query, config, sparql_one_dot_one=sparql_one_dot_one)
-    decomposed_query = decomposer.decompose()
-
-    if decomposed_query is None:
-        return json.dumps({"results": {}, "error": "The query cannot be answered by the endpoints in the federation."})
-
-    planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
-    plan = planner.createPlan()
-
-    output = Queue()
-    plan.execute(output)
-
-    result = []
-    r = output.get()
-    card = 0
-    while r != 'EOF':
-        card += 1
-        res = {}
-        for key, value in r.items():
-            res[key] = {"value": value, "type": "uri" if re_https.match(value) else "literal"}
-        res['__meta__'] = {"is_verified": True}
-
-        result.append(res)
-        r = output.get()
-    end_time = time.time()
-
-    return json.dumps({"head": {"vars": decomposed_query.variables()},
-                    "cardinality": card,
-                    "results": {"bindings": result},
-                    "execution_time": end_time - start_time,
-                    "output_version": "2.0"}, indent=2)
-
-
 def get_options():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h:q:o:")
+        opts, args = getopt.getopt(sys.argv[1:], "h:q:o:c:")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
 
     query_file = None
     sparql_one_dot_one = False
+    config_file = "./Config/rdfmts.json"
     for opt, arg in opts:
         if opt == "-h":
             usage()
@@ -69,24 +33,29 @@ def get_options():
             query_file = arg
         elif opt == "-o":
             sparql_one_dot_one = eval(arg)
+        elif opt == "-c":
+            config_file = arg
 
     if not query_file:
         usage()
         sys.exit(1)
 
-    return query_file, sparql_one_dot_one
+    return query_file, sparql_one_dot_one, config_file
 
 
 def usage():
-    usage_str = "Usage: {program} -q <query>"
+    usage_str = "Usage: {program} -q <query_file> -c <config_file> -o <sparql1.1>" \
+                "\nwhere \n" \
+                "<sparql1.1> is one in [True, False], when True, no decomposition is needed\n"
     print(usage_str.format(program=sys.argv[0]), )
 
 
 def main():
-    query_file, sparql_one_dot_one = get_options()
+    query_file, sparql_one_dot_one, config_file = get_options()
     try:
         query = open(query_file, "r", encoding="utf8").read()
-        print(run_query(query, sparql_one_dot_one))
+        config = ConfigFile(config_file)
+        print(json.dumps(run_query(query, sparql_one_dot_one, config), indent=2))
     except Exception as e:
         print(e)
 
