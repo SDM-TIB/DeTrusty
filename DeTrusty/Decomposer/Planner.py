@@ -734,7 +734,7 @@ class IndependentOperator(object):
     def aux(self, n):
         return self.tree.aux(n)
 
-    def execute(self, outputqueue, processqueue=Queue(), token=None):
+    def execute(self, outputqueue, processqueue=Queue()):
 
         if self.tree.service.limit == -1:
             self.tree.service.limit = 10000  # TODO: Fixed value, this can be learnt in the future
