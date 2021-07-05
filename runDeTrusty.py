@@ -1,15 +1,9 @@
 import getopt
 import json
-import re
 import sys
-import time
-from multiprocessing import Queue
 
 from DeTrusty import get_logger
-from DeTrusty.Decomposer.Decomposer import Decomposer
-from DeTrusty.Decomposer.Planner import Planner
 from DeTrusty.Molecule.MTManager import ConfigFile
-from DeTrusty.Wrapper.RDFWrapper import contact_source
 from DeTrusty.flaskr import run_query
 
 logger = get_logger(__name__)
