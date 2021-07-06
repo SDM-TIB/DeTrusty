@@ -198,11 +198,11 @@ class Planner(object):
         n = None
         dependent_join = False
 
-        if isinstance(l, IndependentOperator) and l.tree.service.triples[0].subject.constant:
+        if isinstance(l, IndependentOperator) and isinstance(l.tree.service.triples, list) and l.tree.service.triples[0].subject.constant:
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                 dependent_join = True
-        elif isinstance(r, IndependentOperator) and r.tree.service.triples[0].subject.constant:
+        elif isinstance(r, IndependentOperator) and isinstance(r.tree.service.triples, list) and r.tree.service.triples[0].subject.constant:
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                 dependent_join = True
