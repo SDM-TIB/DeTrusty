@@ -27,9 +27,7 @@ def version():
     return Response('DeTrusty v' + app.config['VERSION'] + "\n", mimetype='text/plain')
 
 
-def run_query(query: str, sparql_one_dot_one: bool = False, config: ConfigFile = app.config['CONFIG']):
-    re_https = re.compile("https?://")
-
+def run_query(query: str, sparql_one_dot_one: bool = False, config: ConfigFile = app.config['CONFIG'], print_result: bool = True):
     start_time = time.time()
     decomposer = Decomposer(query, config, sparql_one_dot_one=sparql_one_dot_one)
     decomposed_query = decomposer.decompose()
@@ -48,18 +46,19 @@ def run_query(query: str, sparql_one_dot_one: bool = False, config: ConfigFile =
     card = 0
     while r != 'EOF':
         card += 1
-        res = {}
-        for key, value in r.items():
-            res[key] = {"value": value, "type": "uri" if re_https.match(value) else "literal"}
-        res['__meta__'] = {"is_verified": True}
+        if print_result:
+            res = {}
+            for key, value in r.items():
+                res[key] = {"value": value, "type": "uri" if re_https.match(value) else "literal"}
+            res['__meta__'] = {"is_verified": True}
 
-        result.append(res)
+            result.append(res)
         r = output.get()
     end_time = time.time()
 
     return {"head": {"vars": decomposed_query.variables()},
                     "cardinality": card,
-                    "results": {"bindings": result},
+                    "results": {"bindings": result} if print_result else "printing results was disabled",
                     "execution_time": end_time - start_time,
                     "output_version": "2.0"}
 
