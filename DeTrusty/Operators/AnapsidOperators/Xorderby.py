@@ -52,23 +52,13 @@ class Xorderby(object):
         tuple = self.left.get(True)
         # print "tuple", tuple
         tuple_id = 0
-        orderargs = []
         while (tuple != "EOF"):
             results_copy.append(tuple)
             res = {}
             res.update(tuple)
             # print "tuple", tuple
             for arg in self.args:
-                if "Argument" not in str(arg.__class__.__name__):
-                    argname = self.extractName(arg)
-                    if argname.name[1:] in tuple:
-                        orderargs.append(argname)
-                else:
-                    argname = arg
-                    if argname.name[1:] in tuple:
-                        orderargs.append(arg)
-                if argname.name[1:] in tuple:
-                    res.update({argname.name[1:]: self.extractValue(tuple[argname.name[1:]])})
+                res.update({arg.name[1:]: self.extractValue(tuple[arg.name[1:]])})
             res.update({'__id__': tuple_id})
             results.append(res)
             tuple_id = tuple_id + 1
@@ -77,10 +67,9 @@ class Xorderby(object):
         # Sorting.
         self.args.reverse()
         # print "en order by ",self.args
-        for arg in orderargs:
-            if arg.name[1:] in results:
-                order_by = "lambda d: (d['" + arg.name[1:] + "'])"
-                results = sorted(results, key=eval(order_by), reverse=arg.desc)
+        for arg in self.args:
+            order_by = "lambda d: (d['" + arg.name[1:] + "'])"
+            results = sorted(results, key=eval(order_by), reverse=arg.desc)
 
         # Add results to output queue.
         for tuple in results:
@@ -108,11 +97,3 @@ class Xorderby(object):
         # Handles non-typed literals.
         else:
             return str(val)
-
-    def extractName(self, arg):
-        if "Argument" in str(arg.__class__.__name__):
-            return arg
-        else:
-            if "Argument" not in str(arg.__class__.__name__):
-                arg = self.extractName(arg.left)
-            return arg
