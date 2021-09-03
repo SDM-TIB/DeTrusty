@@ -229,7 +229,7 @@ class Leaf(Tree):
         else:
             projvars = list(set([v.name for v in query.args if not v.constant]))
         subvars = list((query.join_vars | set(projvars)) & set(vs))
-        vars_order_by = [x for v in query.order_by for x in v.getVars() if x in subvars]
+        vars_order_by = [x for v in query.order_by for x in v.getVars()]
         # print "subvar 1: ", subvars
         if subvars == []:
             subvars = vs
