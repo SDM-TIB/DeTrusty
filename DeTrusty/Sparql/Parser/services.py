@@ -866,11 +866,10 @@ class Expression(object):
             return ("(" + str(self.left)+" "+ self.op +" "+str(self.right)+ ")")
 
     def getVars(self):
-        #if (self.op=='REGEX' or self.op == 'xsd:integer' or self.op=='!' or self.op == 'BOUND' or self.op == 'ISIRI' or self.op == 'ISURI' or self.op == 'ISBLANK' or self.op == 'ISLITERAL' or self.op == 'STR' or self.op == 'LANG' or self.op == 'DATATYPE'):
-        if ((self.op in unaryFunctor) or (self.op in binaryFunctor) or (self.right is  None)):
+        if (self.op in unaryFunctor) or (self.right is None):
             return self.left.getVars()
         else:
-            return self.left.getVars()+self.right.getVars()
+            return self.left.getVars() + self.right.getVars()
 
     def getConsts(self):
         if self.op in unaryFunctor or self.right is None:
