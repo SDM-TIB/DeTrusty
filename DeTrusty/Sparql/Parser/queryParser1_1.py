@@ -1,3 +1,4 @@
+import urllib.parse
 from ply import lex, yacc
 from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Service
 
@@ -1094,4 +1095,4 @@ parser = yacc.yacc(debug=0)
 
 # Helpers
 def parse(string):
-    return parser.parse(string, lexer=lexer)
+    return parser.parse(urllib.parse.unquote(string), lexer=lexer)
