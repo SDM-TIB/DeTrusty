@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/294416497.svg)](https://zenodo.org/badge/latestdoi/294416497)
+
 # DeTrusty
 
 DeTrusty is a federated query engine.
