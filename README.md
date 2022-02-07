@@ -30,7 +30,7 @@ You can now start to make POST requests to the DeTrusty API running at localhost
 
 ## Configuring DeTrusty
 In order to set up the federation of endpoints that will be queried by DeTrusty follow these instructions.
-1. create a file including the URLs of the endpoints (one per line)
+1. create a file including the URLs of the endpoints (one per line; must be accessible from within the container)
 1. inside the container: place this file in `/DeTrusty/Config/endpoints.txt`
 1. inside the container: run `create_rdfmts.py -s /DeTrusty/Config/endpoints.txt`
 1. once it is done collecting the source descriptions, restart the container
