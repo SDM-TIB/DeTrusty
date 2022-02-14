@@ -48,7 +48,7 @@ def get_options():
 def usage():
     usage_str = "Usage: {program} -q <query_file> -c <config_file> -d <decomposition> -o <sparql1.1> -r <print_result>" \
                 "\nwhere \n" \
-                "<decomposition> is one in [STAR, EG] (default STAR). STAR decomposes the query into star-shaped sub-queries while EG follows the exclusive groups approach\n" \
+                "<decomposition> is one in [STAR, EG, TRIPLE] (default STAR). STAR decomposes the query into star-shaped sub-queries, EG follows the exclusive groups approach, TRIPLE generates a triple-wise decomposition.\n" \
                 "<sparql1.1> is one in [True, False] (default False), when True, no decomposition is needed\n" \
                 "<print_result> is one in [True, False] (default True), when False, only metadata is returned\n"
     print(usage_str.format(program=sys.argv[0]), )

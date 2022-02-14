@@ -113,6 +113,22 @@ class Decomposer(object):
         else:
             return []
 
+    def decompose_triple_wise(self, tl):
+        """
+        Decomposes the query into triple-wise sub-queries.
+        """
+        views = []
+        for sg in tl:
+            eps = self.search(sg.predicate.name)
+            if len(eps) == 1:
+                serv = Service(eps[0], sg)
+                views = views + [serv]
+            if len(eps) > 1:
+                elems = [JoinBlock([Service(ep, sg)]) for ep in eps]
+                ub = UnionBlock(elems)
+                views = views + [ub]
+        return views
+
     def decompose_exclusive_groups(self, tl):
         """
         Decomposes the query into sub-queries following the exclusive groups approach.
@@ -122,7 +138,6 @@ class Decomposer(object):
 
         for sg in tl:
             eps0 = self.search(sg.predicate.name)
-            logger.warning("endpoints for " + sg.predicate.name + ": " + str(eps0))
             if not eps0:
                 qcl0 = qcl1 = []
             elif len(eps0) == 1:
@@ -806,6 +821,7 @@ class Decomposer(object):
 class DecompositionType(Enum):
     STAR = partial(Decomposer.decomposeBGP)
     EG = partial(Decomposer.decompose_exclusive_groups)
+    TRIPLE = partial(Decomposer.decompose_triple_wise)
 
     def decompose(self, decomposer, tl):
         return self.value(decomposer, tl)
