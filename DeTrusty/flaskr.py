@@ -23,7 +23,7 @@ re_https = re.compile("https?://")
 
 @app.route('/version', methods=['POST'])
 def version():
-    """Returns the version of DeTrusty that is being run."""
+    """Returns the version of the running DeTrusty instance."""
     return Response('DeTrusty v' + app.config['VERSION'] + "\n", mimetype='text/plain')
 
 
@@ -57,10 +57,10 @@ def run_query(query: str, sparql_one_dot_one: bool = False, config: ConfigFile =
     end_time = time.time()
 
     return {"head": {"vars": decomposed_query.variables()},
-                    "cardinality": card,
-                    "results": {"bindings": result} if print_result else "printing results was disabled",
-                    "execution_time": end_time - start_time,
-                    "output_version": "2.0"}
+            "cardinality": card,
+            "results": {"bindings": result} if print_result else "printing results was disabled",
+            "execution_time": end_time - start_time,
+            "output_version": "2.0"}
 
 
 @app.route('/sparql', methods=['POST'])
