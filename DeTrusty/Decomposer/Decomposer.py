@@ -1,24 +1,21 @@
-__author__ = 'Kemele M. Endris'
+__author__ = 'Kemele M. Endris and Philipp D. Rohde'
 
-import logging
+import collections
+from enum import Enum
+from functools import partial
 
 import DeTrusty.Decomposer.utils as utils
-from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock
+from DeTrusty import get_logger
 from DeTrusty.Decomposer import Tree
+from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.FileHandler('.decompositions.log')
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+logger = get_logger(__name__, '.decompositions.log')
 
 
 class Decomposer(object):
 
-    def __init__(self, query, config, tempType="MULDER", joinstarslocally=True, sparql_one_dot_one=False):
-        self.tempType = tempType
+    def __init__(self, query, config, decompType="STAR", joinstarslocally=True, sparql_one_dot_one=False):
+        self.decomposition_type = DecompositionType[decompType]
         self.sparql_one_dot_one = sparql_one_dot_one
         if not self.sparql_one_dot_one:
             from DeTrusty.Sparql.Parser import queryParser
@@ -87,10 +84,7 @@ class Decomposer(object):
                     sl.append(pub)
 
         if tl:
-            if self.tempType == "METIS" or self.tempType == "SemEP":
-                gs = self.decomposeForMETIS(tl)
-            else:
-                gs = self.decomposeBGP(tl)
+            gs = self.decomposition_type.decompose(self, tl)
 
             if gs:
                 gs.extend(sl)
@@ -108,66 +102,56 @@ class Decomposer(object):
         else:
             return None
 
-    def decomposeForMETIS(self, tl):
-        results = []
-        stars = self.getQueryStar(tl)
+    def search(self, predicate: str) -> list:
+        """
+        Returns a list of all endpoints serving the specified predicate.
+        """
+        if predicate[0] == "<":
+            predicate = predicate[1:-1]
+        if predicate in self.config.predwrapidx:
+            return list(self.config.predwrapidx[predicate])
+        else:
+            return []
 
-        for s in stars:
-            ltr = stars[s]
-            mols = {}
-            unions = {}
-            for tp in ltr:
-                if tp.predicate.constant:
-                    p = utils.getUri(tp.predicate, self.prefixes)[1:-1]
-                    t = self.config.findbypred(p)
+    def decompose_exclusive_groups(self, tl):
+        """
+        Decomposes the query into sub-queries following the exclusive groups approach.
+        """
+        qcl0 = collections.defaultdict(list)
+        qcl1 = collections.defaultdict(list)
 
-                    if len(t) > 0:
-                        if len(t) == 1:
-                            for c in t:
-                                if c in mols:
-                                    mols[c].append(tp)
-                                else:
-                                    mols[c] = [tp]
-                                break
-                        else:
-                            unions[tp] = t
+        for sg in tl:
+            eps0 = self.search(sg.predicate.name)
+            logger.warning("endpoints for " + sg.predicate.name + ": " + str(eps0))
+            if not eps0:
+                qcl0 = qcl1 = []
+            elif len(eps0) == 1:
+                p = eps0[0]
+                qcl0[p].append(sg)
+            else:
+                qcl1[sg].extend(eps0)
 
-                    else:
-                        print("cannot find any matching cluster for:", tl)
-                        return []
-                else:
-                    mm = [m for m in self.config.metadata]
-                    unions[tp] = mm
-            for m in mols:
-                results.append(Service("<" + m + ">", mols[m]))
+        views0 = []
+        views1 = []
+        for cl in qcl0:
+            l0 = qcl0[cl]
+            serv = Service(cl, l0)
+            views0 = views0 + [serv]
+        for t in qcl1:
+            eps = qcl1[t]
+            elems = [JoinBlock([Service(ep, t)]) for ep in eps]
+            ub = UnionBlock(elems)
+            views1 = views1 + [ub]
 
-            for tp in unions.copy():
-                cs = unions[tp]
-
-                tps = [t for t in unions if t != tp and unions[t] == cs]
-                if len(tps) > 0:
-                    for u in tps:
-                        del unions[u]
-                tps.append(tp)
-                samesource = None
-                url = None
-                differents = None
-                for s in cs:
-                    wr = self.config.findMolecule(s)
-                    wrs = [w for w in wr['wrappers']]
-                    wrr = wrs[0]['url']
-                    if url is None or wrr == url:
-                        url = wrr
-                        samesource = s
-                    else:
-                        differents = s
-                        break
-                if differents is None:
-                    results.append(Service("<" + samesource + ">", tps))
-                else:
-                    results.append(UnionBlock([UnionBlock([Service("<" + c + ">", tps)]) for c in cs]))
-
-        return results
+        if views0 and views1:
+            views1.insert(0, views0)
+            return views1
+        elif views0:
+            return [views0]
+        elif views1:
+            return views1
+        else:
+            return []
 
     def decomposeBGP(self, tl):
         stars = self.getQueryStar(tl)
@@ -228,7 +212,6 @@ class Decomposer(object):
                 selectedmolecules[s] = mols
 
         molConn = self.getMTsConnection(selectedmolecules)
-        results = []
         if len(splitedstars) > 0:
             for s in splitedstars:
                 newstarpreds = {utils.getUri(tr.predicate, self.prefixes)[1:-1]: tr for tr in stars[s] if tr.predicate.constant}
@@ -818,3 +801,15 @@ class Decomposer(object):
 
     def makeLeftLinearTree(self, ls):
         return Tree.makeLLTree(ls)
+
+
+class DecompositionType(Enum):
+    STAR = partial(Decomposer.decomposeBGP)
+    EG = partial(Decomposer.decompose_exclusive_groups)
+
+    def decompose(self, decomposer, tl):
+        return self.value(decomposer, tl)
+
+    @classmethod
+    def __missing__(cls, value):
+        return DecompositionType.STAR

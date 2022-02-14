@@ -1,4 +1,4 @@
-__author__ = 'Kemele M. Endris'
+__author__ = 'Kemele M. Endris and Philipp D. Rohde'
 
 import abc
 import os
@@ -10,21 +10,17 @@ class Config(object):
         if os.path.isfile(configfile):
             self.configfile = configfile
             self.metadata = self.getAll()
-            self.wrappers = self.getWrappers()
             self.predidx = self.createPredicateIndex()
+            self.predwrapidx = self.createPredicateWrapperIndex()
         else:
             self.configfile = None
             self.metadata = {}
-            self.wrappers = {}
             self.predidx = {}
+            self.predwrapidx = {}
 
     @abc.abstractmethod
     def getAll(self):
         return
-
-    @abc.abstractmethod
-    def getWrappers(self):
-        return None
 
     def createPredicateIndex(self):
         pidx = {}
@@ -38,6 +34,20 @@ class Config(object):
                     pidx[p['predicate']].add(m)
 
         return pidx
+
+    def createPredicateWrapperIndex(self):
+        idx = {}
+        for m in self.metadata:
+            wrappers = self.metadata[m]['wrappers']
+            for wrapper in wrappers:
+                preds = wrapper['predicates']
+                for pred in preds:
+                    if pred not in idx:
+                        idx[pred] = set()
+                        idx[pred].add(wrapper['url'])
+                    else:
+                        idx[pred].add(wrapper['url'])
+        return idx
 
     def findbypreds(self, preds):
         res = []
@@ -84,22 +94,10 @@ class Config(object):
 
 class ConfigFile(Config):
     def getAll(self):
-        return self.readJsonFile(self.configfile)
+        return self.read_json_file(self.configfile)
 
-    def getWrappers(self):
-        with open(self.configfile) as f:
-            conf = json.load(f)
-        wrappers = {}
-        if "WrappersConfig" in conf:
-            if "MappingFolder" in conf['WrappersConfig']:
-                self.mappingFolder = conf['WrappersConfig']['MappingFolder']
-
-            for w in conf['WrappersConfig']:
-                wrappers[w] = conf['WrappersConfig'][w]
-
-        return wrappers
-
-    def readJsonFile(self, configfile):
+    @staticmethod
+    def read_json_file(configfile):
         try:
             with open(configfile, 'r', encoding='utf8') as f:
                 mts = json.load(f)

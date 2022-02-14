@@ -27,9 +27,13 @@ def version():
     return Response('DeTrusty v' + app.config['VERSION'] + "\n", mimetype='text/plain')
 
 
-def run_query(query: str, sparql_one_dot_one: bool = False, config: ConfigFile = app.config['CONFIG'], print_result: bool = True):
+def run_query(query: str,
+              decomposition_type: str = "STAR",
+              sparql_one_dot_one: bool = False,
+              config: ConfigFile = app.config['CONFIG'],
+              print_result: bool = True):
     start_time = time.time()
-    decomposer = Decomposer(query, config, sparql_one_dot_one=sparql_one_dot_one)
+    decomposer = Decomposer(query, config, decompType=decomposition_type, sparql_one_dot_one=sparql_one_dot_one)
     decomposed_query = decomposer.decompose()
 
     if decomposed_query is None:
@@ -71,8 +75,9 @@ def sparql():
         if query is None:
             return jsonify({"result": [], "error": "No query passed."})
         sparql1_1 = request.values.get("sparql1_1", False)
+        decomposition_type = request.values.get("decomp", "STAR")
 
-        return jsonify(run_query(query, sparql1_1))
+        return jsonify(run_query(query, decomposition_type, sparql1_1))
     except Exception as e:
         logger.exception(e)
         import sys
