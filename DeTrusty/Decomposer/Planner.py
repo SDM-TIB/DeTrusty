@@ -7,6 +7,7 @@ from multiprocessing import Process, Queue
 from DeTrusty.Decomposer.Tree import Leaf, Node
 from DeTrusty.Operators.AnapsidOperators.Xdistinct import Xdistinct
 from DeTrusty.Operators.AnapsidOperators.Xfilter import Xfilter
+from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues 
 from DeTrusty.Operators.AnapsidOperators.Xgjoin import Xgjoin
 from DeTrusty.Operators.AnapsidOperators.Xgoptional import Xgoptional
 from DeTrusty.Operators.AnapsidOperators.Xlimit import Xlimit
@@ -17,7 +18,7 @@ from DeTrusty.Operators.AnapsidOperators.Xunion import Xunion
 from DeTrusty.Operators.BlockingOperators.Union import Union
 from DeTrusty.Operators.NonBlockingOperators.NestedHashJoinFilter import NestedHashJoinFilter as NestedHashJoin
 from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalFilter import NestedHashOptionalFilter as NestedHashOptional
-from DeTrusty.Sparql.Parser.services import Service, Optional, UnionBlock, JoinBlock
+from DeTrusty.Sparql.Parser.services import Service, Optional, UnionBlock, JoinBlock, Filter, Values
 
 
 class Planner(object):
@@ -37,6 +38,9 @@ class Planner(object):
 
         query = self.query
         operatorTree = self.includePhysicalOperatorsQuery()
+
+        if (query.values):
+            operatorTree = TreePlan(Xvalues(query.values), operatorTree.vars, operatorTree)
 
         # Adds the order by operator to the plan.
         if (len(query.order_by) > 0):
@@ -112,12 +116,15 @@ class Planner(object):
         if len(tl) == 1:
             nf = self.includePhysicalOperatorsOptional(tl[0], ol)
 
-            if isinstance(tl[0], TreePlan) and isinstance(tl[0].operator, Xfilter):
+            if isinstance(tl[0], TreePlan) and (isinstance(tl[0].operator, Xfilter) or isinstance(tl[0].operator, Xvalues)):
                 return nf
             else:
-                if len(jb.filters) > 0:
+                if len(jb.filters) > 0 and isinstance(tl[0].operator, Xfilter):
                     for f in jb.filters:
                         nf = TreePlan(Xfilter(f), nf.vars, nf)
+                if len(jb.filters) > 0 and isinstance(tl[0].operator, Xvalues):
+                    for f in jb.filters:
+                        nf = TreePlan(Xvalues(f), nf.vars, nf)
                     return nf
                 else:
                     return nf
@@ -162,7 +169,10 @@ class Planner(object):
                 for f in tree.filters:
                     vars_f = f.getVarsName()
                     if set(n.vars) & set(vars_f) == set(vars_f):
-                        n = TreePlan(Xfilter(f), n.vars, n)
+                        if isinstance(f, Values):
+                            n = TreePlan(Xvalues(f), n.vars, n)
+                        if isinstance(f, Filter):
+                            n = TreePlan(Xfilter(f), n.vars, n)
             return n
 
     def includePhysicalOperatorJoinX(self, l, r):

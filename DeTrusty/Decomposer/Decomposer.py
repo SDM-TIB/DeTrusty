@@ -7,7 +7,7 @@ from functools import partial
 import DeTrusty.Decomposer.utils as utils
 from DeTrusty import get_logger
 from DeTrusty.Decomposer import Tree
-from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock
+from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values
 
 logger = get_logger(__name__, '.decompositions.log')
 
@@ -33,6 +33,7 @@ class Decomposer(object):
             return None
 
         self.query.body = groups
+        self.query.values = self.decomposeValues(self.query.values)
         logger.info('Decomposition obtained')
         logger.info(self.query)
 
@@ -42,6 +43,15 @@ class Decomposer(object):
         self.query.body = self.makePlanQuery(self.query)
 
         return self.query
+
+    def decomposeValues(self, values):
+        if values is not None:
+            vl = values.instantiate()
+            for row in vl.data_block:
+                for value in row:
+                    if value is not None:
+                        value.name = utils.getUri(value, self.prefixes)
+            return vl
 
     def decomposeUnionBlock(self, ub):
         r = []
@@ -65,15 +75,18 @@ class Decomposer(object):
                 tl.append(bgp)
             elif isinstance(bgp, Filter):
                 fl.append(bgp)
+            elif isinstance(bgp, Values):
+                 fl.append(bgp)
             elif isinstance(bgp, Optional):
                 ubb = self.decomposeUnionBlock(bgp.bgg)
                 skipp = False
-                for ot in ubb.triples:
-                    if isinstance(ot, JoinBlock) and len(ot.triples) > 1 and len(ot.filters) > 0:
-                        skipp = True
-                        break
-                if not skipp:
-                    sl.append(Optional(ubb))
+                if ubb is not None:
+                    for ot in ubb.triples:
+                        if isinstance(ot, JoinBlock) and len(ot.triples) > 1 and len(ot.filters) > 0:
+                            skipp = True
+                            break
+                    if not skipp:
+                        sl.append(Optional(ubb))
             elif isinstance(bgp, UnionBlock):
                 pub = self.decomposeUnionBlock(bgp)
                 if pub:
@@ -660,6 +673,15 @@ class Decomposer(object):
                     fl2 = self.includeFilterUnionBlock(jb, f)
                     fl1 = fl1 + fl2
             elif (isinstance(jb, Service)):
+                for f in fl:
+                    values = self.query.values
+                    if values is None and isinstance(f, Values):
+                        values = f
+                        vl = values.instantiate()
+                        for row in vl.data_block:
+                            for value in row:
+                                if value is not None:
+                                    value.name = utils.getUri(value, self.prefixes)
                 for f in fl:
                     fl2 = self.includeFilterAuxSK(f, jb.triples, jb)
                     fl1 = fl1 + fl2

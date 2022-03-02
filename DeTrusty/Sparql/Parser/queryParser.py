@@ -1,12 +1,14 @@
 import urllib.parse
 from ply import lex, yacc
-from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression
+from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values
 
 # Lexer
 reserved = {
     'UNION': 'UNION',
     'FILTER': 'FILTER',
     'OPTIONAL': 'OPTIONAL',
+    'VALUES' : 'VALUES',
+    'UNDEF' : 'UNDEF',
     'SELECT': 'SELECT',
     'DISTINCT': 'DISTINCT',
     'WHERE': 'WHERE',
@@ -161,18 +163,18 @@ lexer = lex.lex()
 # Parser
 def p_parse_sparql_0(p):
     """
-    parse_sparql : prefix_list query order_by limit offset
+    parse_sparql : prefix_list query order_by limit offset values_clause
     """
     (vs, ts, d) = p[2]
-    p[0] = Query(p[1], vs, ts, d, p[3], p[4], p[5])
+    p[0] = Query(p[1], vs, ts, d, p[6], p[3], p[4], p[5])
 
 
 def p_parse_sparql_1(p):
     """
-    parse_sparql : prefix_list query order_by offset limit
+    parse_sparql : prefix_list query order_by offset limit values_clause
     """
     (vs, ts, d) = p[2]
-    p[0] = Query(p[1], vs, ts, d, p[3], p[5], p[4])
+    p[0] = Query(p[1], vs, ts, d, p[6], p[3], p[5], p[4])
 
 
 def p_prefix_list(p):
@@ -223,6 +225,27 @@ def p_uri_2(p):
     """
     p[0] = p[1]
 
+
+def p_values_clause_0(p):
+    """
+    values_clause : VALUES LPAR var_list RPAR LKEY data_block RKEY
+    """
+    p[0] = Values(p[3], p[6])
+
+
+def p_values_clause_1(p):
+    """
+    values_clause : VALUES var_list LKEY data_block RKEY
+    """
+    p[0] = Values(p[2], p[4])
+
+
+def p_values_clause_2(p):
+    """
+    values_clause : empty
+    """
+    p[0] = None 
+  
 
 def p_order_by_0(p):
     """
@@ -412,6 +435,8 @@ def p_join_block_0(p):
     """
     if p[4] != [] and isinstance(p[4][0], Filter):
         p[0] = [UnionBlock(p[2])] + p[4]
+    if p[4] != [] and isinstance(p[4][0], Values):
+        p[0] = [UnionBlock(p[2])] + p[4]
     elif p[4] != []:
         p[0] = [UnionBlock(p[2])] + [JoinBlock(p[4])]
     else:
@@ -506,6 +531,87 @@ def p_bgp_6(p):
         p[0] = p[2][0]
     else:
         p[0] = JoinBlock(p[2])
+
+
+def p_bgp_7(p):
+    """
+    bgp : VALUES LPAR var_list RPAR LKEY data_block RKEY
+    """
+    p[0] = Values(p[3], p[6])
+
+
+def p_bgp_8(p):
+    """
+    bgp : VALUES var_list LKEY data_block RKEY
+    """
+    p[0] = Values(p[2], p[4])
+
+def p_data_block_0(p):
+    """
+    data_block : data_block LPAR values_list RPAR
+    """ 
+    p[0] = p[1] + [p[3]]
+
+
+def p_data_block_1(p):
+    """
+    data_block : data_block values_list
+    """ 
+    p[0] = p[1] + [p[2]]
+
+
+def p_data_block_2(p):
+    """
+    data_block : values_list
+    """
+    p[0] = [p[1]]
+
+
+def p_data_block_3(p):
+    """
+    data_block : LPAR values_list RPAR
+    """
+    p[0] = [p[2]]
+
+
+def p_values_list_0(p):
+    """
+    values_list : values_list value_arg
+    """
+    p[0] = p[1] + [p[2]]
+
+
+def p_values_list_1(p):
+    """
+    values_list : value_arg
+    """
+    p[0] = [p[1]]
+
+
+def p_value_arg_0(p):
+    """
+    value_arg : uri
+    """
+    p[0] = Argument(p[1], True)
+
+
+def p_value_arg_1(p):
+    """
+    value_arg : CONSTANT
+    """
+    c = p[1].strip()
+    p[0] = Argument(p[1], True)
+    if xsd in p[1]:
+        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^")+1:])
+    if "@" in p[1]:
+        p[0] = Argument(c[:c.find("^")], True, datatype="<" + xsd + "string>", lang=c[c.rfind("@")+1:])
+
+
+def p_value_arg_2(p):
+    """
+    value_arg : UNDEF
+    """
+    p[0] = None 
 
 
 def p_expression_0(p):
