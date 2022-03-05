@@ -55,11 +55,11 @@ def usage():
 
 
 def main():
-    query_file, decomposition_tpye, sparql_one_dot_one, config_file, print_result = get_options()
+    query_file, decomposition_type, sparql_one_dot_one, config_file, print_result = get_options()
     try:
         query = open(query_file, "r", encoding="utf8").read()
         config = ConfigFile(config_file)
-        print(json.dumps(run_query(query, decomposition_tpye, sparql_one_dot_one, config, print_result), indent=2))
+        print(json.dumps(run_query(query, decomposition_type, sparql_one_dot_one, config, print_result), indent=2))
     except Exception as e:
         print(e)
 
