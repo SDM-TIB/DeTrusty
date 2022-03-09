@@ -10,8 +10,8 @@ RUN python -m pip install --upgrade --no-cache-dir pip==22.0.* setuptools==60.9.
 
 # copy the source code into the container
 COPY . /DeTrusty
-RUN cd /DeTrusty && python3 setup.py install && mkdir -p Config
+RUN cd /DeTrusty && python -m pip install -e . && mkdir -p Config
 WORKDIR /DeTrusty/DeTrusty
 
 # start the Flask app
-ENTRYPOINT ["gunicorn", "-c", "/DeTrusty/DeTrusty/gunicorn.conf.py", "flaskr:app"]
+ENTRYPOINT ["/DeTrusty/start-services.sh"]
