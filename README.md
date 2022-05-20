@@ -23,11 +23,15 @@ This list might not be exhaustive. Please, let us know if we missed something.
 ## Running DeTrusty
 In order to run DeTrusty, build the Docker image from the source code:
 
-``docker build . -t sdmtib/detrusty:v0.2.0``
+``docker build . -t sdmtib/detrusty:latest``
 
-Once the Docker image is built, you can start DeTrusty:
+Or pull it from DockerHub:
 
-``docker run --name DeTrusty -d -p 5000:5000 sdmtib/detrusty:v0.4.0``
+``docker pull sdmtib/detrusty:latest``
+
+Once the Docker image is built or pulled, you can start DeTrusty:
+
+``docker run --name DeTrusty -d -p 5000:5000 sdmtib/detrusty:latest``
 
 You can now start to make POST requests to the DeTrusty API running at localhost:5000.
 
