@@ -33,7 +33,9 @@ class Decomposer(object):
             return None
 
         self.query.body = groups
-        self.query.values = self.decomposeValues(self.query.values)
+        self.query.values = self.decomposeValues(self.query.values) if not self.sparql_one_dot_one else None
+        if self.query.order_by == -1:
+            self.query.order_by = []
         logger.info('Decomposition obtained')
         logger.info(self.query)
 

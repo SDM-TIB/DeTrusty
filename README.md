@@ -27,7 +27,7 @@ In order to run DeTrusty, build the Docker image from the source code:
 
 Once the Docker image is built, you can start DeTrusty:
 
-``docker run --name DeTrusty -d -p 5000:5000 sdmtib/detrusty:v0.2.0``
+``docker run --name DeTrusty -d -p 5000:5000 sdmtib/detrusty:v0.4.0``
 
 You can now start to make POST requests to the DeTrusty API running at localhost:5000.
 
@@ -37,6 +37,10 @@ In order to set up the federation of endpoints that will be queried by DeTrusty 
 1. inside the container: place this file in `/DeTrusty/Config/endpoints.txt`
 1. inside the container: run `create_rdfmts.py -s /DeTrusty/Config/endpoints.txt`
 1. once it is done collecting the source descriptions, restart the container
+
+## DeTrusty Interface
+DeTrusty can be queried using your favorite browser. DeTrusty makes use of YASGUI which is accessible at `/sparql`.
+If you started the container as above, the full URL is `localhost:5000/sparql`.
 
 ## DeTrusty API
 You can use DeTrusty by making POST requests to its API.

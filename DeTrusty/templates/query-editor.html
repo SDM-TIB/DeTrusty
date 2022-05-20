@@ -1,0 +1,37 @@
+<head>
+  <link href="https://unpkg.com/@triply/yasgui@4.2.25/build/yasgui.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://unpkg.com/@triply/yasgui@4.2.25/build/yasgui.min.js"></script>
+  <style>
+    .yasgui .autocompleteWrapper,
+    .yasgui .controlbar,
+    .yasqe .yasqe_buttons .yasqe_share {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="yasgui"></div>
+  <script>
+    const yasgui = new Yasgui(document.getElementById("yasgui"), {
+      yasqe: {
+        // modify codemirror tab handling to solely use 2 spaces
+        tabSize: 2,
+        indentUnit: 2,
+        // set default query
+        value: "SELECT DISTINCT ?concept\nWHERE {\n\t?s a ?concept\n} LIMIT 10"
+      },
+      extraKeys: {
+        Tab: function (cm) {
+          var spaces = new Array(cm.getOption("indentUnit") + 1).join(" ");
+          cm.replaceSelection(spaces);
+        }
+      },
+      requestConfig: {
+        // configuring the endpoint for DeTrusty
+        endpoint: '/sparql',
+        method: 'POST',
+        args: [{name: "yasqe", value: true}]
+      }
+    });
+  </script>
+</body>

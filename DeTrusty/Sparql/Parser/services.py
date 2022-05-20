@@ -155,14 +155,14 @@ class Service(object):
 
 class Query(object):
 
-    def __init__(self, prefs, args, body, distinct, values, order_by=[], limit=-1, offset=-1, filter_nested=''):
+    def __init__(self, prefs, args, body, distinct, values, order_by=None, limit=-1, offset=-1, filter_nested=''):
         self.prefs = prefs
         self.args = args
         self.body = body
         self.distinct = distinct
         self.values = values
         self.join_vars = self.getJoinVars()
-        self.order_by = order_by
+        self.order_by = order_by if order_by is not None else []
         self.limit = limit
         self.offset = offset
         self.filter_nested = filter_nested
