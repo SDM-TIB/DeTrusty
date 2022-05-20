@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-
 import setuptools
+
+with open("VERSION", "r", encoding="utf-8") as ver:
+    version = ver.read()
 
 setuptools.setup(
     name='DeTrusty',
-    version='0.2.0',
+    version=version,
     description='DeTrusty - Decentralized and Trustable Query Engine',
     author='Philipp D. Rohde',
     author_email='philipp.rohde@tib.eu',
