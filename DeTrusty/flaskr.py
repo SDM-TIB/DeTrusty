@@ -17,6 +17,7 @@ app = Flask(__name__)
 app.config['VERSION'] = os.environ.get("VERSION")
 app.config['JSON_AS_ASCII'] = False
 app.config['CONFIG'] = ConfigFile('/DeTrusty/Config/rdfmts.json')
+app.config['JOIN_STARS_LOCALLY'] = os.environ.get("JOIN_STARS_LOCALLY", True)
 
 re_https = re.compile("https?://")
 
@@ -33,7 +34,10 @@ def run_query(query: str,
               config: ConfigFile = app.config['CONFIG'],
               print_result: bool = True):
     start_time = time.time()
-    decomposer = Decomposer(query, config, decompType=decomposition_type, sparql_one_dot_one=sparql_one_dot_one)
+    decomposer = Decomposer(query, config,
+                            decompType=decomposition_type,
+                            joinstarslocally=app.config['JOIN_STARS_LOCALLY'],
+                            sparql_one_dot_one=sparql_one_dot_one)
     decomposed_query = decomposer.decompose()
 
     if decomposed_query is None:
