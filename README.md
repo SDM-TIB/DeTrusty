@@ -14,8 +14,9 @@ However, the parts about the explainability and trustworthiness have not been im
 DeTrusty only supports `SELECT` queries.
 The following SPARQL 1.1 operations are not supported:
 - Aggregation functions, e.g., `COUNT`, `MAX`
-- `GROUP BY` clause
+- `GROUP BY` clause (including `HAVING`)
 - `BIND` clause
+- Specifying RDF datasets using `FROM`, `FROM NAMED`, or `GRAPH`
 
 This list might not be exhaustive. Please, let us know if we missed something.
 
