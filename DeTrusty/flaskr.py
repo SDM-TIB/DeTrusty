@@ -10,6 +10,7 @@ from multiprocessing import Queue
 import time
 import os
 import re
+from distutils.util import strtobool
 
 logger = get_logger(__name__)
 
@@ -17,7 +18,7 @@ app = Flask(__name__)
 app.config['VERSION'] = os.environ.get("VERSION")
 app.config['JSON_AS_ASCII'] = False
 app.config['CONFIG'] = ConfigFile('/DeTrusty/Config/rdfmts.json')
-app.config['JOIN_STARS_LOCALLY'] = os.environ.get("JOIN_STARS_LOCALLY", True)
+app.config['JOIN_STARS_LOCALLY'] = bool(strtobool(os.environ.get("JOIN_STARS_LOCALLY", 'True')))
 
 re_https = re.compile("https?://")
 re_service = re.compile(r".*[^:][Ss][Ee][Rr][Vv][Ii][Cc][Ee]\s*<.+>\s*{.*", flags=re.DOTALL)
