@@ -1,0 +1,21 @@
+{
+  "description": "Federated Query Engine over RDF Sources",
+  "access_right": "open",
+  "license": "GPL-3.0-or-later",
+  "upload_type": "software",
+  "creators": [
+    {
+      "affiliation": "TIB Leibniz Information Centre for Science and Technology",
+      "name": "Philipp D. Rohde",
+      "orcid": "0000-0002-9835-4354"
+    },
+    {
+      "affiliation": "TIB Leibniz Information Centre for Science and Technology",
+      "name": "Mazen Bechara"
+    }
+  ],
+  "keywords": [
+    "sparql",
+    "federated-query"
+  ]
+}
