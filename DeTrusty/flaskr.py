@@ -1,7 +1,5 @@
 __author__ = "Philipp D. Rohde"
 
-import logging
-
 from flask import Flask, Response, request, jsonify, render_template
 from DeTrusty import get_logger
 from DeTrusty.Molecule.MTManager import ConfigFile
@@ -87,44 +85,9 @@ def sparql():
         decomposition_type = request.values.get("decomp", "STAR")
         yasqe = request.values.get("yasqe", False)
 
-        logger = logging.getLogger('gunicorn.error')
-        logger.critical("\n****************************************\nQUERY\n" + query + "\n****************************************")
-        logger.critical("Query includes SERVICE: " + str(re_service.match(query)))
-        logger.critical("Query includes HTTP(S): " + str(re_https.match(query)))
-
         if yasqe and re_service.match(query):
             sparql1_1 = True
 
-        fake_result = {
-            "cardinality": 2,
-            "output_version": "2.0",
-            "execution_time": "0.0000300312",
-            "head": {
-#                "link": [],
-                "vars": [
-                    "concept"
-                ]
-            },
-            "results": {
-#                "distinct": False,
-#                "ordered": True,
-                "bindings": [
-                    {
-                        "concept": {
-                            "type": "uri",
-                            "value": "http://www.openlinksw.com/schemas/virtrdf#QuadMapFormat"
-                        }
-                    },
-                    {
-                        "concept": {
-                            "type": "uri",
-                            "value": "http://www.openlinksw.com/schemas/virtrdf#QuadStorage"
-                        }
-                    }
-                ]
-            }
-        }
-        #return jsonify(fake_result)
         return jsonify(run_query(query, decomposition_type, sparql1_1, yasqe=yasqe))
     except Exception as e:
         logger.exception(e)
