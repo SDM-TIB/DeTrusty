@@ -182,7 +182,10 @@ class Query(object):
         return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + values_str + "\n" + self.filter_nested + "\n}"
 
     def variables(self):
-        return [str(arg).replace('?', '') for arg in self.args]
+        if not self.args:
+            return [var.replace('?', '') for var in set(self.body.getVars())]
+        else:
+            return [str(arg).replace('?', '') for arg in self.args]
 
     def instantiate(self, d):
         new_args = []
@@ -1047,6 +1050,8 @@ class Triple(object):
         l = []
         if not self.subject.constant:
             l.append(self.subject.name)
+        if not self.predicate.constant:
+            l.append(self.predicate.name)
         if not self.theobject.constant:
             l.append(self.theobject.name)
         return l
