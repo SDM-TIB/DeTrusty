@@ -57,7 +57,7 @@ def contact_source_aux(referer, server, path, port, query, queue):
         server = server.replace('0.0.0.0', 'localhost')
 
     js = "application/sparql-results+json"
-    params = {'query': query, 'format': js}
+    params = {'query': query, 'format': 'JSON'}
     headers = {"User-Agent":
                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
                "Accept": js}
