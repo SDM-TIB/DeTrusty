@@ -130,5 +130,8 @@ SELECT ?s WHERE {
 python runDeTrusty.py -q ./query.sparql -o True
 ```
 
+## DeTrusty GUI
+Starting with version 0.4.0, DeTrusty also comes with a Web interface. The Web interface uses the JavaScript library [YASGUI](https://triply.cc/docs/yasgui). The interface is accessible from `localhost:5000/sparql`.
+
 ## License
 DeTrusty is licensed under GPL-3.0.
