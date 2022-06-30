@@ -1,4 +1,5 @@
 [![Latest Release](http://img.shields.io/github/release/SDM-TIB/DeTrusty.svg?logo=github)](https://github.com/SDM-TIB/DeTrusty/releases)
+[![Docker Image](https://img.shields.io/badge/Docker%20Image-sdmtib/detrusty-blue?logo=Docker)](https://hub.docker.com/r/sdmtib/detrusty)
 [![DOI](https://zenodo.org/badge/294416497.svg)](https://zenodo.org/badge/latestdoi/294416497)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
