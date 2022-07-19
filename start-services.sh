@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd /DeTrusty/
-gunicorn -c DeTrusty/gunicorn.conf.py flaskr:app
+gunicorn -c DeTrusty/App/gunicorn.conf.py flaskr:app

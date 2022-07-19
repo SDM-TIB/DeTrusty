@@ -4,9 +4,9 @@ import getopt
 import json
 import sys
 
-from DeTrusty import get_logger
+from DeTrusty.Logger import get_logger
+from DeTrusty import run_query
 from DeTrusty.Molecule.MTManager import ConfigFile
-from DeTrusty.flaskr import run_query
 
 logger = get_logger(__name__)
 
@@ -59,9 +59,13 @@ def main():
     try:
         query = open(query_file, "r", encoding="utf8").read()
         config = ConfigFile(config_file)
-        print(json.dumps(run_query(query, decomposition_type, sparql_one_dot_one, config, print_result), indent=2))
+        print(json.dumps(run_query(query, decomposition_type, sparql_one_dot_one, config, print_result=print_result), indent=2))
     except Exception as e:
-        print(e)
+        import sys
+        import traceback
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        emsg = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        print(emsg)
 
 
 if __name__ == '__main__':

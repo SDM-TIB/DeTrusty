@@ -5,7 +5,7 @@ from enum import Enum
 from functools import partial
 
 from DeTrusty.Decomposer import utils as utils
-from DeTrusty import get_logger
+from DeTrusty.Logger import get_logger
 from DeTrusty.Decomposer import Tree
 from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values
 

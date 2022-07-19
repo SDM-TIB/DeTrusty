@@ -2,7 +2,7 @@ import re
 import urllib.parse
 import urllib.request
 
-from DeTrusty import get_logger
+from DeTrusty.Logger import get_logger
 
 logger = get_logger(__name__)
 
