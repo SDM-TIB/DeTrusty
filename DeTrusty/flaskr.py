@@ -3,8 +3,7 @@ __author__ = "Philipp D. Rohde"
 from flask import Flask, Response, request, jsonify, render_template
 from DeTrusty import get_logger
 from DeTrusty.Molecule.MTManager import ConfigFile
-from DeTrusty.Decomposer.Decomposer import Decomposer
-from DeTrusty.Decomposer.Planner import Planner
+from DeTrusty.Decomposer import Decomposer, Planner
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 from multiprocessing import Queue
 import time
