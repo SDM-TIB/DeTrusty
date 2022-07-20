@@ -1,4 +1,3 @@
-import re
 import urllib.parse
 import urllib.request
 
@@ -15,17 +14,8 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1):
     b = None
     cardinality = 0
 
-    referer = server
-    server = re.split("https?://", server)[1]
-    if '/' in server:
-        (server, path) = server.split("/", 1)
-    else:
-        path = ""
-    host_port = server.split(":")
-    port = 80 if len(host_port) == 1 else host_port[1]
-
     if limit == -1:
-        b, cardinality = contact_source_aux(referer, server, path, port, query, queue)
+        b, cardinality = contact_source_aux(server, query, queue)
     else:
         # Contacts the datasource (i.e. real endpoint) incrementally,
         # retrieving partial result sets combining the SPARQL sequence
@@ -36,7 +26,7 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1):
 
         while True:
             query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
-            b, card = contact_source_aux(referer, server, path, port, query_copy, queue)
+            b, card = contact_source_aux(server, query_copy, queue)
             cardinality += card
             if card < limit:
                 break
@@ -48,13 +38,10 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1):
     return b
 
 
-def contact_source_aux(referer, server, path, port, query, queue):
+def contact_source_aux(server, query, queue):
     # Setting variables to return.
     b = None
     cardinality = 0
-
-    if '0.0.0.0' in server:
-        server = server.replace('0.0.0.0', 'localhost')
 
     js = "application/sparql-results+json"
     params = {'query': query, 'format': 'JSON'}
@@ -64,7 +51,7 @@ def contact_source_aux(referer, server, path, port, query, queue):
     try:
         data = urllib.parse.urlencode(params)
         data = data.encode('utf-8')
-        req = urllib.request.Request(referer, data, headers)
+        req = urllib.request.Request(server, data, headers)
         with urllib.request.urlopen(req) as response:
             resp = response.read()
             resp = resp.decode()
@@ -107,7 +94,7 @@ def contact_source_aux(referer, server, path, port, query, queue):
                     "content-type") + " format, instead of"
                       + " the JSON format required, then that answer will be ignored")
     except Exception as e:
-        logger.error("Exception while sending request to ", referer, "msg:", e)
+        logger.error("Exception while sending request to " + str(server) + "msg: " + str(e))
 
     # print "b - ", b
     # print server, query, len(reslist)
