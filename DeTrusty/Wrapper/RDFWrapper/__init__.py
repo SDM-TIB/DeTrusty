@@ -94,10 +94,7 @@ def contact_source_aux(server, query, queue):
                     "content-type") + " format, instead of"
                       + " the JSON format required, then that answer will be ignored")
     except Exception as e:
-        logger.error("Exception while sending request to " + str(server) + "msg: " + str(e))
+        logger.error("Exception while sending request to " + str(server) + " - msg: " + str(e))
+        return None, -2  # indicating an error during the query execution
 
-    # print "b - ", b
-    # print server, query, len(reslist)
-
-    # print "Contact Source returned: ", len(reslist), ' results'
     return b, cardinality
