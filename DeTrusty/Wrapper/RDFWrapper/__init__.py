@@ -35,7 +35,7 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1):
 
     # Close the queue
     queue.put("EOF")
-    return b
+    return b, cardinality
 
 
 def contact_source_aux(server, query, queue):
