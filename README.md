@@ -14,8 +14,9 @@ The current version is a federated query engine following the SPARQL 1.1 protoco
 However, the parts about the explainability and trustworthiness have not been implemented yet.**
 
 DeTrusty only supports `SELECT` queries.
-The following SPARQL 1.1 operations are not supported:
+The following SPARQL 1.1 operations are not supported (yet):
 - Aggregation functions, e.g., `COUNT`, `MAX`
+- Conditional functions, e.g., `IF`, `BOUND`, `COALESCE` 
 - `GROUP BY` clause (including `HAVING`)
 - `BIND` clause
 - Specifying RDF datasets using `FROM`, `FROM NAMED`, or `GRAPH`
