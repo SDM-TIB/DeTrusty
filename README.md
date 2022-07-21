@@ -45,10 +45,6 @@ In order to set up the federation of endpoints that will be queried by DeTrusty 
 1. inside the container: run `create_rdfmts.py -s /DeTrusty/Config/endpoints.txt`
 1. once it is done collecting the source descriptions, restart the container
 
-## DeTrusty Interface
-DeTrusty can be queried using your favorite browser. DeTrusty makes use of YASGUI which is accessible at `/sparql`.
-If you started the container as above, the full URL is `localhost:5000/sparql`.
-
 ## DeTrusty API
 You can use DeTrusty by making POST requests to its API.
 In the following, the different API calls are described.
@@ -134,7 +130,10 @@ python runDeTrusty.py -q ./query.sparql -o True
 ```
 
 ## DeTrusty GUI
-Starting with version 0.4.0, DeTrusty also comes with a Web interface. The Web interface uses the JavaScript library [YASGUI](https://triply.cc/docs/yasgui). The interface is accessible from `localhost:5000/sparql`.
+Starting with version 0.4.0, DeTrusty also comes with a Web interface.
+Hence, you can run queries using your favorite browser.
+The Web interface uses the JavaScript library [YASGUI](https://triply.cc/docs/yasgui).
+If you started the container as described above, the interface is accessible at `localhost:5000/sparql`.
 
 ## License
 DeTrusty is licensed under GPL-3.0.
