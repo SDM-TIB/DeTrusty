@@ -31,11 +31,9 @@ def get_options(argv):
     return endpoints, output
 
 
-def usage():  # TODO: update the output
+def usage():
     usage_str = (
-        'Usage: {program}\n'
-        '-s <path/to/endpoints.txt>\n'
-        '-o <path/to/output.json>\n'
+        'Usage: {program} -s <path/to/endpoints.txt> [-o <path/to/output.json>]\n'
         'where\n'
         '    <path/to/endpoints.txt> - path to a text file containing a list of SPARQL endpoint URLs\n'
         '    <path/to/output.json> - name of output file\n'
@@ -48,7 +46,7 @@ if __name__ == '__main__':
     with open(endpoints_file, 'r') as f:
         endpoints = f.readlines()
         if len(endpoints) == 0:
-            logger.critical("Endpoints file should have at least one url")
+            logger.critical("The endpoints file should contain at least one URL")
             sys.exit(1)
     endpoints = [e for e in [e.strip('\n') for e in endpoints] if e]
     create_rdfmts(endpoints, output)
