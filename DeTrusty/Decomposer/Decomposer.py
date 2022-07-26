@@ -26,6 +26,7 @@ class Decomposer(object):
         self.prefixes = utils.getPrefs(self.query.prefs)
         self.config = config
         self.joinlocally = joinstarslocally
+        self.alltriplepatterns = []
 
     def decompose(self):
         groups = self.decomposeUnionBlock(self.query.body) if not self.sparql_one_dot_one else self.query.body
@@ -75,6 +76,7 @@ class Decomposer(object):
         for bgp in jb.triples:
             if isinstance(bgp, Triple):
                 tl.append(bgp)
+                self.alltriplepatterns.append(bgp)
             elif isinstance(bgp, Filter):
                 fl.append(bgp)
             elif isinstance(bgp, Values):
