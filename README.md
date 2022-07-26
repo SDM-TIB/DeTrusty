@@ -130,7 +130,7 @@ The Web interface uses the JavaScript library [YASGUI](https://triply.cc/docs/ya
 If you started the container as described above, the interface is accessible at `localhost:5000/sparql`.
 
 ### DeTrusty as a Library
-DeTrusty can also be used as a library. You first need to install it via `python3 -m pip install DeTrusty`.
+Starting with version 0.5.0, DeTrusty can also be used as a library. You first need to install it via `python3 -m pip install DeTrusty`.
 The following example script shows how you can use DeTrusty within your project.
 
 ```python
