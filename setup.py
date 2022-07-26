@@ -37,7 +37,7 @@ setuptools.setup(
                       'Flask==2.0.3',
                       'ply==3.11'],
     include_package_data=True,
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',

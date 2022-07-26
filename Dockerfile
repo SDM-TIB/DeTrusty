@@ -1,7 +1,7 @@
 FROM python:3.9.10-slim-buster
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
-ENV VERSION="0.4.5"
+ENV VERSION="0.5.0"
 
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
