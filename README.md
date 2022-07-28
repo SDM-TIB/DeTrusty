@@ -147,7 +147,18 @@ print(query_result)
 ```
 
 Of course, you can also further process the results according to your needs.
+
 If you want to execute a SPARQL 1.1 query with the SERVICE clause, add the parameter `sparql_one_dot_one=True` to your call of `run_query`.
+It is also not necessary to collect the metadata in that case.
+
+```python
+from DeTrusty import run_query
+
+query = "SELECT ?s WHERE { SERVICE <https://dbpedia.org/sparql> { ?s a <http://dbpedia.org/ontology/Scientist> }} LIMIT 10"
+query_result = run_query(query, sparql_one_dot_one=True)
+
+print(query_result)
+```
 
 ## License
 DeTrusty is licensed under GPL-3.0.
