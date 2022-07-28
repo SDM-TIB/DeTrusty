@@ -160,5 +160,29 @@ query_result = run_query(query, sparql_one_dot_one=True)
 print(query_result)
 ```
 
+#### Running Multiple Queries
+The aforementioned method is not very performant in a use case where multiple queries will be executed over the same federation of endpoints.
+This is due to the fact, that the `run_query` method will read the metadata from file by default.
+You can keep the metadata in its internal representation and pass it to the `run_query` method in oder to save the time of reading it from file everytime.
+
+```python
+from DeTrusty.Molecule.MTCreation import create_rdfmts
+from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty import run_query
+
+endpoints = ['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql']
+rdfmt_file = './Config/rdfmts.json'
+create_rdfmts(endpoints, rdfmt_file)
+config = ConfigFile(rdfmt_file)
+
+query = "SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/Scientist> } LIMIT 10"
+query_result = run_query(query, config=config)  # pass config file to avoid reading from file again
+print(query_result)
+
+query2 = "SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/City> } LIMIT 10"
+query2_result = run_query(query2, config=config)  # pass config file to avoid reading from file again
+print(query2_result)
+```
+
 ## License
 DeTrusty is licensed under GPL-3.0.
