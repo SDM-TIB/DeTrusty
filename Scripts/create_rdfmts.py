@@ -1,30 +1,51 @@
 #!/usr/bin/env python3
 
 import getopt
+import json
+
 from DeTrusty.Molecule.MTCreation import *
 
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, 'h:s:o:')
+        opts, args = getopt.getopt(argv, 'h:s:o:p')
     except getopt.GetoptError:
         usage()
         sys.exit(1)
 
-    endpoints = None
+    endpoints_file = None
     output = DEFAULT_OUTPUT_PATH
+    plain_text = False
     for opt, arg in opts:
         if opt == '-h':
             usage()
             sys.exit()
         elif opt == '-s':
-            endpoints = arg
+            endpoints_file = arg
         elif opt == '-o':
             output = arg
+        elif opt == '-p':
+            plain_text = True
 
-    if not endpoints:
+    if not endpoints_file:
         usage()
         sys.exit(1)
+
+    endpoints: list
+    if plain_text:
+        with open(endpoints_file, 'r') as f:
+            endpoints = f.readlines()
+            if len(endpoints) == 0:
+                logger.critical("The endpoints file should contain at least one URL")
+                sys.exit(1)
+            endpoints = [Endpoint(e) for e in [e.strip('\n') for e in endpoints]]
+    else:
+        endpoints = []
+        with open(endpoints_file, 'r') as f:
+            data = json.load(f)
+            for elem in data:
+                url = elem.pop('url')
+                endpoints.append(Endpoint(url, elem))
 
     if '.json' not in output:
         output += '.json'
@@ -42,11 +63,5 @@ def usage():
 
 
 if __name__ == '__main__':
-    endpoints_file, output = get_options(sys.argv[1:])
-    with open(endpoints_file, 'r') as f:
-        endpoints = f.readlines()
-        if len(endpoints) == 0:
-            logger.critical("The endpoints file should contain at least one URL")
-            sys.exit(1)
-    endpoints = [e for e in [e.strip('\n') for e in endpoints] if e]
+    endpoints, output = get_options(sys.argv[1:])
     create_rdfmts(endpoints, output)

@@ -6,6 +6,7 @@ import multiprocessing
 import sys
 from queue import Queue
 from time import time
+from typing import List
 
 from DeTrusty.Logger import get_logger
 from DeTrusty.Wrapper.RDFWrapper import contact_source
@@ -26,7 +27,14 @@ metas = [
 ]
 
 
-def create_rdfmts(endpoints: list, output: str = DEFAULT_OUTPUT_PATH):
+class Endpoint:
+    """Simple representation of an endpoint. URL is mandatory but an endpoint might have optional parameters."""
+    def __init__(self, url: str, params: dict = None):
+        self.url = url
+        self.params = params
+
+
+def create_rdfmts(endpoints: List[Endpoint], output: str = DEFAULT_OUTPUT_PATH):
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
     logger_wrapper.setLevel(logging.WARNING)  # temporarily disable logging of contacting the source
 
@@ -52,10 +60,10 @@ def create_rdfmts(endpoints: list, output: str = DEFAULT_OUTPUT_PATH):
     if len(endpoints) == 0:
         logger.critical('None of the endpoints can be accessed. Please check if you write URLs properly!')
         sys.exit(1)
-    for url in endpoints:
+    for e in endpoints:
         tq = multiprocessing.Queue()
-        eoffs[url] = tq
-        p1 = multiprocessing.Process(target=_collect_rdfmts_from_source, args=(url, tq,))
+        eoffs[e.url] = tq
+        p1 = multiprocessing.Process(target=_collect_rdfmts_from_source, args=(e, tq,))
         epros.append(p1)
         p1.start()
 
@@ -73,15 +81,15 @@ def create_rdfmts(endpoints: list, output: str = DEFAULT_OUTPUT_PATH):
     # now the interlinking
     eofflags = []
     epros = []
-    for e1 in sparqlendps:
-        for e2 in sparqlendps:
+    for e1 in endpoints:
+        for e2 in endpoints:
             if e1 == e2:
                 continue
             q = multiprocessing.Queue()
             eofflags.append(q)
-            logger.info('Finding inter-links between: ' + e1 + ' and ' + e2)
+            logger.info('Finding inter-links between: ' + e1.url + ' and ' + e2.url)
             logger.info('==============================//=========//===============================')
-            p = multiprocessing.Process(target=_get_links, args=(e1, sparqlendps[e1], e2, sparqlendps[e2], q,))
+            p = multiprocessing.Process(target=_get_links, args=(e1, sparqlendps[e1.url], e2, sparqlendps[e2.url], q,))
             epros.append(p)
             p.start()
 
@@ -117,10 +125,10 @@ def create_rdfmts(endpoints: list, output: str = DEFAULT_OUTPUT_PATH):
     logger_wrapper.setLevel(logging.INFO)  # reset the logger
 
 
-def _collect_rdfmts_from_source(endpoint, tq):
+def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
     # get the typed concepts, predicates, etc. for one source
     concepts = _get_typed_concepts(endpoint)
-    logger.info(endpoint + ': ' + str(concepts))
+    logger.info(endpoint.url + ': ' + str(concepts))
     molecules = []
     for c in concepts:
         if '^^' in c:
@@ -136,18 +144,19 @@ def _collect_rdfmts_from_source(endpoint, tq):
             class_properties.append({
                 'predicate': p,
                 'range': range_,
-                'policies': [{'dataset': endpoint, 'operator': 'PR'}]
+                'policies': [{'dataset': endpoint.url, 'operator': 'PR'}]
             })
+        endpoint.params.pop('token', None)
+        endpoint.params.pop('valid_until', None)
         molecules.append({
             'rootType': c,
             'predicates': class_properties,
             'linkedTo': list(linked_to),
             'wrappers': [{
-                'url': endpoint,
+                'url': endpoint.url,
                 'predicates': predicates,
-                'urlparam': '',
+                'urlparam': endpoint.params,
                 'wrapperType': 'SPARQLEndpoint'
-
             }]
         })
 
@@ -214,20 +223,21 @@ def _get_predicate_range(endpoint, type_, predicate):
 def _accessible_endpoints(endpoints):
     ask = 'ASK { ?s ?p ?o }'
     accessible_endpoints = []
-    for url in endpoints:
-        val, c = contact_source(url, ask, Queue())
+    for e in endpoints:
+        url = e.url
+        val, c = contact_source(url, ask, Queue(), params=e.params)
         if c == -2:
             logger.error(url + ' --> is not accessible. Please check if this endpoint properly started!')
             sys.exit(1)
         if val:
-            accessible_endpoints.append(url)
+            accessible_endpoints.append(e)
         else:
             logger.info(url + ' --> is returning empty results. Hence, will not be included in the federation!')
 
     return accessible_endpoints
 
 
-def _get_results_iter(query, endpoint, limit=-1, max_tries=-1, max_answers=-1):
+def _get_results_iter(query: str, endpoint: Endpoint, limit: int = -1, max_tries: int = -1, max_answers: int = -1):
     offset = 0
     res_list = []
     status = 0
@@ -240,7 +250,7 @@ def _get_results_iter(query, endpoint, limit=-1, max_tries=-1, max_answers=-1):
         query_copy = query + ' LIMIT ' + str(limit) + (' OFFSET ' + str(offset) if offset > 0 else '')
         num_requests += 1
         res_queue = Queue()
-        _, card = contact_source(endpoint, query_copy, res_queue)
+        _, card = contact_source(endpoint.url, query_copy, res_queue, params=endpoint.params)
 
         # if receiving the answer fails, try with a decreasing limit
         if card == -2:
