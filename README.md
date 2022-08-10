@@ -235,5 +235,58 @@ config = ConfigFile(rdfmt_file)
 The keys of the `endpoint_dict` are the URLs of the SPARQL endpoints.
 Each endpoint is represented as a dictionary itself; holding all parameters in the form of (key, value) pairs.
 
+## Metadata from RML Mappings
+Starting with version 0.6.0, DeTrusty can collect the metadata necessary for source selection and decomposition from RML mappings.
+Collecting the metadata from RML mappings instead from the SPARQL endpoint considerably increases the performance of the metadata collection process.
+Of course, this is only feasible for endpoints that were created using RML mappings.
+
+The aforementioned configuration of DeTrusty changes slightly when collecting the metadata from RML mappings.
+
+### DeTrusty as a Service
+If you run DeTrusty as a service, in step 3, you will use the file `./Config/endpoints.json` instead of a plain text version.
+The file should look like this:
+```json
+[
+  {
+    "url": "https://url_to_endpoint_1",
+    "mappings": [
+      "path/to/mapping/file1",
+      "path/to/mapping/file2"
+    ]
+  }
+]
+```
+Each endpoint is a single object in a list of JSON objects. The key `url` refers to the URL of the SPARQL endpoint.
+`mappings` is a list of all mapping files associated with the endpoint.
+In step 5, you need to adjust the file name to the JSON file and add the `-j` switch to tell the script that you are using JSON input.
+```bash
+docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.json -j'
+```
+
+### DeTrusty as a Library
+If you use DeTrusty as a library, you will need to pass a dictionary to the `setEndpoints()` method instead of list.
+The following example shows how:
+
+```python
+from DeTrusty.Molecule.MTCreation import create_rdfmts
+from DeTrusty.Molecule.MTManager import ConfigFile, MTCreationConfig
+
+endpoint_dict = {
+  'https://url_to_endpoint_1': {
+    'mappings': [
+      'path/to/mapping/file1',
+      'path/to/mapping/file2'
+    ]
+  }
+}
+endpoints = MTCreationConfig()
+endpoints.setEndpoints(endpoint_dict)
+rdfmt_file = './Config/rdfmts.json'
+create_rdfmts(endpoints, rdfmt_file)
+config = ConfigFile(rdfmt_file)
+```
+The keys of the `endpoint_dict` are the URLs of the SPARQL endpoints.
+Each endpoint is represented as a dictionary itself; holding a list with all mapping files associated with the endpoint under the key `mappings`.
+
 ## License
 DeTrusty is licensed under GPL-3.0.
