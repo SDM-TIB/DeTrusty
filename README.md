@@ -167,10 +167,11 @@ You can keep the metadata in its internal representation and pass it to the `run
 
 ```python
 from DeTrusty.Molecule.MTCreation import create_rdfmts
-from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty.Molecule.MTManager import ConfigFile, MTCreationConfig
 from DeTrusty import run_query
 
-endpoints = ['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql']
+endpoints = MTCreationConfig()
+MTCreationConfig.setEndpoints(['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql'])
 rdfmt_file = './Config/rdfmts.json'
 create_rdfmts(endpoints, rdfmt_file)
 config = ConfigFile(rdfmt_file)
@@ -183,6 +184,56 @@ query2 = "SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/City> } LIMIT 10"
 query2_result = run_query(query2, config=config)  # pass config file to avoid reading from file again
 print(query2_result)
 ```
+
+## Private Endpoints
+Starting with version 0.6.0, DeTrusty can handle private endpoints that require authentication via tokens.
+DeTrusty assumes that there is a server providing these tokens and that the response includes the token in the `access_token` field together with the lifespan of the token in seconds (`expires_in`).
+
+The aforementioned configuration of DeTrusty changes slightly when using private endpoints since additional information is needed.
+
+### DeTrusty as a Service
+If you run DeTrusty as a service, in step 3, you will use the file `./Config/endpoints.json` instead of a plain text version.
+The file should look like this:
+```json
+[
+  {
+    "url": "https://url_to_endpoint_1",
+    "keycloak": "https://url_to_token_server",
+    "username": "YOUR_USERNAME",
+    "password": "YOUR_PASSWORD"
+  }
+]
+```
+Each endpoint is a single object in a list of JSON objects. The key `url` refers to the URL of the SPARQL endpoint.
+`keycloak` is the URL to the token server. `username` and `password` represent the credentials for the token server.
+In step 5, you need to adjust the file name to the JSON file and add the `-j` switch to tell the script that you are using JSON input.
+```bash
+docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.json -j'
+```
+
+### DeTrusty as a Library
+If you use DeTrusty as a library, you will need to pass a dictionary to the `setEndpoints()` method instead of list.
+The following example shows how:
+
+```python
+from DeTrusty.Molecule.MTCreation import create_rdfmts
+from DeTrusty.Molecule.MTManager import ConfigFile, MTCreationConfig
+
+endpoint_dict = {
+  'https://url_to_endpoint_1': {
+    'keycloak': 'https://url_to_token_server',
+    'username': 'YOUR_USERNAME',
+    'password': 'YOUR_PASSWORD'
+  }
+}
+endpoints = MTCreationConfig()
+endpoints.setEndpoints(endpoint_dict)
+rdfmt_file = './Config/rdfmts.json'
+create_rdfmts(endpoints, rdfmt_file)
+config = ConfigFile(rdfmt_file)
+```
+The keys of the `endpoint_dict` are the URLs of the SPARQL endpoints.
+Each endpoint is represented as a dictionary itself; holding all parameters in the form of (key, value) pairs.
 
 ## License
 DeTrusty is licensed under GPL-3.0.
