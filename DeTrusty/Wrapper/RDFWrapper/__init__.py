@@ -1,15 +1,12 @@
 import urllib.parse
 import urllib.request
-from time import time
-
-import requests
 
 from DeTrusty.Logger import get_logger
 
 logger = get_logger(__name__)
 
 
-def contact_source(server, query, queue, buffersize=16384, limit=-1, params=None):
+def contact_source(server, query, queue, config, limit=-1):
     # Contacts the datasource (i.e. real endpoint).
     # Every tuple in the answer is represented as Python dictionaries
     # and is stored in a queue.
@@ -18,7 +15,7 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1, params=None
     cardinality = 0
 
     if limit == -1:
-        b, cardinality = contact_source_aux(server, query, queue, params)
+        b, cardinality = contact_source_aux(server, query, queue, config)
     else:
         # Contacts the datasource (i.e. real endpoint) incrementally,
         # retrieving partial result sets combining the SPARQL sequence
@@ -29,7 +26,7 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1, params=None
 
         while True:
             query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
-            b, card = contact_source_aux(server, query_copy, queue, params)
+            b, card = contact_source_aux(server, query_copy, queue, config)
             cardinality += card
             if card < limit:
                 break
@@ -41,7 +38,7 @@ def contact_source(server, query, queue, buffersize=16384, limit=-1, params=None
     return b, cardinality
 
 
-def contact_source_aux(server, query, queue, params=None):
+def contact_source_aux(server, query, queue, config=None):
     # Setting variables to return.
     b = None
     cardinality = 0
@@ -51,19 +48,8 @@ def contact_source_aux(server, query, queue, params=None):
                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
                "Accept": "application/sparql-results+json"}
 
-    if params is not None and 'keycloak' in params and 'username' in params and 'password' in params:
-        valid_token = False
-        if 'token' in params and 'valid_until' in params:
-            current = time()
-            if params['valid_until'] > current:
-                valid_token = True
-
-        if valid_token:
-            token = params['token']
-        else:
-            token, valid_until = __get_auth_token(params['keycloak'], params['username'], params['password'])
-            params['token'] = token
-            params['valid_until'] = valid_until
+    token = config.getEndpointToken(server)
+    if token is not None:
         headers['Authorization'] = 'Bearer ' + token
 
     try:
@@ -116,14 +102,3 @@ def contact_source_aux(server, query, queue, params=None):
         return None, -2  # indicating an error during the query execution
 
     return b, cardinality
-
-
-def __get_auth_token(server, username, password):
-    payload = 'grant_type=client_credentials&client_id=' + username + '&client_secret=' + password
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-
-    start = time()
-    response = requests.request('POST', server, headers=headers, data=payload)
-    if response.status_code != 200:
-        raise Exception(str(response.status_code) + ': ' + response.text)
-    return response.json()['access_token'], start + response.json()['expires_in']

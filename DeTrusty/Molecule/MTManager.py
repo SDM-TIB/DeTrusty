@@ -3,24 +3,69 @@ __author__ = 'Kemele M. Endris and Philipp D. Rohde'
 import abc
 import os
 import json
+import time
+import requests
 
 
 class Config(object):
     def __init__(self, configfile):
-        if os.path.isfile(configfile):
+        if configfile is not None and os.path.isfile(configfile):
             self.configfile = configfile
             self.metadata = self.getAll()
             self.predidx = self.createPredicateIndex()
             self.predwrapidx = self.createPredicateWrapperIndex()
+            self.endpoints = self.getEndpoints()
         else:
             self.configfile = None
             self.metadata = {}
             self.predidx = {}
             self.predwrapidx = {}
+            self.endpoints = {}
 
     @abc.abstractmethod
     def getAll(self):
         return
+
+    def getEndpoints(self):
+        endpoints = {}
+        for m in self.metadata:
+            wrappers = self.metadata[m]['wrappers']
+            for w in wrappers:
+                if w['url'] not in endpoints:
+                    endpoints[w['url']] = w['urlparam']
+        return endpoints
+
+    def setEndpointToken(self, endpoint, token, valid_until):
+        self.endpoints[endpoint]['token'] = token
+        self.endpoints[endpoint]['valid_until'] = valid_until
+
+    @staticmethod
+    def __get_auth_token(server, username, password):
+        payload = 'grant_type=client_credentials&client_id=' + username + '&client_secret=' + password
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+        start = time.time()
+        response = requests.request('POST', server, headers=headers, data=payload)
+        if response.status_code != 200:
+            raise Exception(str(response.status_code) + ': ' + response.text)
+        return response.json()['access_token'], start + response.json()['expires_in']
+
+    def getEndpointToken(self, endpoint):
+        params = self.endpoints.get(endpoint, None)
+        if params is not None and 'keycloak' in params and 'username' in params and 'password' in params:
+            valid_token = False
+            if 'token' in params and 'valid_until' in params:
+                current = time.time()
+                if params['valid_until'] > current:
+                    valid_token = True
+
+            if valid_token:
+                token = params['token']
+            else:
+                token, valid_until = self.__get_auth_token(params['keycloak'], params['username'], params['password'])
+                self.setEndpointToken(endpoint, token, valid_until)
+            return token
+        return None
 
     def createPredicateIndex(self):
         pidx = {}
@@ -145,3 +190,16 @@ class ConfigFile(Config):
         except Exception as e:
             print("Exception while reading molecule templates file:", e)
             return None
+
+
+class MTCreationConfig(Config):
+    def __init__(self):
+        super().__init__(None)
+        self.endpoints = {}
+
+    def addEndpoint(self, url, params: dict = None):
+        if url not in self.endpoints:
+            self.endpoints[url] = params
+
+    def getAll(self):
+        return None

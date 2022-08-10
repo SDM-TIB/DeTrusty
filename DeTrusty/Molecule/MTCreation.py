@@ -6,13 +6,14 @@ import multiprocessing
 import sys
 from queue import Queue
 from time import time
-from typing import List
 
 from DeTrusty.Logger import get_logger
+from DeTrusty.Molecule.MTManager import MTCreationConfig
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger('rdftms', './rdfmts-log.log', file_and_console=True)
 
+CONFIG = None
 DEFAULT_OUTPUT_PATH = '/DeTrusty/Config/rdfmts.json'
 
 metas = [
@@ -33,8 +34,16 @@ class Endpoint:
         self.url = url
         self.params = params
 
+    def get_params(self):
+        if self.params is None:
+            return ''
+        params_public = self.params.copy()
+        params_public.pop('token', None)
+        params_public.pop('valid_until', None)
+        return params_public
 
-def create_rdfmts(endpoints: List[Endpoint], output: str = DEFAULT_OUTPUT_PATH):
+
+def create_rdfmts(config: MTCreationConfig, output: str = DEFAULT_OUTPUT_PATH):
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
     logger_wrapper.setLevel(logging.WARNING)  # temporarily disable logging of contacting the source
 
@@ -43,7 +52,7 @@ def create_rdfmts(endpoints: List[Endpoint], output: str = DEFAULT_OUTPUT_PATH):
             if not f.writable():
                 raise PermissionError
     except FileNotFoundError:
-        logger.critical('No such file or directory: ' + output + '\tMake sure the directories exist!')
+        logger.critical('No such file or directory: ' + output + '\tMake sure the directory exists!')
         return
     except PermissionError:
         logger.critical('You may not have permissions to open or write to the file: ' + output +
@@ -56,6 +65,10 @@ def create_rdfmts(endpoints: List[Endpoint], output: str = DEFAULT_OUTPUT_PATH):
     epros = []
     start = time()
 
+    global CONFIG
+    CONFIG = config
+
+    endpoints = [Endpoint(key, value) for key, value in config.endpoints.items()]
     endpoints = _accessible_endpoints(endpoints)
     if len(endpoints) == 0:
         logger.critical('None of the endpoints can be accessed. Please check if you write URLs properly!')
@@ -146,8 +159,6 @@ def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
                 'range': range_,
                 'policies': [{'dataset': endpoint.url, 'operator': 'PR'}]
             })
-        endpoint.params.pop('token', None)
-        endpoint.params.pop('valid_until', None)
         molecules.append({
             'rootType': c,
             'predicates': class_properties,
@@ -155,7 +166,7 @@ def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
             'wrappers': [{
                 'url': endpoint.url,
                 'predicates': predicates,
-                'urlparam': endpoint.params,
+                'urlparam': endpoint.get_params(),
                 'wrapperType': 'SPARQLEndpoint'
             }]
         })
@@ -225,7 +236,7 @@ def _accessible_endpoints(endpoints):
     accessible_endpoints = []
     for e in endpoints:
         url = e.url
-        val, c = contact_source(url, ask, Queue(), params=e.params)
+        val, c = contact_source(url, ask, Queue(), CONFIG)
         if c == -2:
             logger.error(url + ' --> is not accessible. Please check if this endpoint properly started!')
             sys.exit(1)
@@ -250,7 +261,7 @@ def _get_results_iter(query: str, endpoint: Endpoint, limit: int = -1, max_tries
         query_copy = query + ' LIMIT ' + str(limit) + (' OFFSET ' + str(offset) if offset > 0 else '')
         num_requests += 1
         res_queue = Queue()
-        _, card = contact_source(endpoint.url, query_copy, res_queue, params=endpoint.params)
+        _, card = contact_source(endpoint.url, query_copy, res_queue, CONFIG)
 
         # if receiving the answer fails, try with a decreasing limit
         if card == -2:
