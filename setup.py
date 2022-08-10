@@ -34,7 +34,8 @@ setuptools.setup(
         'DeTrusty.Wrapper.RDFWrapper'
     ],
     install_requires=['requests>=2.27.0',
-                      'ply==3.11'],
+                      'ply==3.11',
+                      'rdflib>=6.0.0'],
     include_package_data=True,
     python_requires='>=3.7',
     classifiers=[

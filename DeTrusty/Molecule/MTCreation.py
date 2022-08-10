@@ -7,6 +7,8 @@ import sys
 from queue import Queue
 from time import time
 
+from rdflib import Graph
+
 from DeTrusty.Logger import get_logger
 from DeTrusty.Molecule.MTManager import MTCreationConfig
 from DeTrusty.Wrapper.RDFWrapper import contact_source
@@ -40,6 +42,7 @@ class Endpoint:
         params_public = self.params.copy()
         params_public.pop('token', None)
         params_public.pop('valid_until', None)
+        params_public.pop('mappings', None)
         return params_public
 
 
@@ -140,6 +143,12 @@ def create_rdfmts(config: MTCreationConfig, output: str = DEFAULT_OUTPUT_PATH):
 
 def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
     # get the typed concepts, predicates, etc. for one source
+    if 'mappings' in endpoint.params:
+        molecules = get_rdfmts_from_mapping(endpoint)
+        tq.put(molecules)
+        tq.put('EOF')
+        return molecules
+
     concepts = _get_typed_concepts(endpoint)
     logger.info(endpoint.url + ': ' + str(concepts))
     molecules = []
@@ -355,3 +364,62 @@ def _merge_mts(rdfmt, root_type, dsrdfmts):
     newpreds = set(list(predicates_this.keys())).difference(list(predicates_other.keys()))
     otherrdfmt['predicates'].extend([predicates_this[p] for p in newpreds])
     otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
+
+
+def get_rdfmts_from_mapping(endpoint):
+    mapping_graph = Graph()
+    for mapping_file in endpoint.params['mappings']:
+        mapping_graph.parse(mapping_file, format='n3')
+
+    query = 'PREFIX rr: <http://www.w3.org/ns/r2rml#> ' \
+            'SELECT DISTINCT ?t ?p ?r WHERE {\n' \
+            '  ?tm rr:subjectMap  ?sm. ?sm rr:class ?t .\n' \
+            '  ?tm rr:predicateObjectMap ?pom .\n' \
+            '  ?pom rr:predicate ?p .\n' \
+            '  OPTIONAL {\n' \
+            '    ?pom rr:objectMap ?om .\n' \
+            '    ?om rr:parentTriplesMap ?pt .\n' \
+            '    ?pt rr:subjectMap ?ptsm .\n' \
+            '    ?ptsm rr:class ?r .\n' \
+            '  }\n' \
+            '} ORDER BY ?t ?p ?r'
+
+    res = mapping_graph.query(query)
+    metadata = {}
+    for r in res:
+        class_ = str(r['t'])
+        if class_ not in metadata:
+            metadata[class_] = {
+                'predicates': {},
+                'linkedTo': set()
+            }
+
+        predicate = str(r['p'])
+        range_ = str(r['r']) if r['r'] is not None else None
+        if predicate not in metadata[class_]['predicates']:
+            metadata[class_]['predicates'][predicate] = {
+                'predicate': predicate,
+                'range': [] if range_ is None else [range_],
+                'policies': [{'dataset': endpoint.url, 'operator': 'PR'}]
+            }
+        else:
+            if range_ is not None:
+                metadata[class_]['predicates'][predicate]['range'].append(range_)
+
+        if range_ is not None:
+            metadata[class_]['linkedTo'].add(range_)
+
+    molecules = []
+    for mol in metadata:
+        molecules.append({
+            'rootType': mol,
+            'predicates': list(metadata[mol]['predicates'].values()),
+            'linkedTo': list(metadata[mol]['linkedTo']),
+            'wrappers': [{
+                'url': endpoint.url,
+                'predicates': list(metadata[mol]['predicates'].keys()),
+                'urlparam': endpoint.get_params() or '',
+                'wrapperType': 'SPARQLEndpoint'
+            }]
+        })
+    return molecules
