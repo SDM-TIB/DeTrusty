@@ -40,7 +40,7 @@ def get_options(argv):
             if len(endpoints) == 0:
                 logger.critical("The endpoints file should contain at least one URL")
                 sys.exit(1)
-            [config.addEndpoint(e) for e in [e.strip('\n') for e in endpoints]]
+            config.setEndpoints([e.strip('\n') for e in endpoints])
     else:
         with open(endpoints_file, 'r') as f:
             data = json.load(f)
