@@ -367,6 +367,9 @@ def _merge_mts(rdfmt, root_type, dsrdfmts):
 
 
 def get_rdfmts_from_mapping(endpoint):
+    rdf_type = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+    policies = [{'dataset': endpoint.url, 'operator': 'PR'}]
+
     mapping_graph = Graph()
     for mapping_file in endpoint.params['mappings']:
         mapping_graph.parse(mapping_file, format='n3')
@@ -393,6 +396,11 @@ def get_rdfmts_from_mapping(endpoint):
                 'predicates': {},
                 'linkedTo': set()
             }
+            metadata[class_]['predicates'][rdf_type] = {
+                'predicate': rdf_type,
+                'range': [],
+                'policies': policies
+            }
 
         predicate = str(r['p'])
         range_ = str(r['r']) if r['r'] is not None else None
@@ -400,7 +408,7 @@ def get_rdfmts_from_mapping(endpoint):
             metadata[class_]['predicates'][predicate] = {
                 'predicate': predicate,
                 'range': [] if range_ is None else [range_],
-                'policies': [{'dataset': endpoint.url, 'operator': 'PR'}]
+                'policies': policies
             }
         else:
             if range_ is not None:
