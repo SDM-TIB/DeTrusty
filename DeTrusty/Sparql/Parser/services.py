@@ -1,5 +1,4 @@
-import string
-import os
+import urllib.parse
 
 xsd = "http://www.w3.org/2001/XMLSchema#"
 
@@ -1111,7 +1110,7 @@ class Triple(object):
 class Argument(object):
 
     def __init__(self, name, constant, desc=False, datatype=None, lang=None):
-        self.name = name
+        self.name = name if not constant else urllib.parse.quote(name, safe='<:/#>')
         self.constant = constant
         self.desc = desc
         self.datatype = datatype
