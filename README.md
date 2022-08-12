@@ -135,9 +135,11 @@ The following example script shows how you can use DeTrusty within your project.
 
 ```python
 from DeTrusty.Molecule.MTCreation import create_rdfmts
+from DeTrusty.Molecule.MTManager import MTCreationConfig
 from DeTrusty import run_query
 
-endpoints = ['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql']
+endpoints = MTCreationConfig()
+endpoints.setEndpoints(['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql'])
 create_rdfmts(endpoints, './Config/rdfmts.json')
 
 query = "SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/Scientist> } LIMIT 10"
@@ -171,7 +173,7 @@ from DeTrusty.Molecule.MTManager import ConfigFile, MTCreationConfig
 from DeTrusty import run_query
 
 endpoints = MTCreationConfig()
-MTCreationConfig.setEndpoints(['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql'])
+endpoints.setEndpoints(['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql'])
 rdfmt_file = './Config/rdfmts.json'
 create_rdfmts(endpoints, rdfmt_file)
 config = ConfigFile(rdfmt_file)
