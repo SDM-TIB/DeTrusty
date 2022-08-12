@@ -201,7 +201,7 @@ class MTCreationConfig(Config):
         if url not in self.endpoints:
             self.endpoints[url] = params
 
-    def setEndpoints(self, endpoints):
+    def setEndpoints(self, endpoints: list | dict):
         self.endpoints = {}
         if isinstance(endpoints, list):
             [self.addEndpoint(e) for e in endpoints]

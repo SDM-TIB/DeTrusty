@@ -5,7 +5,6 @@ import json
 import sys
 
 from DeTrusty.Molecule.MTCreation import DEFAULT_OUTPUT_PATH, create_rdfmts, logger
-from DeTrusty.Molecule.MTManager import MTCreationConfig
 
 
 def get_options(argv):
@@ -33,24 +32,20 @@ def get_options(argv):
         usage()
         sys.exit(1)
 
-    config = MTCreationConfig()
     if not is_json:
         with open(endpoints_file, 'r') as f:
             endpoints = f.readlines()
             if len(endpoints) == 0:
                 logger.critical("The endpoints file should contain at least one URL")
                 sys.exit(1)
-            config.setEndpoints([e.strip('\n') for e in endpoints])
+            endpoints = [e.strip('\n') for e in endpoints]
     else:
         with open(endpoints_file, 'r') as f:
-            data = json.load(f)
-            for elem in data:
-                url = elem.pop('url')
-                config.addEndpoint(url, elem)
+            endpoints = json.load(f)
 
     if '.json' not in output:
         output += '.json'
-    return config, output
+    return endpoints, output
 
 
 def usage():
@@ -66,5 +61,5 @@ def usage():
 
 
 if __name__ == '__main__':
-    config, output = get_options(sys.argv[1:])
-    create_rdfmts(config, output)
+    endpoints, output = get_options(sys.argv[1:])
+    create_rdfmts(endpoints, output)

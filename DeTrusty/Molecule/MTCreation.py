@@ -46,7 +46,7 @@ class Endpoint:
         return params_public
 
 
-def create_rdfmts(config: MTCreationConfig, output: str = DEFAULT_OUTPUT_PATH):
+def create_rdfmts(endpoints: list | dict, output: str = DEFAULT_OUTPUT_PATH):
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
     logger_wrapper.setLevel(logging.WARNING)  # temporarily disable logging of contacting the source
 
@@ -69,9 +69,10 @@ def create_rdfmts(config: MTCreationConfig, output: str = DEFAULT_OUTPUT_PATH):
     start = time()
 
     global CONFIG
-    CONFIG = config
+    CONFIG = MTCreationConfig()
+    CONFIG.setEndpoints(endpoints)
 
-    endpoints = [Endpoint(key, value) for key, value in config.endpoints.items()]
+    endpoints = [Endpoint(key, value) for key, value in CONFIG.endpoints.items()]
     endpoints = _accessible_endpoints(endpoints)
     if len(endpoints) == 0:
         logger.critical('None of the endpoints can be accessed. Please check if you write URLs properly!')
