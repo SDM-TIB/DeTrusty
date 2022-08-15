@@ -17,7 +17,7 @@ from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger('rdftms', './rdfmts-log.log', file_and_console=True)
 
-CONFIG = None
+CONFIG = MTCreationConfig()
 DEFAULT_OUTPUT_PATH = '/DeTrusty/Config/rdfmts.json'
 
 metas = [
@@ -70,8 +70,6 @@ def create_rdfmts(endpoints: list | dict, output: str = DEFAULT_OUTPUT_PATH):
     epros = []
     start = time()
 
-    global CONFIG
-    CONFIG = MTCreationConfig()
     CONFIG.setEndpoints(endpoints)
 
     endpoints = [Endpoint(key, value) for key, value in CONFIG.endpoints.items()]
