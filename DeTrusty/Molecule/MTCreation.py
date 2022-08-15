@@ -56,13 +56,13 @@ def create_rdfmts(endpoints: list | dict, output: str = DEFAULT_OUTPUT_PATH):
         with open(output, 'a') as f:
             if not f.writable():
                 raise PermissionError
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         logger.critical('No such file or directory: ' + output + '\tMake sure the directory exists!')
-        return
-    except PermissionError:
+        raise e
+    except PermissionError as e:
         logger.critical('You may not have permissions to open or write to the file: ' + output +
                         '\tPlease, check your permissions!')
-        return
+        raise e
 
     dsrdfmts = {}
     sparqlendps = {}
