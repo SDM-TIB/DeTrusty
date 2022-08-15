@@ -36,7 +36,7 @@ class Endpoint:
     """Simple representation of an endpoint. URL is mandatory but an endpoint might have optional parameters."""
     def __init__(self, url: str, params: dict = None):
         self.url = url
-        self.params = params
+        self.params = params if params is not None else {}
 
     def get_params(self):
         if self.params is None:
