@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __author__ = 'Philipp D. Rohde and Kemele M. Endris'
 
 import json

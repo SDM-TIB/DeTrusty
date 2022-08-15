@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __author__ = 'Kemele M. Endris and Philipp D. Rohde'
 
 import abc
