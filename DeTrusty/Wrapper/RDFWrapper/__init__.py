@@ -3,7 +3,7 @@ import urllib.request
 
 from DeTrusty.Logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger('DeTrusty.Wrapper.RDFWrapper')
 
 
 def contact_source(server, query, queue, config, limit=-1):
