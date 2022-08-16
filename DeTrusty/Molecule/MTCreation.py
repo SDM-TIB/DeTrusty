@@ -15,7 +15,7 @@ from DeTrusty.Logger import get_logger
 from DeTrusty.Molecule.MTManager import MTCreationConfig
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
-logger = get_logger('rdftms', './rdfmts-log.log', file_and_console=True)
+logger = get_logger('rdfmts', '.rdfmts.log', file_and_console=True)
 
 CONFIG = MTCreationConfig()
 DEFAULT_OUTPUT_PATH = '/DeTrusty/Config/rdfmts.json'
