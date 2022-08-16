@@ -1127,7 +1127,7 @@ def p_error(p):
     raise TypeError("unknown text at %r" % (value,))
 
 
-parser = yacc.yacc(debug=0)
+parser = yacc.yacc(debug=False, write_tables=False)
 
 
 # Helpers
