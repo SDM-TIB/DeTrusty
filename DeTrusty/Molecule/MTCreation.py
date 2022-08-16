@@ -39,7 +39,7 @@ class Endpoint:
         self.params = params if params is not None else {}
 
     def get_params(self):
-        if self.params is None:
+        if self.params is None or len(self.params.keys()) == 0:
             return ''
         params_public = self.params.copy()
         params_public.pop('token', None)
