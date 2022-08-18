@@ -30,30 +30,30 @@ def run_query(query: str,
     ----------
     query : str
         The SPARQL query to be executed.
-    decomposition_type : str
+    decomposition_type : str, optional
         The decomposition type to be used for decomposing the query. Possible values
         are 'STAR' for a star-shaped decomposition, 'EG' for exclusive groups decomposition,
         and 'TRIPLE' for a triple-wise decomposition, i.e., each triple pattern of the query
         produces a sub-query. Default is 'STAR'.
-    sparql_one_dot_one : bool
+    sparql_one_dot_one : bool, optional
         Indicates whether the query includes the SERVICE clause.
         'True' meaning the SERVICE clause is present in the query, 'False' otherwise.
         Default is 'False'.
-    config : DeTrusty.Molecule.MTManager.ConfigFile
+    config : DeTrusty.Molecule.MTManager.ConfigFile, optional
         The configuration holding the metadata about the federation over which the
         SPARQL query should be executed. If no value is specified, DeTrusty will
         attempt to load the configuration from `./Config/rdfmts.json`.
-    join_stars_locally : bool
+    join_stars_locally : bool, optional
         Indicates whether joins should be performed at the query engine.
         'True' meaning joins will be performed in DeTrusty, 'False' leads to joins
         being executed in the sources if possible. Default behavior is join execution
         at the query engine level.
-    print_result : bool
+    print_result : bool, optional
         Indicates whether the actual query result should be returned.
         'True' meaning the result will be included in the answer.
         'False' only returns the metadata of the query result, like the cardinality.
         Default is 'True'.
-    yasqe : bool
+    yasqe : bool, optional
         Indicates whether the SPARQL query was sent from the YASGUI interface of
         DeTrusty's Web interface. This is a workaround for YASQE not being able
         to show the query results when the validation data is included.
