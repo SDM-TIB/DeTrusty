@@ -8,11 +8,12 @@ import multiprocessing
 import sys
 from queue import Queue
 from time import time
+from typing import Optional
 
 from rdflib import Graph
 
 from DeTrusty.Logger import get_logger
-from DeTrusty.Molecule.MTManager import MTCreationConfig
+from DeTrusty.Molecule.MTManager import JSONConfig, MTCreationConfig
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger('rdfmts', '.rdfmts.log', file_and_console=True)
@@ -48,21 +49,22 @@ class Endpoint:
         return params_public
 
 
-def create_rdfmts(endpoints: list | dict, output: str = DEFAULT_OUTPUT_PATH):
+def create_rdfmts(endpoints: list | dict, output: Optional[str] = DEFAULT_OUTPUT_PATH) -> Optional[JSONConfig]:
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
     logger_wrapper.setLevel(logging.WARNING)  # temporarily disable logging of contacting the source
 
-    try:
-        with open(output, 'a') as f:
-            if not f.writable():
-                raise PermissionError
-    except FileNotFoundError as e:
-        logger.critical('No such file or directory: ' + output + '\tMake sure the directory exists!')
-        raise e
-    except PermissionError as e:
-        logger.critical('You may not have permissions to open or write to the file: ' + output +
-                        '\tPlease, check your permissions!')
-        raise e
+    if output is not None:
+        try:
+            with open(output, 'a') as f:
+                if not f.writable():
+                    raise PermissionError
+        except FileNotFoundError as e:
+            logger.critical('No such file or directory: ' + output + '\tMake sure the directory exists!')
+            raise e
+        except PermissionError as e:
+            logger.critical('You may not have permissions to open or write to the file: ' + output +
+                            '\tPlease, check your permissions!')
+            raise e
 
     dsrdfmts = {}
     sparqlendps = {}
@@ -137,9 +139,12 @@ def create_rdfmts(endpoints: list | dict, output: str = DEFAULT_OUTPUT_PATH):
 
     templates = list(dsrdfmts.values())
     duration = time() - start
-    json.dump(templates, open(output, 'w'), indent=2)
     logger.info('----- DONE in ' + str(duration) + ' seconds!-----')
     logger_wrapper.setLevel(logging.INFO)  # reset the logger
+    if output is not None:
+        json.dump(templates, open(output, 'w'), indent=2)
+    else:
+        return JSONConfig(templates)
 
 
 def _collect_rdfmts_from_source(endpoint: Endpoint, tq):

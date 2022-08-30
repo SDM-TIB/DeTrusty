@@ -10,15 +10,16 @@ import requests
 
 
 class Config(object):
-    def __init__(self, configfile):
-        if configfile is not None and os.path.isfile(configfile):
-            self.configfile = configfile
+    def __init__(self, configfile=None, json_data=None):
+        self.configfile = configfile
+        if configfile is not None or json_data is not None:
+            if json_data is not None:
+                self.metadata = json_data
             self.metadata = self.getAll()
             self.predidx = self.createPredicateIndex()
             self.predwrapidx = self.createPredicateWrapperIndex()
             self.endpoints = self.getEndpoints()
         else:
-            self.configfile = None
             self.metadata = {}
             self.predidx = {}
             self.predwrapidx = {}
@@ -140,6 +141,12 @@ class Config(object):
 
 
 class ConfigFile(Config):
+    def __init__(self, configfile):
+        if os.path.isfile(configfile):
+            super().__init__(configfile=configfile)
+        else:
+            super().__init__()
+
     def getAll(self):
         return self.read_json_file(self.configfile)
 
@@ -196,7 +203,7 @@ class ConfigFile(Config):
 
 class MTCreationConfig(Config):
     def __init__(self):
-        super().__init__(None)
+        super().__init__()
         self.endpoints = {}
 
     def addEndpoint(self, url, params: dict = None):
@@ -212,3 +219,14 @@ class MTCreationConfig(Config):
 
     def getAll(self):
         return None
+
+
+class JSONConfig(Config):
+    def __init__(self, json_data):
+        super().__init__(json_data=json_data)
+
+    def getAll(self):
+        meta = {}
+        for m in self.metadata:
+            meta[m['rootType']] = m
+        return meta
