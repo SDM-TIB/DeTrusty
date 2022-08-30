@@ -139,6 +139,10 @@ class Config(object):
         else:
             return None
 
+    def saveToFile(self, path):
+        with open(path, 'w', encoding='utf8') as output_file:
+            json.dump([self.metadata[m] for m in self.metadata], output_file, indent=2)
+
 
 class ConfigFile(Config):
     def __init__(self, configfile):
