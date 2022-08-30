@@ -167,13 +167,10 @@ You can keep the metadata in its internal representation and pass it to the `run
 
 ```python
 from DeTrusty.Molecule.MTCreation import create_rdfmts
-from DeTrusty.Molecule.MTManager import ConfigFile
 from DeTrusty import run_query
 
 endpoints = ['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql']
-rdfmt_file = './Config/rdfmts.json'
-create_rdfmts(endpoints, rdfmt_file)
-config = ConfigFile(rdfmt_file)
+config = create_rdfmts(endpoints, None)  # returns the configuration instead of writing it to a file 
 
 query = "SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/Scientist> } LIMIT 10"
 query_result = run_query(query, config=config)  # pass config file to avoid reading from file again
@@ -182,6 +179,11 @@ print(query_result)
 query2 = "SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/City> } LIMIT 10"
 query2_result = run_query(query2, config=config)  # pass config file to avoid reading from file again
 print(query2_result)
+```
+
+If you want to keep the configuration for later so that you do not need to compute it again, you can save it to a file:
+```python
+config.saveToFile('./Config/rdfmts.json')
 ```
 
 ## Private Endpoints
