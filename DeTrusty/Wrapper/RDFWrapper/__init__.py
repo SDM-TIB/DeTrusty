@@ -48,9 +48,9 @@ def contact_source_aux(server, query, queue, config=None):
                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
                "Accept": "application/sparql-results+json"}
 
-    token = config.getEndpointToken(server)
-    if token is not None:
-        headers['Authorization'] = 'Bearer ' + token
+    auth = config.get_auth(server)
+    if auth is not None:
+        headers['Authorization'] = auth
 
     try:
         data = urllib.parse.urlencode(payload)

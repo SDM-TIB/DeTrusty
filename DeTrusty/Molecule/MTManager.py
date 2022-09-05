@@ -3,9 +3,11 @@ from __future__ import annotations
 __author__ = 'Kemele M. Endris and Philipp D. Rohde'
 
 import abc
-import os
 import json
+import os
 import time
+from base64 import b64encode
+
 import requests
 
 
@@ -53,21 +55,25 @@ class Config(object):
             raise Exception(str(response.status_code) + ': ' + response.text)
         return response.json()['access_token'], start + response.json()['expires_in']
 
-    def getEndpointToken(self, endpoint):
+    def get_auth(self, endpoint):
         params = self.endpoints.get(endpoint, None)
-        if params is not None and 'keycloak' in params and 'username' in params and 'password' in params:
-            valid_token = False
-            if 'token' in params and 'valid_until' in params:
-                current = time.time()
-                if params['valid_until'] > current:
-                    valid_token = True
+        if params is not None and 'username' in params and 'password' in params:
+            if 'keycloak' in params:
+                valid_token = False
+                if 'token' in params and 'valid_until' in params:
+                    current = time.time()
+                    if params['valid_until'] > current:
+                        valid_token = True
 
-            if valid_token:
-                token = params['token']
+                if valid_token:
+                    token = params['token']
+                else:
+                    token, valid_until = self.__get_auth_token(params['keycloak'], params['username'], params['password'])
+                    self.setEndpointToken(endpoint, token, valid_until)
+                return 'Bearer ' + token
             else:
-                token, valid_until = self.__get_auth_token(params['keycloak'], params['username'], params['password'])
-                self.setEndpointToken(endpoint, token, valid_until)
-            return token
+                credentials = params['username'] + ':' + params['password']
+                return 'Basic ' + b64encode(credentials.encode()).decode()
         return None
 
     def createPredicateIndex(self):

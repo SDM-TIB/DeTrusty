@@ -211,6 +211,9 @@ In step 5, you need to adjust the file name to the JSON file and add the `-j` sw
 docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.json -j'
 ```
 
+**Note:**
+If your SPARQL endpoint uses basic authentication with Base64 encoding instead of a token server, simply omit the entry for `keycloak`.
+
 ### DeTrusty as a Library
 If you use DeTrusty as a library, you will need to pass a dictionary to the `create_rdfmts()` method instead of list.
 The following example shows how:
