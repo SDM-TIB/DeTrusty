@@ -1,7 +1,7 @@
 FROM python:3.9.13-slim-bullseye
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
-ENV VERSION="0.6.2"
+ENV VERSION="0.6.3"
 
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
