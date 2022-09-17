@@ -39,6 +39,10 @@ class Endpoint:
         self.url = url
         self.params = params if params is not None else {}
 
+    @property
+    def types(self):
+        return self.params.get('types', [])
+
     def get_params(self):
         if self.params is None or len(self.params.keys()) == 0:
             return ''
@@ -46,6 +50,7 @@ class Endpoint:
         params_public.pop('token', None)
         params_public.pop('valid_until', None)
         params_public.pop('mappings', None)
+        params_public.pop('types', None)
         return params_public
 
 
@@ -193,6 +198,9 @@ def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
 
 
 def _get_typed_concepts(endpoint):
+    if endpoint.types:
+        return endpoint.types
+
     query = 'SELECT DISTINCT ?t WHERE { ?s a ?t . }'
     res_list, _ = _get_results_iter(query, endpoint)
     return [r['t'] for r in res_list if True not in [m in str(r['t']) for m in metas]]

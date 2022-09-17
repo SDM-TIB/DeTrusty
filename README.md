@@ -59,7 +59,7 @@ curl -X POST localhost:5000/version
 
 Example output:
 
-``DeTrusty v0.5.0``
+``DeTrusty v0.7.0``
 
 ##### /sparql
 This API call is used to send a query to the federation and retrieve the result.
@@ -285,6 +285,56 @@ config = ConfigFile(rdfmt_file)
 ```
 The keys of the `endpoint_dict` are the URLs of the SPARQL endpoints; just as in the `endpoints.json` file described above.
 Each endpoint is represented as a dictionary itself; holding a list with all mapping files associated with the endpoint under the key `mappings`.
+
+## Restricting Classes of an Endpoint
+Starting with version 0.7.0, DeTrusty can restrict the collection of metadata to specific classes of an endpoint.
+The mentioned classes need to be specified using their full URI.
+
+The aforementioned configuration of DeTrusty changes slightly when collecting the metadata from RML mappings.
+
+### DeTrusty as a Service
+If you run DeTrusty as a service, in step 3, you will use the file `./Config/endpoints.json` instead of a plain text version.
+The file should look like this:
+```json
+{
+  "https://url_to_endpoint_1": {
+    "types": [
+      "http://example.com/ontology/ClassA",
+      "http://example.com/ontology/ClassB"
+    ]
+  }
+}
+```
+Each endpoint is a single JSON object identified by its URL (as key).
+The key `types` is a list of RDF classes for which the metadata will be collected.
+All other RDF classes in the endpoint will be ignored.
+In step 5, you need to adjust the file name to the JSON file and add the `-j` switch to tell the script that you are using JSON input.
+```bash
+docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.json -j'
+```
+
+### DeTrusty as a Library
+If you use DeTrusty as a library, you will need to pass a dictionary to the `create_rdfmts()` method instead of list.
+The following example shows how:
+
+```python
+from DeTrusty.Molecule.MTCreation import create_rdfmts
+from DeTrusty.Molecule.MTManager import ConfigFile
+
+endpoints = {
+  'https://url_to_endpoint_1': {
+    'types': [
+      'http://example.com/ontology/ClassA',
+      'http://example.com/ontology/ClassB'
+    ]
+  }
+}
+rdfmt_file = './Config/rdfmts.json'
+create_rdfmts(endpoints, rdfmt_file)
+config = ConfigFile(rdfmt_file)
+```
+The keys of the `endpoint_dict` are the URLs of the SPARQL endpoints; just as in the `endpoints.json` file described above.
+Each endpoint is represented as a dictionary itself; holding a list with the RDF classes that should be considered during the metadata extraction under the key `types`.
 
 ## License
 DeTrusty is licensed under GPL-3.0.
