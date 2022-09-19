@@ -429,10 +429,11 @@ class Decomposer(object):
             return qpl1
 
     def shareAtLeastOneVar(self, left, right):
-        leftsubj = [s.subject.name for s in left if not s.subject.constant]
-        leftobj = [s.theobject.name for s in left if not s.subject.constant]
-        rightsubj = [s.subject.name for s in right if not s.subject.constant]
-        rightobj = [s.theobject.name for s in right if not s.subject.constant]
+        # joins can also be over constants, so also consider them
+        leftsubj = [s.subject.name for s in left]
+        leftobj = [s.theobject.name for s in left]
+        rightsubj = [s.subject.name for s in right]
+        rightobj = [s.theobject.name for s in right]
 
         leftvars = leftsubj + leftobj
         rightvars = rightsubj + rightobj
