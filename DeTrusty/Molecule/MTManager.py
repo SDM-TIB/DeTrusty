@@ -14,18 +14,19 @@ import requests
 class Config(object):
     def __init__(self, configfile=None, json_data=None):
         self.configfile = configfile
+        self.metadata = {}
+        self.predidx = {}
+        self.predwrapidx = {}
+        self.endpoints = {}
         if configfile is not None or json_data is not None:
             if json_data is not None:
                 self.metadata = json_data
             self.metadata = self.getAll()
+            if self.metadata is None:
+                self.metadata = {}
             self.predidx = self.createPredicateIndex()
             self.predwrapidx = self.createPredicateWrapperIndex()
             self.endpoints = self.getEndpoints()
-        else:
-            self.metadata = {}
-            self.predidx = {}
-            self.predwrapidx = {}
-            self.endpoints = {}
 
     @abc.abstractmethod
     def getAll(self):
