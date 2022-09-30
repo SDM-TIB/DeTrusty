@@ -1,3 +1,8 @@
+# v0.7.2 - 30 Sep 2022
+- Fix bug when config file is empty
+- Disable caching for YASGUI
+- Update YASGUI
+
 # v0.7.1 – 19 Sep 2022
 - Fix bug where sub-queries with constants where not considered for merging
 
