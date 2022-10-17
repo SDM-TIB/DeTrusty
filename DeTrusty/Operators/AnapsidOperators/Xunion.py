@@ -5,9 +5,11 @@ Implements the Xunion operator.
 The intermediate results are represented in a queue.
 
 @author: Maribel Acosta Deibe
+
+Modified 2022-10-17 by Philipp D. Rohde to speed up merging both input queues.
 """
 
-from multiprocessing import Queue
+from multiprocessing import Queue, Process
 from queue import Empty
 from DeTrusty.Operators.Union import _Union
 
@@ -20,12 +22,10 @@ class Xunion(_Union):
         self.qresults = Queue()
         self.vars_left = vars_left
         self.vars_right = vars_right
-        self.count = 0
 
     def instantiate(self, d):
         newvars_left = self.vars_left - set(d.keys())
         newvars_right = self.vars_right - set(d.keys())
-        # return Xunion(newvars_left, newvars_right, self.distinct)
         return Xunion(newvars_left, newvars_right)
 
     def instantiateFilter(self, instantiated_vars, filter_str):
@@ -41,53 +41,44 @@ class Xunion(_Union):
         # print "left", hex(id(left)), "right", hex(id(right)), "out", hex(id(out))
 
         # Identify the kind of union to perform.
-        if (self.vars_left == self.vars_right):
-            self.sameVariables()
+        if self.vars_left == self.vars_right:
+            self.same_variables()
         else:
-            self.differentVariables()
+            self.different_variables()
 
         # Put EOF in queue and exit.
         self.qresults.put("EOF")
 
-    def sameVariables(self):
+    @staticmethod
+    def __insert_result(in_, out, vars=None):
+        # Puts the results from one input queue to the output queue.
+        try:
+            tuple_ = in_.get()
+            while tuple_ != 'EOF':
+                if vars is not None:
+                    res = {}
+                    res.update(vars)
+                    res.update(tuple_)
+                else:
+                    res = tuple_
+                out.put(res)
+                tuple_ = in_.get()
+        except Empty:
+            pass
+
+    def same_variables(self):
         # Executes the Xunion operator when the variables are the same.
+        p_left = Process(target=self.__insert_result, args=(self.left, self.qresults))
+        p_left.start()
 
-        # Initialize tuples.
-        tuple1 = None
-        tuple2 = None
+        p_right = Process(target=self.__insert_result, args=(self.right, self.qresults))
+        p_right.start()
 
-        # Get the tuples from the queues.
-        while tuple1 != "EOF" or tuple2 != "EOF":
-            if tuple1 != "EOF":
-                try:
-                    tuple1 = self.left.get(False)
-                    if tuple1 != "EOF":
-                        self.count += 1
-                        self.qresults.put(tuple1)
-                except Empty:
-                    # This catch:
-                    # Empty: in tuple1 = self.left.get(False), when the queue is empty.
-                    pass
+        p_left.join()
+        p_right.join()
 
-            if tuple2 != "EOF":
-                try:
-                    tuple2 = self.right.get(False)
-                    if tuple2 != "EOF":
-                        self.count += 1
-                        self.qresults.put(tuple2)
-
-                except Empty:
-                    # This catch:
-                    # Empty: in tuple2 = self.right.get(False), when the queue is empty.
-                    pass
-
-    def differentVariables(self):
+    def different_variables(self):
         # Executes the Xunion operator when the variables are not the same.
-
-        # Initialize tuples.
-        tuple1 = None
-        tuple2 = None
-
         # Initialize empty tuples.
         v1 = {}
         v2 = {}
@@ -99,35 +90,11 @@ class Xunion(_Union):
         for v in self.vars_left:
             v2.update({v: ''})
 
-        # Get the tuples from the queues.
-        while (not (tuple1 == "EOF") or not (tuple2 == "EOF")):
+        p_left = Process(target=self.__insert_result, args=(self.left, self.qresults, v1))
+        p_left.start()
 
-            # Get tuple from left queue, and concatenate with empty tuple.
-            if (not (tuple1 == "EOF")):
-                try:
-                    tuple1 = self.left.get(False)
-                    if (not (tuple1 == "EOF")):
-                        res = {}
-                        res.update(v1)
-                        res.update(tuple1)
-                        self.qresults.put(res)
-                        # print(tuple1)
-                except Exception:
-                    # This catch:
-                    # Empty: in tuple1 = self.left.get(False), when the queue is empty.
-                    pass
+        p_right = Process(target=self.__insert_result, args=(self.right, self.qresults, v2))
+        p_right.start()
 
-            # Get tuple from right queue, and concatenate with empty tuple.
-            if (not (tuple2 == "EOF")):
-                try:
-                    tuple2 = self.right.get(False)
-                    if (not (tuple2 == "EOF")):
-                        res = {}
-                        res.update(v2)
-                        res.update(tuple2)
-                        self.qresults.put(res)
-                        # print(tuple2)
-                except Exception:
-                    # This catch:
-                    # Empty: in tuple2 = self.right.get(False), when the queue is empty.
-                    pass
+        p_left.join()
+        p_right.join()
