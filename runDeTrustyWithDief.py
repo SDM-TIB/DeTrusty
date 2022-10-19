@@ -69,7 +69,7 @@ def run_query(query, decomposition_type, sparql_one_dot_one, config, result_fold
     planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
     plan = planner.createPlan()
 
-    pt = time() - dt
+    pt = time() - time1
 
     res = Queue()
     p2 = Process(target=plan.execute, args=(res,))
