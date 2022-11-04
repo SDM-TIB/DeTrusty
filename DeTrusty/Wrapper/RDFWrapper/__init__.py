@@ -1,3 +1,4 @@
+import json
 import urllib.parse
 import urllib.request
 
@@ -57,12 +58,8 @@ def contact_source_aux(server, query, queue, config=None):
         data = data.encode('utf-8')
         req = urllib.request.Request(server, data, headers)
         with urllib.request.urlopen(req) as response:
-            resp = response.read()
-            resp = resp.decode()
-            res = resp.replace("false", "False")
-            res = res.replace("true", "True")
-            res = eval(res)
-            if type(res) == dict:
+            res = json.loads(response.read().decode('utf8'))  # TODO: does this need another try block?
+            if isinstance(res, dict):
                 b = res.get('boolean', None)
 
                 if 'results' in res:
