@@ -158,7 +158,7 @@ class NestedHashJoinFilter(Join):
                     else:
                         if '^^<' not in v:
                             v = '"' + v + '"'
-                            vf = "?" + var + "=" + v  # + " || " + "?" + var + "=" + v + "^^<http://www.w3.org/2001/XMLSchema#string>)"
+                            vf = "str(?" + var + ")=" + v  # + " || " + "?" + var + "=" + v + "^^<http://www.w3.org/2001/XMLSchema#string>)"
                             and_expr.append(vf)
                         else:
                             loc = v.find('^^<')
