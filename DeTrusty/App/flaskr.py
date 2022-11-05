@@ -11,10 +11,11 @@ from distutils.util import strtobool
 logger = get_logger(__name__)
 
 app = Flask(__name__)
-app.config['VERSION'] = os.environ.get("VERSION")
+app.config['VERSION'] = os.environ.get('VERSION')
+app.config['VERSION_STRING'] = 'DeTrusty v' + os.environ.get('VERSION')
 app.config['JSON_AS_ASCII'] = False
 app.config['CONFIG'] = ConfigFile('/DeTrusty/Config/rdfmts.json')
-app.config['JOIN_STARS_LOCALLY'] = bool(strtobool(os.environ.get("JOIN_STARS_LOCALLY", 'True')))
+app.config['JOIN_STARS_LOCALLY'] = bool(strtobool(os.environ.get('JOIN_STARS_LOCALLY', 'True')))
 
 re_service = re.compile(r".*[^:][Ss][Ee][Rr][Vv][Ii][Cc][Ee]\s*<.+>\s*{.*", flags=re.DOTALL)
 
@@ -22,7 +23,7 @@ re_service = re.compile(r".*[^:][Ss][Ee][Rr][Vv][Ii][Cc][Ee]\s*<.+>\s*{.*", flag
 @app.route('/version', methods=['POST'])
 def version():
     """Returns the version of the running DeTrusty instance."""
-    return Response('DeTrusty v' + app.config['VERSION'] + "\n", mimetype='text/plain')
+    return Response(app.config['VERSION_STRING'] + '\n', mimetype='text/plain')
 
 
 @app.route('/sparql', methods=['POST'])
@@ -60,7 +61,7 @@ def sparql():
 
 @app.route('/sparql', methods=['GET'])
 def query_editor():
-    return render_template('query-editor.html')
+    return render_template('query-editor.html', title=app.config['VERSION_STRING'])
 
 
 if __name__ == "__main__":
