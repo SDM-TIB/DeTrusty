@@ -1,3 +1,9 @@
+# v0.8.0 - 05 Nov 2022
+- Improved Xunion operator
+- Fixed issue for filters with different data types
+- Improved the RDF wrapper
+- Updated Python base image to 3.11.0
+
 # v0.7.2 - 30 Sep 2022
 - Fix bug when config file is empty
 - Disable caching for YASGUI
