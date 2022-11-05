@@ -5,7 +5,7 @@ ENV VERSION="0.7.2"
 
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
-RUN python -m pip install --upgrade --no-cache-dir pip==22.2.* setuptools==65.0.* gunicorn==20.1.* && \
+RUN python -m pip install --upgrade --no-cache-dir pip==22.3.* setuptools==65.0.* gunicorn==20.1.* && \
     python -m pip install --no-cache-dir -r /DeTrusty/requirements.txt
 
 # copy the source code into the container
