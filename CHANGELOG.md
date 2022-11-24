@@ -1,3 +1,10 @@
+# v0.9.0 - 24 Nov 2022
+- Added GROUP BY clause
+- Added aggregates
+- Added BIND clause
+- Added ability to process simple expressions
+- Added function `year`
+
 # v0.8.0 - 05 Nov 2022
 - Improved Xunion operator
 - Fixed issue for filters with different data types

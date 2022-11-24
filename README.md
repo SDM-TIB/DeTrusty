@@ -20,10 +20,10 @@ However, the parts about the explainability and trustworthiness have not been im
 
 DeTrusty only supports `SELECT` queries.
 The following SPARQL 1.1 operations are not supported (yet):
-- Aggregation functions, e.g., `COUNT`, `MAX`
-- Conditional functions, e.g., `IF`, `BOUND`, `COALESCE` 
-- `GROUP BY` clause (including `HAVING`)
-- `BIND` clause
+- Conditional functions, e.g., `IF`, `BOUND`, `COALESCE`
+- `HAVING` clause
+- Complex expressions
+- Built-in functions, e.g., `isIRI`, `STRLEN`, `abs`, `floor`, `now`, `month`, `MD5`
 - Specifying RDF datasets using `FROM`, `FROM NAMED`, or `GRAPH`
 
 This list might not be exhaustive. Please, let us know if we missed something.
