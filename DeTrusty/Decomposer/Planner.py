@@ -4,21 +4,25 @@ import urllib.parse
 import urllib.request
 from multiprocessing import Process, Queue
 
+import DeTrusty.Decomposer.utils as utils
 from DeTrusty.Decomposer.Tree import Leaf, Node
+from DeTrusty.Operators.AnapsidOperators.Xbind import Xbind
 from DeTrusty.Operators.AnapsidOperators.Xdistinct import Xdistinct
 from DeTrusty.Operators.AnapsidOperators.Xfilter import Xfilter
-from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues 
 from DeTrusty.Operators.AnapsidOperators.Xgjoin import Xgjoin
 from DeTrusty.Operators.AnapsidOperators.Xgoptional import Xgoptional
+from DeTrusty.Operators.AnapsidOperators.Xgroupby import Xgroupby
+from DeTrusty.Operators.AnapsidOperators.Xhaving import Xhaving
 from DeTrusty.Operators.AnapsidOperators.Xlimit import Xlimit
 from DeTrusty.Operators.AnapsidOperators.Xoffset import Xoffset
 from DeTrusty.Operators.AnapsidOperators.Xorderby import Xorderby
 from DeTrusty.Operators.AnapsidOperators.Xproject import Xproject
 from DeTrusty.Operators.AnapsidOperators.Xunion import Xunion
+from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues
 from DeTrusty.Operators.BlockingOperators.Union import Union
 from DeTrusty.Operators.NonBlockingOperators.NestedHashJoinFilter import NestedHashJoinFilter as NestedHashJoin
-from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalFilter import NestedHashOptionalFilter as NestedHashOptional
-from DeTrusty.Sparql.Parser.services import Service, Optional, UnionBlock, JoinBlock, Filter, Values
+from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalFilter import  NestedHashOptionalFilter as NestedHashOptional
+from DeTrusty.Sparql.Parser.services import Bind, Filter, Service, Optional, UnionBlock, JoinBlock, Values
 
 
 class Planner(object):
@@ -38,9 +42,25 @@ class Planner(object):
 
         query = self.query
         operatorTree = self.includePhysicalOperatorsQuery()
+        aggs = list()
+
+        over_all_triples = utils.collectVars(query.args, query.group_by, query.having, aggs)  # TODO: test & fix
+        # print(query.args, query.group_by, query.having, aggs, over_all_triples)
 
         if (query.values):
             operatorTree = TreePlan(Xvalues(query.values), operatorTree.vars, operatorTree)
+
+        # Adds the group by operator to the plan.
+        if (len(query.group_by) > 0):
+            operatorTree = TreePlan(Xgroupby(query.group_by), operatorTree.vars, operatorTree)
+
+        # Adds the group by operator to the plan.
+        # if aggs:
+            # operatorTree = TreePlan(Xaggregate(aggs, over_all_triples, query.group_by, query.prefs), operatorTree.vars, operatorTree)
+
+        # Adds the having operator to the plan.
+        if query.having is not None:
+            operatorTree = TreePlan(Xhaving(query.having), operatorTree.vars, operatorTree)
 
         # Adds the order by operator to the plan.
         if (len(query.order_by) > 0):
@@ -115,13 +135,15 @@ class Planner(object):
 
         if len(tl) == 1:
             nf = self.includePhysicalOperatorsOptional(tl[0], ol)
-
-            if isinstance(tl[0], TreePlan) and (isinstance(tl[0].operator, Xfilter) or isinstance(tl[0].operator, Xvalues)):
+            if isinstance(tl[0], TreePlan) and (isinstance(tl[0].operator, Xfilter) or isinstance(tl[0].operator, Xvalues) or isinstance(tl[0].operator, Xbind)):
                 return nf
             else:
                 if len(jb.filters) > 0 and isinstance(tl[0].operator, Xfilter):
                     for f in jb.filters:
                         nf = TreePlan(Xfilter(f), nf.vars, nf)
+                if len(jb.filters) > 0 and isinstance(tl[0].operator, Xbind):
+                    for f in jb.filters:
+                        nf = TreePlan(Xbind(f), nf.vars, nf)
                 if len(jb.filters) > 0 and isinstance(tl[0].operator, Xvalues):
                     for f in jb.filters:
                         nf = TreePlan(Xvalues(f), nf.vars, nf)
@@ -166,13 +188,17 @@ class Planner(object):
                 return self.includePhysicalOperatorJoin(left_subtree, right_subtree)
             else:
                 n = self.includePhysicalOperatorJoin(left_subtree, right_subtree)
-                for f in tree.filters:
+                for f in tree.filters: 
                     vars_f = f.getVarsName()
                     if set(n.vars) & set(vars_f) == set(vars_f):
                         if isinstance(f, Values):
                             n = TreePlan(Xvalues(f), n.vars, n)
                         if isinstance(f, Filter):
                             n = TreePlan(Xfilter(f), n.vars, n)
+                    if isinstance(f, Bind):
+                        n.vars = set(n.vars) | set(vars_f)
+                        if n.vars & set(vars_f) == set(vars_f):
+                            n = TreePlan(Xbind(f), n.vars, n)
             return n
 
     def includePhysicalOperatorJoinX(self, l, r):
@@ -183,7 +209,7 @@ class Planner(object):
             if (n.left.constantPercentage() <= 0.5) and not (n.left.tree.service.allTriplesGeneral()):
                 n.left.tree.service.limit = 10000  # Fixed value, this can be learnt in the future
         # elif not decided:
-        #    n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
+            # n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
         # print "n: ", n
         if isinstance(n.right, IndependentOperator) and isinstance(n.right.tree, Leaf):
             if not dependent_join:
@@ -244,7 +270,7 @@ class Planner(object):
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                 dependent_join = True
-                #
+                
                 # if not isinstance(l, TreePlan):
                 #     if isinstance(r, TreePlan):
                 #         if not isinstance(r.operator, NestedHashJoin) and not isinstance(r.operator, Xgjoin):
@@ -267,7 +293,7 @@ class Planner(object):
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                 dependent_join = True
-                #
+                
                 # if not isinstance(r, TreePlan):
                 #     if isinstance(l, TreePlan):
                 #         if not isinstance(l.operator, NestedHashJoin) and not isinstance(l.operator, Xgjoin):
@@ -329,7 +355,7 @@ class Planner(object):
             join_variables = l.vars & right.vars
             dependent_op = False
             # if left.operator.__class__.__name__ == "NestedHashJoinFilter":
-            #    l = TreePlan(Xgoptional(left.vars, right.vars), all_variables, l, right)
+            #     l = TreePlan(Xgoptional(left.vars, right.vars), all_variables, l, right)
             # Case 1: left operator is highly selective and right operator is low selective
             if not (lowSelectivityLeft) and lowSelectivityRight and not (isinstance(right, TreePlan)):
                 l = TreePlan(NestedHashOptional(l.vars, right.vars), all_variables, l, right)
@@ -621,14 +647,14 @@ class TreePlan(object):
 
     def execute(self, outputqueue, processqueue=Queue()):
         # Evaluates the execution plan.
-        if self.left: #and this.right: # This line was modified by mac in order to evaluate unary operators
+        if self.left:  # and this.right: # This line was modified by mac in order to evaluate unary operators
             qleft  = Queue()
             qright = Queue()
 
             # The left node is always evaluated.
             # Create process for left node
-            #print "self.right: ", self.right
-            #print "self.left: ", self.left
+            # print("self.right:", self.right)
+            # print("self.left:", self.left)
 
             p1 = Process(target=self.left.execute, args=(qleft, processqueue, ))
             p1.start()
@@ -645,11 +671,11 @@ class TreePlan(object):
                 p2.start()
                 # processqueue.put(p2.pid)
             else:
-                qright = self.right #qright.put("EOF")
+                qright = self.right  # qright.put("EOF")
 
             # Create a process for the operator node.
             p = Process(target=self.operator.execute, args=(qleft, qright, outputqueue, processqueue, ))
-            #print "left and right "
+            # print("left and right")
             # Execute the plan
             p.start()
             # processqueue.put(p.pid)
@@ -659,9 +685,8 @@ class IndependentOperator(object):
     """
     Implements an operator that can be resolved independently.
 
-    It receives as input the url of the server to be contacted,
-    the filename that contains the query, the header size of the
-    of the messages.
+    It receives as input the url of the server to be contacted, the
+    filename that contains the query, the header size of the messages.
 
     The execute() method reads tuples from the input queue and
     response message and the buffer size (length of the string)
@@ -679,7 +704,7 @@ class IndependentOperator(object):
         self.config = config
         self.cardinality = None
         self.joinCardinality = []
-        #self.limit = limit
+        # self.limit = limit
 
     def __repr__(self):
         return str(self.tree)
@@ -733,6 +758,7 @@ class IndependentOperator(object):
         return self.tree.places()
 
     def constantNumber(self):
+
         return self.tree.constantNumber()
 
     def constantPercentage(self):
@@ -748,7 +774,7 @@ class IndependentOperator(object):
 
         # Evaluate the independent operator.
 
-        #self.q = Queue()
+        # self.q = Queue()
 
         p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit))
         p.start()
@@ -765,7 +791,7 @@ class IndependentOperator(object):
         #     # Check if there's no more data.
         #     if res == "EOF":
         #         break
-        #
+        
         # p.terminate()
 
 
@@ -776,11 +802,11 @@ def contactSource(molecule, query, queue, config, limit=-1):
     # print "in *NEW* contactSource"
     b = None
     cardinality = 0
-    #moleculeMetadata = config.findMolecule(molecule)
-    #wrappers = [w for w in moleculeMetadata['wrappers']]
-    #if len(wrappers) == 0:
-    #    queue.put("EOF")
-    #server = wrappers[0]['url']
+    # moleculeMetadata = config.findMolecule(molecule)
+    # wrappers = [w for w in moleculeMetadata['wrappers']]
+    # if len(wrappers) == 0:
+    #     queue.put("EOF")
+    # server = wrappers[0]['url']
     server = molecule
 
     referer = server
@@ -867,9 +893,9 @@ def contactSourceAux(referer, server, path, port, query, queue):
                         queue.put(x)
                         reslist += 1
                     # Every tuple is added to the queue.
-                    #for elem in reslist:
+                    # for elem in reslist:
                         # print elem
-                        #queue.put(elem)
+                        # queue.put(elem)
 
             else:
                 print("the source " + str(server) + " answered in " + res.getheader("content-type") + " format, instead of"

@@ -8,6 +8,8 @@ The intermediate results are represented in a queue.
 """
 
 from multiprocessing import Queue
+from . import Xexpression
+from DeTrusty.Sparql.Parser.services import Expression, Aggregate
 
 
 class Xproject(object):
@@ -28,10 +30,22 @@ class Xproject(object):
                 self.qresults.put(dict(tuple))
             else:
                 for var in self.vars:
-                    var = var.name[1:]
+                    alias = None
+                    if isinstance(var, Expression) or isinstance(var, Aggregate):
+                        tmp = Xexpression.simplifyExp(var, tuple)
+                        tuple.update({var.alias[1:]: str(tmp)})
+                        var = var.alias[1:]
+                    else:
+                        if var.alias is not None:
+                            alias = var.alias[1:]
+                        var = var.name[1:]
                     aux = tuple.get(var, '')
-                    res.update({var: aux})
+                    if alias is not None:
+                        res.update({alias: aux})
+                    else:
+                        res.update({var: aux})
                 self.qresults.put(res)
+
             tuple = self.left.get(True)
 
         # Put EOF in queue and exit.

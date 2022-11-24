@@ -7,7 +7,7 @@ from functools import partial
 from DeTrusty.Decomposer import utils as utils
 from DeTrusty.Logger import get_logger
 from DeTrusty.Decomposer import Tree
-from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values
+from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind
 
 logger = get_logger(__name__, '.decompositions.log')
 
@@ -80,7 +80,10 @@ class Decomposer(object):
             elif isinstance(bgp, Filter):
                 fl.append(bgp)
             elif isinstance(bgp, Values):
-                 fl.append(bgp)
+                fl.append(bgp)
+            elif isinstance(bgp, Bind):
+                self.query.extra_vars.append(bgp.alias)
+                fl.append(bgp)
             elif isinstance(bgp, Optional):
                 ubb = self.decomposeUnionBlock(bgp.bgg)
                 skipp = False
@@ -678,17 +681,20 @@ class Decomposer(object):
                     fl2 = self.includeFilterUnionBlock(jb, f)
                     fl1 = fl1 + fl2
             elif (isinstance(jb, Service)):
+                # for f in fl:
+                #     values = self.query.values
+                #     if values is None and isinstance(f, Values):
+                #         values = f
+                #         vl = values.instantiate()
+                #         for row in vl.data_block:
+                #             for value in row:
+                #                 if value is not None:
+                #                     value.name = utils.getUri(value, self.prefixes)
                 for f in fl:
-                    values = self.query.values
-                    if values is None and isinstance(f, Values):
-                        values = f
-                        vl = values.instantiate()
-                        for row in vl.data_block:
-                            for value in row:
-                                if value is not None:
-                                    value.name = utils.getUri(value, self.prefixes)
-                for f in fl:
-                    fl2 = self.includeFilterAuxSK(f, jb.triples, jb)
+                    if type(f) is Filter:
+                        fl2 = self.includeFilterAuxSK(f, jb.triples, jb)
+                    else:
+                        fl2 = self.includeFilterAuxSK(f, jb.triples, jb, True)
                     fl1 = fl1 + fl2
         return fl1
 
@@ -716,7 +722,7 @@ class Decomposer(object):
                         fl1 = fl1 + [f]
         return fl1
 
-    def includeFilterAuxSK(self, f, sl, sr):
+    def includeFilterAuxSK(self, f, sl, sr, not_filter=False):
         """
         updated: includeFilterAuxS(f, sl, sr) below to include filters that all vars in filter exists in any of the triple
         patterns of a BGP. the previous impl includes them only if all vars are in a single triple pattern
@@ -729,12 +735,17 @@ class Decomposer(object):
         serviceFilter = False
         fvars = dict()
         vars_f = f.getVars()
+        # print("debug: ", vars_f)
+        # print("debug: ", f)
 
         for v in vars_f:
             fvars[v] = False
         bgpvars = set()
 
         for s in sl:
+            # print('#####sl_component#####')
+            # print(s)
+            # print('#########')
             bgpvars.update(set(utils.getVars(s)))
             vars_s = set()
             if (isinstance(s, Triple)):
@@ -749,6 +760,13 @@ class Decomposer(object):
         for v in bgpvars:
             if v in fvars:
                 fvars[v] = True
+
+        if not_filter:
+            fvars[f.alias] = True
+        # print(fvars)
+        # print('#####sr_component#####')
+        # print(sr)
+        # print('#########')
         if serviceFilter:
             sr.include_filter(f)
             fl1 = fl1 + [f]

@@ -222,26 +222,37 @@ class Leaf(Tree):
         # print "getinfo: subquery: ", subquery
         vs = list(set(self.service.getVars()))  # - set(self.service.filters_vars)) # Modified this by mac: 31-01-2014
         # print "service", vs
-        predictVar = set(self.service.getPredVars())
+        # predictVar = set(self.service.getPredVars())  # no longer needed since pred vars are included in vars
         variables = [v.lstrip("?$") for v in vs]
-        if query.args == []:
+        if not query.args:
             projvars = vs
         else:
-            projvars = list(set([v.name for v in query.args if not v.constant]))
+            # projvars = list(set([v.name for v in query.args if not v.constant]))
+            projvars = []
+            for arg in query.args:
+                if '?ALL' in arg.getVars():
+                    projvars = vs               # doubtable
+                    break
+                else:
+                    projvars += arg.getVars()
         subvars = list((query.join_vars | set(projvars)) & set(vs))
-        vars_order_by = [x for v in query.order_by for x in v.getVars()]
+        vars_order_by = [x for v in query.order_by for x in v.getVars() if x in vs]
+        vars_group_by = [x for v in query.group_by for x in v.getVars() if x in vs]
+        vars_having = list()
+        if query.having:
+            vars_having = [v for v in query.having.getVars() if v in vs]
         # print "subvar 1: ", subvars
         if subvars == []:
             subvars = vs
             # print "subvar 1.1: ", subvars
         filter_vars = [v for v in query.getFilterVars() if v in vs]
 
-        subvars = list(set(subvars) | predictVar | set(vars_order_by) | set(filter_vars))
+        subvars = list(set(subvars) | set(vars_order_by) | set(filter_vars) | set(vars_group_by) | set(vars_having))
         # print "subvar 2: ", subvars
         # This corresponds to the case when the subquery is the same as the original query.
         # In this case, we project the variables of the original query.
         if query.body.show(" ").count("SERVICE") == 1:
-            subvars = list(set(projvars) | set(vars_order_by))
+            subvars = list(set(projvars) | set(vars_order_by) | set(vars_group_by) | set(vars_having))
             # print "subvar 3: ", subvars
         subvars = " ".join(subvars)
         # MEV distinct pushed down to the sources

@@ -1,3 +1,5 @@
+from DeTrusty.Sparql.Parser.services import Aggregate, HavingHelper, Expression
+
 def getVars(sg):
     s = []
     if not sg.subject.constant:
@@ -46,3 +48,43 @@ def getTemplatesPerMolecule(molecules):
             else:
                 moltemp[m] = [t.pred]
     return moltemp
+
+###################################################################
+
+def collectVars(proj, group, having, agg):
+    implicit_group = not group 
+    agg_exist = False
+    over_all_triples = True
+    index = 0
+
+    for var in proj:
+        if type(var) is Aggregate or type(var) is Expression:
+            agg_exist = True
+            break
+
+    for var in proj:
+        if type(var) is not Aggregate and type(var) is not Expression:
+            over_all_triples = False
+            if implicit_group and agg_exist:
+                group.append(var)
+        else:
+            var.name = "?callret-" + str(index)
+            agg.append(var)
+        index += 1
+
+    if having:
+        tmp = havingVars(having.args)
+        for arg in tmp:
+            if arg not in agg:
+                agg.append(arg)
+
+    return over_all_triples
+
+def havingVars(tmp):
+    ret = list()
+    for x in tmp:
+        if type(x) is HavingHelper:
+            ret.append(x.agg) 
+        else:
+            ret += havingVars(x.args)
+    return ret

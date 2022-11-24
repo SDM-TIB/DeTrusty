@@ -11,7 +11,7 @@ class Service(object):
         self.filters = []
         self.filter_nested = filter_nested if filter_nested is not None else []  # TODO: this is used to store the filters from NestedLoop operators
         self.limit = limit  # TODO: This arg was added in order to integrate contactSource with incremental calls (16/12/2013)
-        #self.filters_vars = set(filter_vars)
+        # self.filters_vars = set(filter_vars)
 
     def include_filter(self, f):
         self.filters.append(f)
@@ -61,7 +61,7 @@ class Service(object):
         new_filters = []
         new_filters.extend(self.filter_nested)
         new_filters.append(filter_str)
-        #new_filters_vars = self.filters_vars | set(d)
+        # new_filters_vars = self.filters_vars | set(d)
 
         return Service("<" + self.endpoint + ">", self.triples, self.limit, new_filters)
 
@@ -94,13 +94,15 @@ class Service(object):
         return triples_str + filters_str
 
     def getVars(self):
+        vars_ = []
         if isinstance(self.triples, list):
-            l = []
             for t in self.triples:
-                l = l + t.getVars()
+                vars_.extend(t.getVars())
         else:
-            l = self.triples.getVars()
-        return l
+            vars_.extend(self.triples.getVars())
+        for filter_ in self.filters:
+            vars_.extend(filter_.getVars())
+        return vars_
 
     def getConsts(self):
         if isinstance(self.triples, list):
@@ -154,18 +156,21 @@ class Service(object):
 
 class Query(object):
 
-    def __init__(self, prefs, args, body, distinct, values, order_by=None, limit=-1, offset=-1, filter_nested=''):
+    def __init__(self, prefs, args, body, distinct, values, group_by=[], order_by=[], limit=-1, offset=-1, having=None, filter_nested='', extra_vars=[]):
         self.prefs = prefs
         self.args = args
         self.body = body
         self.distinct = distinct
         self.values = values
         self.join_vars = self.getJoinVars()
-        self.order_by = order_by if order_by is not None else []
+        self.order_by = order_by
+        self.group_by = group_by
         self.limit = limit
         self.offset = offset
+        self.having = having
         self.filter_nested = filter_nested
-        genPred = [] #readGeneralPredicates('ontario/common/parser/generalPredicates')
+        self.extra_vars = extra_vars
+        genPred = []  # readGeneralPredicates('ontario/common/parser/generalPredicates')
         self.body.setGeneral(getPrefs(self.prefs), genPred)
 
     def __repr__(self):
@@ -221,7 +226,7 @@ class Query(object):
         else:
             d = ""
         values_str = str(self.values)
-        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + values_str  + "\n" + self.filter_nested + "\n}"
+        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + values_str + "\n" + self.filter_nested + "\n}"
 
     def show2(self):
         body_str = self.body.show2(" ")
@@ -331,7 +336,6 @@ def getJoinVarsJoinBlock(jb):
     join_vars = []
 
     for bgp in jb.triples:
-
         if isinstance(bgp, Triple):
             if not bgp.subject.constant:
                 join_vars.append(bgp.subject.name)
@@ -538,7 +542,7 @@ class JoinBlock(object):
                 for f in self.filters:
                     r += str(f)
 
-        return r #+ self.filters
+        return r # + self.filters
 
     def setGeneral(self, ps, genPred):
         if isinstance(self.triples, list):
@@ -583,12 +587,12 @@ class JoinBlock(object):
                 for f in self.filters:
                     joinBody += str(f)
             return joinBody
-            #return ". ".join(map(str, self.triples)) + " ".join(map(str, self.filters)) + self.filters_str
-            #n = nest(self.triples)
-            #if n:
-            #    return aux(n, x, " . ") + " ".join(map(str, self.filters)) + self.filters_str
-            #else:
-            #    return " "
+            # return ". ".join(map(str, self.triples)) + " ".join(map(str, self.filters)) + self.filters_str
+            # n = nest(self.triples)
+            # if n:
+                # return aux(n, x, " . ") + " ".join(map(str, self.filters)) + self.filters_str
+            # else:
+                # return " "
         else:
             return self.triples.show(x)
 
@@ -696,13 +700,13 @@ class Filter(object):
         else:
             return "\n" + x + "FILTER (" + str(self.expr) + ")"
 
-    def getVars(self):
+    def getVars(self):   
         return self.expr.getVars()
 
     def getConsts(self):
         return self.expr.getConsts()
 
-    def getVarsName(self):
+    def getVarsName(self):  
         vars=[]
         for v in self.expr.getVars():
             vars.append(v[1:len(v)])
@@ -731,11 +735,11 @@ class Filter(object):
 
     def constantNumber(self):
         return 1
-        #return self.expr.constantNumber()
+        # return self.expr.constantNumber()
 
     def constantPercentage(self):
         return 0.5
-        #return self.constantNumber()/self.places()
+        # return self.constantNumber()/self.places()
 
 
 class Values(object):
@@ -822,7 +826,67 @@ class Values(object):
     def constantPercentage(self):
         return self.constantNumber()/self.places()
 
+class Bind(object):
 
+    def __init__(self, expr, alias):
+        self.expr = expr
+        self.alias = alias
+
+    def __repr__(self):
+        return "\n" + "BIND (" + str(self.expr) + " AS " + self.alias + ")"
+
+    def show(self, x):
+        return "\n" + x + "BIND (" + str(self.expr) + " AS " + self.alias + ")"
+
+    def getVars(self):
+        if self.alias:
+            # not sure if this correct, check later
+            return [self.alias] + self.expr.getVars()
+        return self.expr.getVars()
+
+    def getConsts(self):
+        c = []
+        for row in self.expr:
+            for arg in row:
+                const = arg.getConsts()  
+                c = c + const
+
+        return c
+    
+    def getVarsName(self):
+        vars = []
+        b_v = self.getVars()
+        for v in b_v:
+            vars.append(v[1:])
+        return vars
+
+    def getPredVars(self):
+        return []
+
+    def setGeneral(self, ps, genPred):
+        return
+
+    def places(self):
+        return self.expr.places()
+
+    def allTriplesGeneral(self):
+        return False
+
+    def allTriplesLowSelectivity(self):
+        return True
+
+    def instantiate(self):
+        return Bind(self.expr, self.alias)
+
+    def instantiateFilter(self, d, filter_str):
+        return Bind(self.expr, self.alias)
+
+    def constantNumber(self):
+        return len(self.getConsts())
+
+    def constantPercentage(self):
+        return self.constantNumber()/self.places()
+        
 class Optional(object):
     def __init__(self, bgg):
         self.bgg = bgg
@@ -938,12 +1002,16 @@ binaryFunctor = {
 
 class Expression(object):
 
-    def __init__(self, op, left, right):
+    def __init__(self, op, left = None, right = None, exp_type = None, alias = None):
         self.op = op
         self.left = left
         self.right = right
+        self.exp_type = exp_type
+        self.alias = alias
 
     def __repr__(self):
+        if self.alias:
+            return self.alias
         if self.op in unaryFunctor:
             return (self.op +"("+ str(self.left) + ")")
         elif self.op in binaryFunctor:
@@ -956,11 +1024,27 @@ class Expression(object):
         else:
             return ("(" + str(self.left)+" "+ self.op +" "+str(self.right)+ ")")
 
+    def __str__(self):
+        if self.alias:
+            return self.alias
+        if self.op in unaryFunctor:
+            return (self.op +"("+ str(self.left) + ")")
+        elif self.op in binaryFunctor:
+            if (self.op == 'REGEX' and self.right.desc!=False):
+                return (self.op + "("+ str(self.left) + "," + self.right.name + "," + self.right.desc + ")")
+            else:
+                return (self.op + "("+ str(self.left) + "," + str(self.right) + ")")
+        elif self.right is None:
+            return (self.op + '(' + str(self.left) + ')')
+        else:
+            return ("(" + str(self.left)+" "+ self.op +" "+str(self.right)+ ")")
+
     def getVars(self):
-        if (self.op in unaryFunctor) or (self.right is None):
+        # if (self.op=='REGEX' or self.op == 'xsd:integer' or self.op=='!' or self.op == 'BOUND' or self.op == 'ISIRI' or self.op == 'ISURI' or self.op == 'ISBLANK' or self.op == 'ISLITERAL' or self.op == 'STR' or self.op == 'LANG' or self.op == 'DATATYPE'):
+        if ((self.op in unaryFunctor) or (self.right is  None)):
             return self.left.getVars()
         else:
-            return self.left.getVars() + self.right.getVars()
+            return self.left.getVars()+self.right.getVars()
 
     def getConsts(self):
         if self.op in unaryFunctor or self.right is None:
@@ -1002,6 +1086,18 @@ class Expression(object):
     def constantPercentage(self):
         return self.constantNumber()/self.places()
 
+    def aggInside(self):
+        if type(self.left) is Aggregate or type(self.right) is Aggregate:
+            return True
+        if type(self.left) is Argument:
+            if type(self.right) is Expression:
+                return self.right.aggInside()
+            return False
+        if type(self.right) is Argument:
+            if type(self.left) is Expression:
+                return self.left.aggInside()
+            return False
+        return self.left.aggInside() or self.right.aggInside()
 
 class Triple(object):
     def __init__(self, subject, predicate, theobject):
@@ -1028,19 +1124,19 @@ class Triple(object):
     def allTriplesGeneral(self):
         return self.isGeneral
 
-    #Modified 17-12-2013. General predicates are not considered to decide if the triple is selective or not
+    # Modified 17-12-2013. General predicates are not considered to decide if the triple is selective or not
     def allTriplesLowSelectivity(self):
         return ((not self.predicate.constant)
-                #or ((self.isGeneral) and (not self.subject.constant)
+                 # or ((self.isGeneral) and (not self.subject.constant)
                  or ((not self.subject.constant)
                     and (not self.theobject.constant))
                  # or
-                 #   # added 09/03/2018
-                 #   (self.theobject.constant and
-                 #   self.predicate.constant and
-                 #   ('rdf:type' in self.predicate.name or 'a' == self.predicate.name or
-                 #     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' in self.predicate.name))
-                )
+                    # # added 09/03/2018
+                    # (self.theobject.constant and
+                    # self.predicate.constant and
+                    # ('rdf:type' in self.predicate.name or 'a' == self.predicate.name or
+                    # 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' in self.predicate.name))
+               )
 
     def show(self, x):
         return x+self.subject.name+" " + self.predicate.name + " " + str(self.theobject)
@@ -1109,30 +1205,36 @@ class Triple(object):
 
 class Argument(object):
 
-    def __init__(self, name, constant, desc=False, datatype=None, lang=None):
+    def __init__(self, name, constant=False, desc=False, datatype=None, lang=None, alias=None, gen_type=None):
         self.name = name if not constant else urllib.parse.quote(name, safe='<:/#>"\'^')
         self.constant = constant
         self.desc = desc
         self.datatype = datatype
         self.lang = lang
+        self.alias = alias
+        self.gen_type = gen_type
 
     def __repr__(self):
-        arg = self.name
-        if self.datatype is not None:
-            arg += "^^" + self.datatype
-        if self.lang is not None:
-            arg += "@" + self.lang
-
-        return arg
+        if self.alias:
+            return self.alias
+        else:
+            arg = str(self.name)
+            if self.datatype is not None:
+                arg += "^^" + self.datatype
+            if self.lang is not None:
+                arg += "@" + self.lang
+            return arg
 
     def __str__(self):
-        arg = self.name
-        if self.datatype is not None:
-            arg += "^^" + self.datatype
-        elif self.lang is not None:
-            arg += "@" + self.lang
-
-        return arg
+        if self.alias:
+            return self.alias
+        else:
+            arg = str(self.name)
+            if self.datatype is not None:
+                arg += "^^" + self.datatype
+            elif self.lang is not None:
+                arg += "@" + self.lang
+            return arg
 
     def __eq__(self, other):
         if isinstance(other, str):
@@ -1174,6 +1276,102 @@ class Argument(object):
 
     def constantPercentage(self):
         return self.constantNumber()/self.places()
+
+
+#######################################################
+
+
+class Aggregate(object):
+
+    def __init__(self, exp, distinct, op, alias=None, sep=None, name=None):
+        self.exp = exp
+        self.distinct = distinct
+        self.op = op
+        self.alias = alias
+        self.sep = sep
+        self.name = name
+
+    def getVars(self):
+        return self.exp.getVars() # TODO: check whether Expression.getVars() correct or not
+    
+    def getName(self):
+        if self.alias:
+            return self.alias[1:]
+        else:
+            if self.name:
+                return self.name[1:]
+            else:
+                return str(self.name)
+
+    def getDefVal(self):
+        if self.op.upper() == 'MAX':
+            return list()
+        elif self.op.upper() == 'MIN':
+            return list()
+        elif self.op.upper() == 'SUM':
+            return list()
+        elif self.op.upper() == 'AVG':
+            return list()
+        elif self.op.upper() == 'COUNT':
+            return list()
+        elif self.op.upper() == 'SAMPLE':
+            return None
+        elif self.op.upper() == 'GROUP_CONCAT':
+            return list()
+
+    def __repr__(self):
+        return '?' + self.getName()
+
+    def __eq__(self, other):
+        return self.exp == other.exp and self.distinct == other.distinct and self.op == other.op and self.sep == other.sep
+
+    def __ne__(self, other):
+        return not self == other
+
+
+#######################################################
+
+
+class HavingHelper(object):
+
+    def __init__(self, agg, op, num):
+        self.agg = agg
+        self.op = op
+        self.num = num
+
+    def getVars(self):
+        return self.agg.getVars()
+
+    # def __repr__(self):
+        # return '?' + self.getName()
+
+    # def __eq__(self, other):
+        # return self.var == other.var and self.distinct == other.distinct and self.op == other.op
+
+    # def __ne__(self, other):
+        # return not self == other
+
+
+#######################################################
+
+
+class Having(object):
+
+    def __init__(self, args, log_op=None):
+        self.args = args
+        self.log_op = log_op
+    
+    def getVars(self):
+        ret = list()
+        for arg in self.args:
+                ret += arg.getVars()
+        return ret
+
+    def __repr__(self):
+        return str(tuple([self.args, self.log_op]))
+
+
+#######################################################
 
 
 def readGeneralPredicates(fileName):
