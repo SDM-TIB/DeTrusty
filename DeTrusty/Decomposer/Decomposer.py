@@ -701,6 +701,7 @@ class Decomposer(object):
     def includeFilterAux(self, f, sl):
         fl1 = []
         for s in sl:
+            # print(type(s))
             vars_s = set()
             for t in s.triples:
                 vars_s.update(set(utils.getVars(t)))

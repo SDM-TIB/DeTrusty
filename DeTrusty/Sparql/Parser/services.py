@@ -839,9 +839,6 @@ class Bind(object):
         return "\n" + x + "BIND (" + str(self.expr) + " AS " + self.alias + ")"
 
     def getVars(self):
-        if self.alias:
-            # not sure if this correct, check later
-            return [self.alias] + self.expr.getVars()
         return self.expr.getVars()
 
     def getConsts(self):

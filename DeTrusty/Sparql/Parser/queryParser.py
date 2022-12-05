@@ -1,8 +1,10 @@
 import urllib.parse
 from ply import lex, yacc
+import sys
 # not all module needed (TODO: check after integrating expression to Having, Aggregate)
 from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Having, HavingHelper, Service
 
+test = list()
 
 # Lexer
 reserved = {
@@ -339,6 +341,10 @@ def p_single_var_list_0(p):
     """
     var_list : VARIABLE
     """
+    # if p[1][1:] not in test:
+    #     p_error(p[1])
+        # print('grouping variable should be in aggregate')
+        # sys.exit()
     p[0] = [Argument(p[1], False)]
 
 
@@ -361,6 +367,10 @@ def p_var_list_0(p):
     """
     var_list : VARIABLE var_list 
     """
+    # if p[1][1:] not in test:
+    #     p_error(p[1])
+        # print('grouping variable should be in aggregate')
+        # sys.exit()
     p[0] = [Argument(p[1], False)] + p[2]
 
 
@@ -388,6 +398,7 @@ def p_group_by_0(p):
    """
    group_by : GROUP BY group_var group_var_list
    """
+   test.append(p[3].name[1:])
    p[0] = [p[3]] + p[4]
 
 
@@ -1652,7 +1663,7 @@ def p_object_constant(p):
 
 
 def p_error(p):
-    print(p)
+    # print(type(p))
     if isinstance(p, str):
         value = p
     else:
