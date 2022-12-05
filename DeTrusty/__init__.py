@@ -79,8 +79,8 @@ def run_query(query: str,
 
     planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
     plan = planner.createPlan()
-    print(plan)
-    sys.exit()
+    # print(plan)
+    # sys.exit()
 
     output = Queue()
     plan.execute(output)

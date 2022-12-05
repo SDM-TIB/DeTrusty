@@ -101,6 +101,9 @@ class Service(object):
         else:
             vars_.extend(self.triples.getVars())
         for filter_ in self.filters:
+            if isinstance(filter_, Bind):
+                print('bind inside')
+                vars_.append(filter_.alias)
             vars_.extend(filter_.getVars())
         return vars_
 

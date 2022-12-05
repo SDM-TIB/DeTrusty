@@ -26,7 +26,7 @@ class Xgroupby(object):                                                    # ens
             arg_list.append(arg.name[1:])
 
         tuple = self.left.get(True)                                     
-        # print(tuple)
+        print(tuple)
 
         while (tuple != "EOF"):
             match = [0] * len(tmp)
