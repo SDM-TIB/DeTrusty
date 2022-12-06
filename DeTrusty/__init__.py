@@ -1,6 +1,6 @@
 __author__ = "Philipp D. Rohde"
 
-import re, sys
+import re
 import time
 from multiprocessing import Queue
 
@@ -79,8 +79,6 @@ def run_query(query: str,
 
     planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
     plan = planner.createPlan()
-    # print(plan)
-    # sys.exit()
 
     output = Queue()
     plan.execute(output)
