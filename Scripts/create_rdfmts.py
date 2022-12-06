@@ -2,9 +2,13 @@
 
 import getopt
 import json
+import pathlib
 import sys
 
+PACKAGE_DETRUSTY = str(pathlib.Path(__file__).parent.parent.resolve())
+sys.path.append(PACKAGE_DETRUSTY)
 from DeTrusty.Molecule.MTCreation import DEFAULT_OUTPUT_PATH, create_rdfmts, logger
+sys.path.remove(PACKAGE_DETRUSTY)
 
 
 def get_options(argv):
