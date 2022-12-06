@@ -18,7 +18,7 @@ setuptools.setup(
     download_url='https://github.com/SDM-TIB/DeTrusty/archive/refs/tags/v' + version + '.tar.gz',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    scripts=['./Scripts/create_rdfmts.py',
+    scripts=['./create_rdfmts.py',
              './Scripts/restart_workers.sh'],
     packages=[
         'DeTrusty',
