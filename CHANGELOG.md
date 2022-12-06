@@ -1,6 +1,6 @@
 # v0.9.1 - 06 Dec 2022
 - Fixed not pushing down BIND in some cases
-- Moved `create_rdfmts.py` to root directory
+- Fixed missing module error in `create_rdfmts.py`
 
 # v0.9.0 - 24 Nov 2022
 - Added GROUP BY clause
