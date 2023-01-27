@@ -8,7 +8,7 @@
 [![Package Status](https://img.shields.io/pypi/status/DeTrusty)](https://pypi.org/project/DeTrusty)
 [![Package Version](https://img.shields.io/pypi/v/DeTrusty)](https://pypi.org/project/DeTrusty)
 
-# DeTrusty
+# ![Logo](https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/images/logo.png "Logo")
 
 DeTrusty is a federated query engine.
 At this stage, only SPARQL endpoints are supported.
