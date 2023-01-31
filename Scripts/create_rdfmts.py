@@ -13,7 +13,7 @@ sys.path.remove(PACKAGE_DETRUSTY)
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, 'h:s:o:j')
+        opts, args = getopt.getopt(argv, 'h:s:o:j:i')
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -21,6 +21,7 @@ def get_options(argv):
     endpoints_file = None
     output = DEFAULT_OUTPUT_PATH
     is_json = False
+    interlinking = False
     for opt, arg in opts:
         if opt == '-h':
             usage()
@@ -31,6 +32,8 @@ def get_options(argv):
             output = arg
         elif opt == '-j':
             is_json = True
+        elif opt == '-i':
+            interlinking = True
 
     if not endpoints_file:
         usage()
@@ -49,21 +52,22 @@ def get_options(argv):
 
     if '.json' not in output:
         output += '.json'
-    return endpoints, output
+    return endpoints, output, interlinking
 
 
 def usage():
     usage_str = (
-        'Usage: {program} -s <path/to/endpoints.txt> [-o <path/to/output.json>] [-j]\n'
+        'Usage: {program} -s <path/to/endpoints.txt> [-o <path/to/output.json>] [-j] [-i]\n'
         'where\n'
         '    <path/to/endpoints.txt> - path to a text file containing a list of SPARQL endpoint URLs\n'
         '    <path/to/output.json> - name of output file\n'
         'parameters\n'
-        '    -j\tif set, the endpoints file will be handled as JSON instead of plain text'
+        '    -j\tif set, the endpoints file will be handled as JSON instead of plain text\n'
+        '    -i\tif set, interlinks between the endpoints will be searched (computationally expensive)'
     )
     print(usage_str.format(program=sys.argv[0]),)
 
 
 if __name__ == '__main__':
-    endpoints, output = get_options(sys.argv[1:])
-    create_rdfmts(endpoints, output)
+    endpoints, output, interlinking = get_options(sys.argv[1:])
+    create_rdfmts(endpoints, output, interlinking)

@@ -55,7 +55,9 @@ class Endpoint:
         return params_public
 
 
-def create_rdfmts(endpoints: list | dict, output: Optional[str] = DEFAULT_OUTPUT_PATH) -> Optional[JSONConfig]:
+def create_rdfmts(endpoints: list | dict,
+                  output: Optional[str] = DEFAULT_OUTPUT_PATH,
+                  interlinking: bool = False) -> Optional[JSONConfig]:
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
     logger_wrapper.setLevel(logging.WARNING)  # temporarily disable logging of contacting the source
 
@@ -104,35 +106,36 @@ def create_rdfmts(endpoints: list | dict, output: Optional[str] = DEFAULT_OUTPUT
             p.terminate()
 
     # now the interlinking
-    eofflags = []
-    epros = []
-    for e1 in endpoints:
-        for e2 in endpoints:
-            if e1 == e2:
-                continue
-            q = multiprocessing.Queue()
-            eofflags.append(q)
-            logger.info('Finding inter-links between: ' + e1.url + ' and ' + e2.url)
-            logger.info('==============================//=========//===============================')
-            p = multiprocessing.Process(target=_get_links, args=(e1, sparqlendps[e1.url], e2, sparqlendps[e2.url], q,))
-            epros.append(p)
-            p.start()
+    if interlinking:
+        eofflags = []
+        epros = []
+        for e1 in endpoints:
+            for e2 in endpoints:
+                if e1 == e2:
+                    continue
+                q = multiprocessing.Queue()
+                eofflags.append(q)
+                logger.info('Finding inter-links between: ' + e1.url + ' and ' + e2.url)
+                logger.info('==============================//=========//===============================')
+                p = multiprocessing.Process(target=_get_links, args=(e1, sparqlendps[e1.url], e2, sparqlendps[e2.url], q,))
+                epros.append(p)
+                p.start()
 
-    while len(eofflags) > 0:
-        for q in eofflags:
-            rdfmts = q.get()
-            for rdfmt in rdfmts:
-                rootType = rdfmt['rootType']
-                if rootType not in dsrdfmts:
-                    dsrdfmts[rootType] = rdfmt
-                else:
-                    _merge_mts(rdfmt, rootType, dsrdfmts)
-            eofflags.remove(q)
-            break
+        while len(eofflags) > 0:
+            for q in eofflags:
+                rdfmts = q.get()
+                for rdfmt in rdfmts:
+                    rootType = rdfmt['rootType']
+                    if rootType not in dsrdfmts:
+                        dsrdfmts[rootType] = rdfmt
+                    else:
+                        _merge_mts(rdfmt, rootType, dsrdfmts)
+                eofflags.remove(q)
+                break
 
-    for p in epros:
-        if p.is_alive():
-            p.terminate()
+        for p in epros:
+            if p.is_alive():
+                p.terminate()
 
     for e in sparqlendps:
         rdfmts = sparqlendps[e]
