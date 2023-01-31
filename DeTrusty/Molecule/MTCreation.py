@@ -20,6 +20,7 @@ logger = get_logger('rdfmts', '.rdfmts.log', file_and_console=True)
 
 CONFIG = MTCreationConfig()
 DEFAULT_OUTPUT_PATH = '/DeTrusty/Config/rdfmts.json'
+TYPING_WIKIDATA = '<http://www.wikidata.org/prop/direct/P31>'
 
 metas = [
     'http://www.w3.org/ns/sparql-service-description',
@@ -171,6 +172,8 @@ def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
         linked_to = set()
         predicates = _get_predicates(endpoint, c)
         for p in predicates:
+            if 'wikiPageWikiLink' in p:
+                continue
             range_ = _get_predicate_range(endpoint, c, p)
             if len(range_) > 0:
                 [linked_to.add(r) for r in range_]
@@ -201,13 +204,23 @@ def _get_typed_concepts(endpoint):
     if endpoint.types:
         return endpoint.types
 
-    query = 'SELECT DISTINCT ?t WHERE { ?s a ?t . }'
+    query = 'SELECT DISTINCT ?t WHERE { ?s '
+    if 'wikidata' in endpoint.url:
+        query += TYPING_WIKIDATA
+    else:
+        query += 'a'
+    query += ' ?t . }'
     res_list, _ = _get_results_iter(query, endpoint)
     return [r['t'] for r in res_list if True not in [m in str(r['t']) for m in metas]]
 
 
 def _get_predicates(endpoint, type_):
-    query = 'SELECT DISTINCT ?p WHERE { ?s a <' + type_ + '> . ?s ?p ?pt . }'
+    query = 'SELECT DISTINCT ?p WHERE { ?s '
+    if 'wikidata' in endpoint.url:
+        query += TYPING_WIKIDATA
+    else:
+        query += 'a'
+    query += ' <' + type_ + '> . ?s ?p ?pt . }'
     res_list, status = _get_results_iter(query, endpoint)
     res_list = [r['p'] for r in res_list]
 
@@ -223,7 +236,12 @@ def _get_predicates(endpoint, type_):
 
 
 def _get_predicates_of_random_instances(endpoint, type_):
-    query = 'SELECT DISTINCT ?s WHERE { ?s a <' + type_ + '> . }'
+    query = 'SELECT DISTINCT ?s WHERE { ?s '
+    if 'wikidata' in endpoint.url:
+        query += TYPING_WIKIDATA
+    else:
+        query += 'a'
+    query += ' <' + type_ + '> . }'
     res_list, _ = _get_results_iter(query, endpoint, limit=100, max_tries=100, max_answers=100)
     results = []
     batches = [res_list[i:i+10] for i in range(0, len(res_list), 10)]
@@ -245,9 +263,14 @@ def _get_predicate_range(endpoint, type_, predicate):
 
     # second, get range from instances
     query = 'SELECT DISTINCT ?range WHERE {\n' \
-            '  ?s a <' + type_ + '> .\n' \
-            '  ?s <' + predicate + '> ?pt .\n' \
-            '  ?pt a ?range .\n}'
+            '  ?s '
+    if 'wikidata' in endpoint.url:
+        query += TYPING_WIKIDATA
+    else:
+        query += 'a'
+    query += ' <' + type_ + '> .\n' \
+             '  ?s <' + predicate + '> ?pt .\n' \
+             '  ?pt a ?range .\n}'
     res_list, _ = _get_results_iter(query, endpoint)
     ranges.extend([r['range'] for r in res_list if True not in [m in str(r['range']) for m in metas]])
 
@@ -331,7 +354,12 @@ def _get_links(endpoint1, rdfmt1, endpoint2, rdfmt2, q):
 
 
 def _get_external_links(endpoint1, root_type, predicate, endpoint2, rdfmt2):
-    query = 'SELECT DISTINCT ?o WHERE { ?s a <' + root_type + '> ; <' + predicate + '> ?o . FILTER (isIRI(?o)) }'
+    query = 'SELECT DISTINCT ?o WHERE { ?s '
+    if 'wikidata' in endpoint1.url:
+        query += TYPING_WIKIDATA
+    else:
+        query += 'a'
+    query += ' <' + root_type + '> ; <' + predicate + '> ?o . FILTER (isIRI(?o)) }'
     e1_objects, _ = _get_results_iter(query, endpoint1, max_tries=100)
     e1_objects = [obj['o'] for obj in e1_objects]
     batches = [e1_objects[i:i + 45] for i in range(0, len(e1_objects), 45)]
@@ -341,8 +369,13 @@ def _get_external_links(endpoint1, root_type, predicate, endpoint2, rdfmt2):
         query = 'SELECT DISTINCT ?c WHERE {\n' \
                 '  VALUES ?o { ' + ' '.join(batch) + ' }\n' \
                 '  ?s ?p ?o .\n' \
-                '  ?s a ?c .\n' \
-                '}'
+                '  ?s '
+        if 'wikidata' in endpoint2.url:
+            query += TYPING_WIKIDATA
+        else:
+            query += 'a'
+        query += ' ?c .\n' \
+                 '}'
         res_list, _ = _get_results_iter(query, endpoint2, max_tries=10)
         [linked_to.add(r['c']) for r in res_list]
 
