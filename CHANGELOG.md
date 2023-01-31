@@ -1,3 +1,7 @@
+# v0.10.0 - 31 Jan 2023
+- Added collecting source descriptions from Wikidata
+- Added feature to disable interlinking in source description collection
+
 # v0.9.1 - 06 Dec 2022
 - Fixed not pushing down BIND in some cases
 - Fixed missing module error in `create_rdfmts.py`
