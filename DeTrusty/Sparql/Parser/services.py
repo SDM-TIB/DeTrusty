@@ -63,7 +63,13 @@ class Service(object):
         new_filters.append(filter_str)
         # new_filters_vars = self.filters_vars | set(d)
 
-        return Service("<" + self.endpoint + ">", self.triples, self.limit, new_filters)
+        service = Service("<" + self.endpoint + ">", self.triples, self.limit, new_filters)
+        # hotfix: BIND needs to stay in order to get the variable
+        for filter_ in self.filters:
+            if isinstance(filter_, Bind):
+                service.include_filter(filter_)
+
+        return service
 
     def getTriples(self):
         if isinstance(self.triples, list):
