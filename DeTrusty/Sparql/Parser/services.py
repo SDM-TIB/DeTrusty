@@ -158,12 +158,11 @@ class Service(object):
 
 class Query(object):
 
-    def __init__(self, prefs, args, body, distinct, values, group_by=[], order_by=[], limit=-1, offset=-1, having=None, filter_nested='', extra_vars=[]):
+    def __init__(self, prefs, args, body, distinct, group_by=[], order_by=[], limit=-1, offset=-1, having=None, filter_nested='', extra_vars=[]):
         self.prefs = prefs
         self.args = args
         self.body = body
         self.distinct = distinct
-        self.values = values
         self.join_vars = self.getJoinVars()
         self.order_by = order_by
         self.group_by = group_by
@@ -184,8 +183,7 @@ class Query(object):
             d = "DISTINCT "
         else:
             d = ""
-        values_str = str(self.values)
-        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + values_str + "\n" + self.filter_nested + "\n}"
+        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + "\n" + self.filter_nested + "\n}"
 
     def variables(self):
         if not self.args:
@@ -199,7 +197,7 @@ class Query(object):
         #     an = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
         #     if not (an in d):
         #         new_args.append(a)
-        return Query(self.prefs, new_args, self.body.instantiate(d), self.distinct, self.values)
+        return Query(self.prefs, new_args, self.body.instantiate(d), self.distinct)
 
     def instantiateFilter(self, d, filter_str):
         new_args = []
@@ -207,7 +205,7 @@ class Query(object):
         #     an = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
         #     if not (an in d):
         #         new_args.append(a)
-        return Query(self.prefs, new_args, self.body, self.distinct, self.values, self.filter_nested + ' ' + filter_str)
+        return Query(self.prefs, new_args, self.body, self.distinct, self.filter_nested + ' ' + filter_str)
 
     def places(self):
         return self.body.places()
@@ -227,8 +225,7 @@ class Query(object):
             d = "DISTINCT "
         else:
             d = ""
-        values_str = str(self.values)
-        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + values_str + "\n" + self.filter_nested + "\n}"
+        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + self.filter_nested + "\n}"
 
     def show2(self):
         body_str = self.body.show2(" ")
@@ -239,8 +236,7 @@ class Query(object):
             d = "DISTINCT "
         else:
             d = ""
-        values_str = str(self.values)
-        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + values_str + "\n" + self.filter_nested + "\n}"
+        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + "\n" + self.filter_nested + "\n}"
 
     def getPrefixes(self):
         r = ""
@@ -744,45 +740,40 @@ class Filter(object):
         # return self.constantNumber()/self.places()
 
 
+# TODO: fix spacing problem in __repr__ somewhere else
 class Values(object):
-    def __init__(self, vars, data_block):
-        self.vars = vars
-        self.data_block = data_block
+    def __init__(self, var, data_block_val, clause_type = None):
+        self.var = var
+        self.data_block_val = data_block_val
+        self.info = clause_type
 
     def __repr__(self):
-        args_str = " ".join(map(str, self.vars))
-        l_par = ''
-        r_par = ''
-
-        if len(self.vars) > 1:
-            l_par = '('
-            r_par = ')'
-        
-        data_str = ''
-        for row in self.data_block:
-            data_str += l_par
-            for value in row:
-                v = "UNDEF" if value is None else value.name
-                data_str += v + " "
-            data_str += r_par + '\n'
-
-        return "\n" + "VALUES " + l_par + args_str + r_par + " { \n"  + data_str + "}"
+        ret = ''
+        if self.info == 'single':
+            ret += '\n        VALUES '
+            for tmp in self.var:
+                ret += tmp.name + ' '
+            ret += '{ '
+            for tmp in self.data_block_val:
+                ret += tmp.name + ' '
+            ret += '}'
+        else:
+            for i in range(len(self.var)):
+                ret += '\n        VALUES '
+                ret += self.var[i].name + ' {' 
+                for tmp in self.data_block_val:
+                    ret += ' ' + tmp[i].name
+                ret += ' }'
+        return ret
 
     def show(self, x):
-        args_str = " ".join(map(str, self.vars))
-        
-        data_str = ''
-        for row in self.data_block:
-            data_str += '('
-            for value in row:
-                v = "UNDEF" if value is None else value.name
-                data_str += v + " "
-            data_str += ')\n'
-
-        return "\n" + x + "VALUES (" + args_str + ")" + "{" + data_str + "}"
+        return "\n" + x + str(self)
 
     def getVars(self):
-        return self.vars
+        ret = list()
+        for tmp in self.var:
+            ret += tmp.getVars()
+        return ret
 
     def getConsts(self):
         c = []
@@ -816,8 +807,21 @@ class Values(object):
     def allTriplesLowSelectivity(self):
         return True
 
-    def instantiate(self):
-        return Values(self.vars, self.data_block)
+    def instantiate(self, used_var):
+        tmp_var = [] # saving things in dictionary may make things easier
+        tmp_dbv = []
+        if len(used_var) == len(self.var):
+            return self
+        for v in self.var:
+            for v1 in used_var:
+                if v.name == v1:
+                    tmp_var.append(v)
+                    for t in self.data_block_val:
+                        if t[self.var.index(v)].name != "UNDEF":
+                            tmp_dbv.append(t[self.var.index(v)])
+        if len(tmp_var) > 1:
+            return Values(tmp_var, tmp_dbv)
+        return Values(tmp_var, tmp_dbv, 'single')
 
     def instantiateFilter(self, d, filter_str):
         return Values(self.vars, self.data_block)
@@ -1205,7 +1209,7 @@ class Triple(object):
 class Argument(object):
 
     def __init__(self, name, constant=False, desc=False, datatype=None, lang=None, alias=None, gen_type=None):
-        self.name = name if not constant else urllib.parse.quote(name, safe='<:/#>"\'^')
+        self.name = name if not constant else urllib.parse.quote(name, safe='<:/#>"\'^') # this supposed to be easily differentiated later after obtaining the datatype and gen_type from directly from EP json output
         self.constant = constant
         self.desc = desc
         self.datatype = datatype

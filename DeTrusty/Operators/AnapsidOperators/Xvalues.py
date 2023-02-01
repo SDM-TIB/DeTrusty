@@ -47,9 +47,9 @@ class Xvalues(object):
         self.qresults.put("EOF")
 
     def filterByValues(self, tuple):        
-        for row in self.values.data_block:
+        for row in self.values.data_block_val:
             isValid = True
-            for idx, variable in enumerate(self.values.vars): 
+            for idx, variable in enumerate(self.values.var): 
                 value = tuple[variable.name[1:]]
                 rowArg = row[idx]
                 if rowArg is None:

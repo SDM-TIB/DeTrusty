@@ -13,3 +13,5 @@ venv/
 **/.DS_Store
 
 DeTrusty/Sparql/Parser/parsetab.py
+
+.decompositions.log

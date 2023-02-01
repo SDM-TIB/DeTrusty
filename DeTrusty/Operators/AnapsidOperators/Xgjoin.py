@@ -69,7 +69,7 @@ class Xgjoin(Join):
             if tuple1 != "EOF":
                 try:
                     tuple1 = self.left.get(False)
-                    # print "tuple1", tuple1
+                    # print ("tuple1", tuple1)
                     self.leftcount += 1
                     signal.alarm(self.timeoutSecondStage)
                     self.stage1(tuple1, self.left_table, self.right_table)
@@ -90,7 +90,7 @@ class Xgjoin(Join):
             if tuple2 != "EOF":
                 try:
                     tuple2 = self.right.get(False)
-                    # print "tuple2", tuple2
+                    # print ("tuple2", tuple2)
                     self.rightcount +=1
                     signal.alarm(self.timeoutSecondStage)
                     self.stage1(tuple2, self.right_table, self.left_table)

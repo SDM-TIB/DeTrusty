@@ -4,14 +4,11 @@ import collections
 from enum import Enum
 from functools import partial
 
-from DeTrusty.Decomposer import utils as utils
 from DeTrusty.Logger import get_logger
-from DeTrusty.Decomposer import Tree
+from DeTrusty.Decomposer import Tree, utils
 from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind
 
 logger = get_logger(__name__, '.decompositions.log')
-
-
 class Decomposer(object):
 
     def __init__(self, query, config, decompType="STAR", joinstarslocally=True, sparql_one_dot_one=False):
@@ -23,53 +20,48 @@ class Decomposer(object):
         else:
             from DeTrusty.Sparql.Parser import queryParser1_1
             self.query = queryParser1_1.parse(query)
-        self.prefixes = utils.getPrefs(self.query.prefs)
+        if self.query:
+            self.prefixes = utils.getPrefs(self.query.prefs)
+        else:
+            self.prefixes = None
         self.config = config
         self.joinlocally = joinstarslocally
         self.alltriplepatterns = []
 
     def decompose(self):
-        groups = self.decomposeUnionBlock(self.query.body) if not self.sparql_one_dot_one else self.query.body
-        if groups is None or not groups:
+
+        if not self.query: # handling empty or whitespaces-filled queries, TODO: review error message from DeTrusty/__init__.py, it is not quite specific
             return None
 
-        self.query.body = groups
-        self.query.values = self.decomposeValues(self.query.values) if not self.sparql_one_dot_one else None
-        if self.query.order_by == -1:
-            self.query.order_by = []
+        self.query.body = self.decomposeUnionBlock(self.query.body) if not self.sparql_one_dot_one else self.query.body
+
+        if not self.query.body:
+            return None
+
         logger.info('Decomposition obtained')
         logger.info(self.query)
-
-        if self.query is None:
-            return None
 
         self.query.body = self.makePlanQuery(self.query)
 
         return self.query
 
-    def decomposeValues(self, values):
-        if values is not None:
-            vl = values.instantiate()
-            for row in vl.data_block:
-                for value in row:
-                    if value is not None:
-                        value.name = utils.getUri(value, self.prefixes)
-            return vl
-
     def decomposeUnionBlock(self, ub):
         r = []
-        filters = []
         for jb in ub.triples:
             pjb = self.decomposeJoinBlock(jb)
             if pjb:
                 r.append(pjb)
-                filters.extend(pjb.filters)
         if r:
             return UnionBlock(r)
         else:
             return None
 
     def decomposeJoinBlock(self, jb):
+        """
+        tl : triple
+        sl : ???
+        fl : filters, (additionally, BIND, VALUES)
+        """
         tl = []
         sl = []
         fl = []
@@ -82,7 +74,6 @@ class Decomposer(object):
             elif isinstance(bgp, Values):
                 fl.append(bgp)
             elif isinstance(bgp, Bind):
-                self.query.extra_vars.append(bgp.alias)
                 fl.append(bgp)
             elif isinstance(bgp, Optional):
                 ubb = self.decomposeUnionBlock(bgp.bgg)
@@ -102,10 +93,8 @@ class Decomposer(object):
                 pub = self.decomposeJoinBlock(bgp)
                 if pub:
                     sl.append(pub)
-
         if tl:
             gs = self.decomposition_type.decompose(self, tl)
-
             if gs:
                 gs.extend(sl)
                 sl = gs
@@ -113,7 +102,7 @@ class Decomposer(object):
                 return None
 
         fl1 = self.includeFilter(sl, fl)
-        fl = list(set(fl) - set(fl1))
+        fl = list(set(fl) - set(fl1)) # in case VALUES with variables from multiple sources, the values object won't be removed
         if sl:
             if len(sl) == 1 and isinstance(sl[0], UnionBlock) and fl != []:
                 sl[0] = self.updateFilters(sl[0], fl)
@@ -681,20 +670,8 @@ class Decomposer(object):
                     fl2 = self.includeFilterUnionBlock(jb, f)
                     fl1 = fl1 + fl2
             elif (isinstance(jb, Service)):
-                # for f in fl:
-                #     values = self.query.values
-                #     if values is None and isinstance(f, Values):
-                #         values = f
-                #         vl = values.instantiate()
-                #         for row in vl.data_block:
-                #             for value in row:
-                #                 if value is not None:
-                #                     value.name = utils.getUri(value, self.prefixes)
                 for f in fl:
-                    if type(f) is Filter:
-                        fl2 = self.includeFilterAuxSK(f, jb.triples, jb)
-                    else:
-                        fl2 = self.includeFilterAuxSK(f, jb.triples, jb, True)
+                    fl2 = self.includeFilterAuxSK(f, jb.triples, jb)
                     fl1 = fl1 + fl2
         return fl1
 
@@ -709,6 +686,10 @@ class Decomposer(object):
             if set(vars_s) & set(vars_f) == set(vars_f):
                 s.include_filter(f)
                 fl1 = fl1 + [f]
+            elif type(f) is Values and set(vars_s) & set(vars_f) != set():
+                fl2 = f.instantiate(set(vars_s) & set(vars_f))
+                s.include_filter(fl2) # the new decomposed clause need to be reconsidered
+                fl1 = fl1 + [fl2]
         return fl1
 
     def includeFilterUnionBlock(self, jb, f):
@@ -718,12 +699,16 @@ class Decomposer(object):
                 if isinstance(jbUS, Service):
                     vars_s = set(jbUS.getVars())
                     vars_f = f.getVars()
-                    if set(vars_s) & set(vars_f) == set(vars_f):
+                    if type(f) is Values and set(vars_s) & set(vars_f) != set():
+                        fl2 = f.instantiate(set(vars_s) & set(vars_f))
+                        jbUS.include_filter(fl2)
+                        fl1 = fl1 + [fl2]
+                    elif set(vars_s) & set(vars_f) == set(vars_f):
                         jbUS.include_filter(f)
                         fl1 = fl1 + [f]
         return fl1
 
-    def includeFilterAuxSK(self, f, sl, sr, not_filter=False):
+    def includeFilterAuxSK(self, f, sl, sr):
         """
         updated: includeFilterAuxS(f, sl, sr) below to include filters that all vars in filter exists in any of the triple
         patterns of a BGP. the previous impl includes them only if all vars are in a single triple pattern
@@ -736,17 +721,12 @@ class Decomposer(object):
         serviceFilter = False
         fvars = dict()
         vars_f = f.getVars()
-        # print("debug: ", vars_f)
-        # print("debug: ", f)
 
         for v in vars_f:
             fvars[v] = False
         bgpvars = set()
 
         for s in sl:
-            # print('#####sl_component#####')
-            # print(s)
-            # print('#########')
             bgpvars.update(set(utils.getVars(s)))
             vars_s = set()
             if (isinstance(s, Triple)):
@@ -755,22 +735,27 @@ class Decomposer(object):
                 for t in s.triples:
                     vars_s.update(set(utils.getVars(t)))
 
-            if set(vars_s) & set(vars_f) == set(vars_f):
+            if set(vars_s) & set(vars_f) == set(vars_f): # Bind supposed to fall to this category
+                serviceFilter = True
+
+            if type(f) is Values and set(vars_s) & set(vars_f) != set():
+                fl2 = f.instantiate(set(vars_s) & set(vars_f))
                 serviceFilter = True
 
         for v in bgpvars:
             if v in fvars:
                 fvars[v] = True
 
-        if not_filter:
-            fvars[f.alias] = True
-        # print(fvars)
-        # print('#####sr_component#####')
-        # print(sr)
-        # print('#########')
+        # if type(f) is Bind: # why is this here? Investigate later
+        #     fvars[f.alias] = True
+
         if serviceFilter:
-            sr.include_filter(f)
-            fl1 = fl1 + [f]
+            if type(f) is Values:
+                sr.include_filter(fl2)
+                fl1 = fl1 + [fl2]
+            else:
+                sr.include_filter(f)
+                fl1 = fl1 + [f]
         else:
             fs = [v for v in fvars if not fvars[v]]
             if len(fs) == 0:
@@ -865,13 +850,10 @@ class Decomposer(object):
 
 
 class DecompositionType(Enum):
+
     STAR = partial(Decomposer.decomposeBGP)
     EG = partial(Decomposer.decompose_exclusive_groups)
     TRIPLE = partial(Decomposer.decompose_triple_wise)
 
     def decompose(self, decomposer, tl):
         return self.value(decomposer, tl)
-
-    @classmethod
-    def __missing__(cls, value):
-        return DecompositionType.STAR

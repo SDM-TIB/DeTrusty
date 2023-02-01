@@ -1,15 +1,12 @@
-import time
-import unittest
-import sys
-sys.path.append('../DeTrusty')
 from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues
 from DeTrusty.Sparql.Parser.services import Argument, Values
+import time, unittest
 
 class filterByValues(unittest.TestCase):
 
     def setUp(self):
-        self.vars1 = Values([Argument("?disease_name", True)], [[Argument("\"Attention-deficit_hyperactivity_disorder\"", True)]])
-        self.vars2 = Values([Argument("?disease_name", True)], [[None, True]])
+        self.vars1 = Values([Argument('?disease_name')], [[Argument("\"Attention-deficit_hyperactivity_disorder\"", True)]])
+        self.vars2 = Values([Argument('?disease_name')], [[None, True]])
         self.value1 = Xvalues(self.vars1)
         self.value2 = Xvalues(self.vars2)
 
@@ -34,7 +31,7 @@ class filterByValues(unittest.TestCase):
 class TestEfficiency(unittest.TestCase):
 
     def setUp(self):
-        self.vars1 = Values([Argument("?disease_name", True)], [[Argument("\"Attention-deficit_hyperactivity_disorder\"", True)]])
+        self.vars1 = Values([Argument("?disease_name")], [[Argument("\"Attention-deficit_hyperactivity_disorder\"", True)]])
         self._filterByValues = Xvalues(self.vars1)
         self._efficiency_data = dict()
 
@@ -62,7 +59,6 @@ class TestEfficiency(unittest.TestCase):
         print(self._efficiency_data)
         self.vars1 = None
         self._filterByValues = None
-
 
 if __name__ == "__main__":
     unittest.main()

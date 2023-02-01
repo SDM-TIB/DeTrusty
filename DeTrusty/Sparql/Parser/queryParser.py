@@ -12,8 +12,10 @@ reserved = {
     'UNION': 'UNION',
     'FILTER': 'FILTER',
     'OPTIONAL': 'OPTIONAL',
+    
     'VALUES' : 'VALUES',
     'UNDEF' : 'UNDEF',
+
     'BIND': 'BIND',
     'AS': 'AS',
     'SERVICE': 'SERVICE',
@@ -227,14 +229,19 @@ lexer = lex.lex()
 # Parser
 
 
-# TODO: merge the services.py 
-
-def p_parse_sparql(p):
+def p_parse_sparql_0(p):
     """
-    parse_sparql : prefix_list query group_by having_clause order_by limit offset values_clause
+    parse_sparql : prefix_list query group_by having_clause order_by limit offset
     """
     (vs, ts, d) = p[2]
-    p[0] = Query(prefs=p[1], args=vs, body=ts, distinct=d, values=p[8], group_by=p[3], order_by=p[5], limit=p[6], offset=p[7], having=p[4])
+    p[0] = Query(prefs=p[1], args=vs, body=ts, distinct=d, group_by=p[3], order_by=p[5], limit=p[6], offset=p[7], having=p[4])
+
+
+def p_parse_sparql_1(p):
+    """
+    parse_sparql : empty
+    """
+    p[0] = None
 
 
 def p_empty(p):
@@ -584,126 +591,12 @@ def p_having_clause_1(p):
 
 
 ############################################################
+# this section to be re-checked, TODO: restructure ?
 
-
-def p_values_clause_0(p):
-    """
-    values_clause : VALUES LPAR var_list RPAR LKEY data_block RKEY
-    """
-    p[0] = Values(p[3], p[6])
-
-
-def p_values_clause_1(p):
-    """
-    values_clause : VALUES var_list LKEY data_block RKEY
-    """
-    p[0] = Values(p[2], p[4])
-
-
-def p_values_clause_2(p):
-    """
-    values_clause : empty
-    """
-    p[0] = None 
-
-
-def p_data_block_0(p):
-    """
-    data_block : data_block LPAR values_list RPAR
-    """ 
-    p[0] = p[1] + [p[3]]
-
-
-def p_data_block_1(p):
-    """
-    data_block : data_block values_list
-    """ 
-    p[0] = p[1] + [p[2]]
-
-
-def p_data_block_2(p):
-    """
-    data_block : values_list
-    """
-    p[0] = [p[1]]
-
-
-def p_data_block_3(p):
-    """
-    data_block : LPAR values_list RPAR
-    """
-    p[0] = [p[2]]
-
-
-def p_values_list_0(p):
-    """
-    values_list : values_list value_arg
-    """
-    p[0] = p[1] + [p[2]]
-
-
-def p_values_list_1(p):
-    """
-    values_list : value_arg
-    """
-    p[0] = [p[1]]
-
-
-def p_value_arg_0(p):
-    """
-    value_arg : uri
-    """
-    p[0] = Argument(p[1], True)
-
-
-def p_value_arg_1(p):
-    """
-    value_arg : rdf_literal
-    """
-    p[0] = p[1]
-
-
-def p_value_arg_2(p):
-    """
-    value_arg : numeric_literal
-    """
-    p[0] = p[1]
-
-
-def p_value_arg_3(p):
-    """
-    value_arg : boolean_literal
-    """
-    p[0] = p[1]
-
-
-def p_value_arg_4(p):
-    """
-    value_arg : UNDEF
-    """
-    p[0] = None 
-
-############################################################
-
-# section to be re-checked at the end
 
 def p_ggp_0(p):
     """
     group_graph_pattern : union_block
-    """
-    p[0] = UnionBlock(p[1])
-
-
-def p_service(p):
-    """
-    service : SERVICE uri LKEY group_graph_pattern_service RKEY
-    """
-    p[0] = Service(p[2], p[4])
-
-
-def p_ggp_service_0(p):
-    """
-    group_graph_pattern_service : union_block_service
     """
     p[0] = UnionBlock(p[1])
 
@@ -736,27 +629,6 @@ def p_union_block_2(p):
     p[0] = [JoinBlock(p[1])] + p[2]
 
 
-def p_union_block_service_0(p):
-    """
-    union_block_service : join_block_service rest_union_block_service
-    """
-    p[0] = [JoinBlock(p[1])] + p[2]
-
-
-def p_rest_union_block_service_0(p):
-    """
-    rest_union_block_service : empty
-    """
-    p[0] = []
-
-
-def p_rest_union_block_service_1(p):
-    """
-    rest_union_block_service : UNION LKEY join_block_service rest_union_block_service RKEY rest_union_block_service
-    """
-    p[0] = [JoinBlock(p[3])] + p[4] + p[6]
-
-
 def p_ppjoin_block_0(p):
     """
     pjoin_block : LKEY join_block RKEY
@@ -776,20 +648,6 @@ def p_ppjoin_block_2(p):
     pjoin_block : empty
     """
     p[0] = []
-
-
-def p_rest_union_block_0(p):
-    """
-    rest_union_block : empty
-    """
-    p[0] = []
-
-
-def p_rest_union_block_1(p):
-    """
-    rest_union_block : UNION LKEY join_block rest_union_block RKEY rest_union_block
-    """
-    p[0] = [JoinBlock(p[3])] + p[4] + p[6]
 
 
 def p_join_block_0(p):
@@ -832,6 +690,55 @@ def p_rest_join_block_2(p):
     rest_join_block : bgp rest_join_block
     """
     p[0] = [p[1]] + p[2]
+
+
+def p_rest_union_block_0(p):
+    """
+    rest_union_block : empty
+    """
+    p[0] = []
+
+
+def p_rest_union_block_1(p):
+    """
+    rest_union_block : UNION LKEY join_block rest_union_block RKEY rest_union_block
+    """
+    p[0] = [JoinBlock(p[3])] + p[4] + p[6]
+
+
+def p_service(p):
+    """
+    service : SERVICE uri LKEY group_graph_pattern_service RKEY
+    """
+    p[0] = Service(p[2], p[4])
+
+
+def p_ggp_service_0(p):
+    """
+    group_graph_pattern_service : union_block_service
+    """
+    p[0] = UnionBlock(p[1])
+
+
+def p_union_block_service_0(p):
+    """
+    union_block_service : join_block_service rest_union_block_service
+    """
+    p[0] = [JoinBlock(p[1])] + p[2]
+
+
+def p_rest_union_block_service_0(p):
+    """
+    rest_union_block_service : empty
+    """
+    p[0] = []
+
+
+def p_rest_union_block_service_1(p):
+    """
+    rest_union_block_service : UNION LKEY join_block_service rest_union_block_service RKEY rest_union_block_service
+    """
+    p[0] = [JoinBlock(p[3])] + p[4] + p[6]
 
 
 def p_join_block_service_0(p):
@@ -937,18 +844,76 @@ def p_bgp_6(p):
         p[0] = JoinBlock(p[2])
 
 
+#####################################################################
+# TODO: throw unmatched variable length exception like in Virtuoso 
+
+
 def p_bgp_7(p):
     """
-    bgp : VALUES LPAR var_list RPAR LKEY data_block RKEY
+    bgp : VALUES VARIABLE LKEY data_block_value RKEY
     """
-    p[0] = Values(p[3], p[6])
+    p[0] = Values([Argument(p[2])], p[4], 'single')
 
 
 def p_bgp_8(p):
     """
-    bgp : VALUES var_list LKEY data_block RKEY
+    bgp : VALUES LPAR value_vars RPAR LKEY data_block_multiple_value RKEY
     """
-    p[0] = Values(p[2], p[4])
+    p[0] = Values(p[3], p[6])
+
+
+def p_value_vars_0(p):
+    """
+    value_vars : empty
+    """
+    p[0] = []
+
+
+def p_value_vars_1(p):
+    """
+    value_vars : VARIABLE value_vars
+    """
+    p[0] = [Argument(p[1])] + p[2]
+
+
+def p_data_block_value_0(p):
+    """
+    data_block_value : empty
+    """
+    p[0] = []
+
+
+def p_data_block_value_1(p):
+    """
+    data_block_value : rdf_literal data_block_value 
+                     | numeric_literal data_block_value 
+                     | boolean_literal data_block_value 
+    """
+    p[0] = [p[1]] + p[2]
+
+
+def p_data_block_value_2(p):
+    """
+    data_block_value : UNDEF data_block_value
+                     | uri data_block_value
+    """
+    p[0] = [Argument(p[1])] + p[2]
+
+
+def p_data_block_multiple_value_0(p):
+    """
+    data_block_multiple_value : empty
+    """
+    p[0] = []
+
+
+def p_data_block_multiple_value_1(p):
+    """
+    data_block_multiple_value : LPAR data_block_value RPAR data_block_multiple_value
+    """
+    p[0] = [p[2]] + p[4]
+
+#####################################################################
 
 
 def p_bgp_9(p):

@@ -18,7 +18,6 @@ from DeTrusty.Operators.AnapsidOperators.Xoffset import Xoffset
 from DeTrusty.Operators.AnapsidOperators.Xorderby import Xorderby
 from DeTrusty.Operators.AnapsidOperators.Xproject import Xproject
 from DeTrusty.Operators.AnapsidOperators.Xunion import Xunion
-from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues
 from DeTrusty.Operators.BlockingOperators.Union import Union
 from DeTrusty.Operators.NonBlockingOperators.NestedHashJoinFilter import NestedHashJoinFilter as NestedHashJoin
 from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalFilter import  NestedHashOptionalFilter as NestedHashOptional
@@ -46,9 +45,6 @@ class Planner(object):
 
         over_all_triples = utils.collectVars(query.args, query.group_by, query.having, aggs)  # TODO: test & fix
         # print(query.args, query.group_by, query.having, aggs, over_all_triples)
-
-        if (query.values):
-            operatorTree = TreePlan(Xvalues(query.values), operatorTree.vars, operatorTree)
 
         # Adds the group by operator to the plan.
         if (len(query.group_by) > 0):
@@ -135,7 +131,7 @@ class Planner(object):
 
         if len(tl) == 1:
             nf = self.includePhysicalOperatorsOptional(tl[0], ol)
-            if isinstance(tl[0], TreePlan) and (isinstance(tl[0].operator, Xfilter) or isinstance(tl[0].operator, Xvalues) or isinstance(tl[0].operator, Xbind)):
+            if isinstance(tl[0], TreePlan) and (isinstance(tl[0].operator, Xfilter) or isinstance(tl[0].operator, Xbind)):
                 return nf
             else:
                 if len(jb.filters) > 0 and isinstance(tl[0].operator, Xfilter):
@@ -144,9 +140,6 @@ class Planner(object):
                 if len(jb.filters) > 0 and isinstance(tl[0].operator, Xbind):
                     for f in jb.filters:
                         nf = TreePlan(Xbind(f), nf.vars, nf)
-                if len(jb.filters) > 0 and isinstance(tl[0].operator, Xvalues):
-                    for f in jb.filters:
-                        nf = TreePlan(Xvalues(f), nf.vars, nf)
                     return nf
                 else:
                     return nf
@@ -191,8 +184,6 @@ class Planner(object):
                 for f in tree.filters: 
                     vars_f = f.getVarsName()
                     if set(n.vars) & set(vars_f) == set(vars_f):
-                        if isinstance(f, Values):
-                            n = TreePlan(Xvalues(f), n.vars, n)
                         if isinstance(f, Filter):
                             n = TreePlan(Xfilter(f), n.vars, n)
                     if isinstance(f, Bind):
