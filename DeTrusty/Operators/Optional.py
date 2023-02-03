@@ -5,6 +5,8 @@ from multiprocessing import Queue
 class Optional(object):
     __metaclass__ = abc.ABCMeta
 
+    name = "OPTIONAL"
+
     @abc.abstractmethod
     def execute(self, left, right, out, processqueue=Queue()):
         return

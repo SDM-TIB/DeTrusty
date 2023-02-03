@@ -12,6 +12,8 @@ from multiprocessing import Queue
 
 class Xlimit(object):
 
+    name = "LIMIT"
+
     def __init__(self, vars, limit):
         self.input = Queue()
         self.qresults = Queue()

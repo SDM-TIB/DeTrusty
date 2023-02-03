@@ -5,6 +5,8 @@ from multiprocessing import Queue
 class Join(object):
     __metaclass__ = abc.ABCMeta
 
+    name = "JOIN"
+
     @abc.abstractmethod
     def execute(self, left, right, out, processqueue=Queue()):
 

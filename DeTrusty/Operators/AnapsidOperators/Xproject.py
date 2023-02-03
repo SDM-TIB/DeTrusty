@@ -14,6 +14,8 @@ from DeTrusty.Sparql.Parser.services import Expression, Aggregate
 
 class Xproject(object):
 
+    name = "PROJECT"
+
     def __init__(self, vars):
         self.input = Queue()
         self.qresults = Queue()

@@ -12,6 +12,8 @@ from DeTrusty.Sparql.Parser.services import HavingHelper
 
 class Xhaving(object):
 
+    name = "HAVING"
+
     def __init__(self, having):
         self.qresults = Queue()                                         # end res.
         self.having = having                                            # HAVING vars

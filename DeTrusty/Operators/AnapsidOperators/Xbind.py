@@ -59,6 +59,8 @@ numerical = (int, float)
 
 class Xbind(object):
 
+    name = "BIND"
+
     def __init__(self, bind):
         self.input = Queue()
         self.qresults = Queue()

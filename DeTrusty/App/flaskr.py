@@ -1,12 +1,15 @@
 __author__ = "Philipp D. Rohde"
 
-from flask import Flask, Response, request, jsonify, render_template
-from DeTrusty.Logger import get_logger
-from DeTrusty import run_query
-from DeTrusty.Molecule.MTManager import ConfigFile
 import os
 import re
 from distutils.util import strtobool
+
+from flask import Flask, Response, request, jsonify, render_template
+
+from DeTrusty import run_query, Decomposer, Planner
+from DeTrusty.Logger import get_logger
+from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger(__name__)
 
@@ -55,13 +58,52 @@ def sparql():
         import sys
         import traceback
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        emsg = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
-        return jsonify({"result": [], "error": str(emsg)})
+        emsg = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))
+        return jsonify({"result": [], "error": emsg})
 
 
 @app.route('/sparql', methods=['GET'])
 def query_editor():
     return render_template('query-editor.html', title=app.config['VERSION_STRING'])
+
+
+@app.route('/query_plan', methods=['GET'])
+def query_editor_plan():
+    return render_template('query-plan.html', title=app.config['VERSION_STRING'])
+
+
+@app.route('/query_plan', methods=['POST'])
+def query_plan():
+    query = request.values.get('query', None)
+    decomposition_type = request.values.get('decomp', 'STAR')
+    logger.warn("Got query: " + str(query))
+    logger.warn("Type: " + str(type(query)))
+    if query is None:
+        return Response('No query was passed.', status=400, mimetype='text/plain')
+
+    try:
+        decomposer = Decomposer(query=query,
+                                config=app.config['CONFIG'],
+                                decompType=decomposition_type,
+                                joinstarslocally=app.config['JOIN_STARS_LOCALLY'])
+        decomposed_query = decomposer.decompose()
+    except Exception as e:
+        logger.exception(e)
+        return Response('An error occurred while parsing. Please check your query', status=400, mimetype='text/plain')
+    if decomposed_query is None:
+        return Response('The query cannot be answered by the endpoints in the federation.',
+                        status=400, mimetype='text/plain')
+
+    try:
+        planner = Planner(decomposed_query, True, contact_source, 'RDF', app.config['CONFIG'])
+        plan = planner.createPlan()
+        tree, details = plan.json()
+    except Exception as e:
+        logger.exception(e)
+        return Response('An error occurred while planning the query. Please check the logs.',
+                        status=400, mimetype='text/plain')
+
+    return {'tree': tree, 'details': details}
 
 
 if __name__ == "__main__":

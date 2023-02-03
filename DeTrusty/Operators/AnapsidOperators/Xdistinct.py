@@ -12,6 +12,8 @@ from multiprocessing import Queue
 
 class Xdistinct(object):
 
+    name = "DISTINCT"
+
     def __init__(self, vars):
         # self.input       = Queue()
         self.qresults = Queue()

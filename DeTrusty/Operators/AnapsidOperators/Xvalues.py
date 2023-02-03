@@ -26,6 +26,8 @@ data_types = {
 
 class Xvalues(object):
 
+    name = "VALUES"
+
     def __init__(self, values): 
         self.input = Queue()
         self.qresults = Queue()

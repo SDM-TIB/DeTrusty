@@ -129,6 +129,9 @@ Hence, you can run queries using your favorite browser.
 The Web interface uses the JavaScript library [YASGUI](https://triply.cc/docs/yasgui).
 If you started the container as described above, the interface is accessible at `localhost:5000/sparql`.
 
+Starting with version 0.11.0, the GUI of DeTrusty also produces the query execution plan of a SPARQL query.
+If you started the container as described above, the query plan interface is accessible at `localhost:5000/query_plan`.
+
 ### DeTrusty as a Library
 Starting with version 0.5.0, DeTrusty can also be used as a library. You first need to install it via `python3 -m pip install DeTrusty`.
 The following example script shows how you can use DeTrusty within your project.

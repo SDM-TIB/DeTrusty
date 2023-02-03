@@ -12,6 +12,8 @@ from multiprocessing import Queue
 
 class Xoffset(object):
 
+    name = "OFFSET"
+
     def __init__(self, vars, offset):
         self.input = Queue()
         self.qresults = Queue()

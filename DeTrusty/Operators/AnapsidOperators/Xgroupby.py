@@ -12,6 +12,8 @@ from multiprocessing import Queue
 
 class Xgroupby(object):                                                    # ensure backward comp.
 
+    name = "GROUP BY"
+
     def __init__(self, args):
         self.qresults = Queue()                                            # end res.
         self.args = args                                                   # GROUP BY vars

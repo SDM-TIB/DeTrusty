@@ -21,7 +21,7 @@ from DeTrusty.Operators.AnapsidOperators.Xunion import Xunion
 from DeTrusty.Operators.BlockingOperators.Union import Union
 from DeTrusty.Operators.NonBlockingOperators.NestedHashJoinFilter import NestedHashJoinFilter as NestedHashJoin
 from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalFilter import  NestedHashOptionalFilter as NestedHashOptional
-from DeTrusty.Sparql.Parser.services import Bind, Filter, Service, Optional, UnionBlock, JoinBlock, Values
+from DeTrusty.Sparql.Parser.services import Bind, Filter, Service, Optional, UnionBlock, JoinBlock
 
 
 class Planner(object):
@@ -181,7 +181,7 @@ class Planner(object):
                 return self.includePhysicalOperatorJoin(left_subtree, right_subtree)
             else:
                 n = self.includePhysicalOperatorJoin(left_subtree, right_subtree)
-                for f in tree.filters: 
+                for f in tree.filters:
                     vars_f = f.getVarsName()
                     if set(n.vars) & set(vars_f) == set(vars_f):
                         if isinstance(f, Filter):
@@ -261,7 +261,7 @@ class Planner(object):
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                 dependent_join = True
-                
+
                 # if not isinstance(l, TreePlan):
                 #     if isinstance(r, TreePlan):
                 #         if not isinstance(r.operator, NestedHashJoin) and not isinstance(r.operator, Xgjoin):
@@ -284,7 +284,7 @@ class Planner(object):
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                 dependent_join = True
-                
+
                 # if not isinstance(r, TreePlan):
                 #     if isinstance(l, TreePlan):
                 #         if not isinstance(l.operator, NestedHashJoin) and not isinstance(l.operator, Xgjoin):
@@ -636,6 +636,23 @@ class TreePlan(object):
             s = s + self.right.aux(n + "  ")
         return s
 
+    def json(self, triples=None, sub_queries=None):
+        if triples is None:
+            triples = {}
+        if sub_queries is None:
+            sub_queries = [0]
+        tree = {'name': self.operator.name}
+        children = []
+        if self.left:
+            child, _ = self.left.json(triples, sub_queries)
+            children.append(child)
+        if self.right:
+            child, _ = self.right.json(triples, sub_queries)
+            children.append(child)
+        if children:
+            tree['children'] = children
+        return tree, triples
+
     def execute(self, outputqueue, processqueue=Queue()):
         # Evaluates the execution plan.
         if self.left:  # and this.right: # This line was modified by mac in order to evaluate unary operators
@@ -699,6 +716,15 @@ class IndependentOperator(object):
 
     def __repr__(self):
         return str(self.tree)
+
+    def json(self, triples, sub_queries):
+        sub_queries[0] += 1
+        name = 'SSQ' + str(sub_queries[0])
+        triples[name] = {
+            'endpoint': self.server,
+            'triples': '\n'.join([str(x).strip() for x in self.tree.service.triples])
+        }
+        return {'name': name, 'endpoint': self.server}, None
 
     def instantiate(self, d):
         new_tree = self.tree.instantiate(d)
@@ -782,7 +808,7 @@ class IndependentOperator(object):
         #     # Check if there's no more data.
         #     if res == "EOF":
         #         break
-        
+
         # p.terminate()
 
 

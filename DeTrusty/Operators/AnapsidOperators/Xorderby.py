@@ -35,6 +35,8 @@ data_types = {
 
 class Xorderby(object):
 
+    name = "ORDER BY"
+
     def __init__(self, args):
         self.input = Queue()
         self.qresults = Queue()
