@@ -1,3 +1,7 @@
+# v0.11.0 - 03 Feb 2023
+- Docker: update Python and PIP
+- Add query plan visualization at route `/query_plan`
+
 # v0.10.0 - 31 Jan 2023
 - Added collecting source descriptions from Wikidata
 - Added feature to disable interlinking in source description collection
