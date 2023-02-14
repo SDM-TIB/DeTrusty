@@ -156,7 +156,7 @@ def p_parse_sparql(p):
     parse_sparql : prefix_list query order_by limit offset
     """
     (vs, ts, d) = p[2]
-    p[0] = Query(p[1], vs, ts, d, p[3], p[4], p[5])
+    p[0] = Query(prefs=p[1], args=vs, body=ts, distinct=d, order_by=p[3], limit=p[4], offset=p[5])
 
 
 def p_prefix_list(p):
