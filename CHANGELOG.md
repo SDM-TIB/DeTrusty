@@ -1,3 +1,6 @@
+# v0.11.1 - 14 Feb 2023
+- Fix query variables when using SERVICE clause
+
 # v0.11.0 - 03 Feb 2023
 - Docker: update Python and PIP
 - Add query plan visualization at route `/query_plan`
