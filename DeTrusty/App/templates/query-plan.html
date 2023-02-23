@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/@triply/yasgui@4.2.28/build/yasgui.min.js"></script>
   <style>
     #btn_query_plan {
-      background-image: url('/static/play.png');
+      background-image: url('static/play.png');
       background-size: 40px 40px;
       height: 40px;
       width: 40px;
@@ -78,7 +78,7 @@
             headers: {
                 Accept: 'application/json'
             },
-            url: '/query_plan',
+            url: window.location.href,
             data: jQuery.param({'query': query}),
             crossDomain: true,
             success: function(data) {
