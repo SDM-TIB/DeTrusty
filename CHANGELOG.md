@@ -1,3 +1,6 @@
+# v0.11.2 - 23 Feb 2023
+- Fix paths for query plan
+
 # v0.11.1 - 14 Feb 2023
 - Fix query variables when using SERVICE clause
 
