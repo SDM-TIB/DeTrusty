@@ -18,6 +18,7 @@ from DeTrusty.Operators.Join import Join
 from DeTrusty.Sparql.Parser import queryParser as qp
 from .OperatorStructures import Table, Partition, Record
 from .NestedHashJoin import NestedHashJoin
+from ...Sparql.Parser.services import Bind
 
 WINDOW_SIZE = 20
 
@@ -139,7 +140,7 @@ class NestedHashJoinFilter(Join):
     def makeInstantiation(self, filter_bag, operators):
         filter_str = ''
         new_vars = ['?' + v for v in self.vars]  # TODO: this might be $
-        filter_str = " . ".join(map(str, operators.tree.service.filters))
+        filter_str = " . ".join(map(str, [op for op in operators.tree.service.filters if type(op) != Bind]))
         # print "making instantiation join filter", filter_bag
         # When join variables are more than one: FILTER ( )
         if len(self.vars) >= 1:
