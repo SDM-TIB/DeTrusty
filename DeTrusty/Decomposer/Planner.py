@@ -720,9 +720,16 @@ class IndependentOperator(object):
     def json(self, triples, sub_queries):
         sub_queries[0] += 1
         name = 'SSQ' + str(sub_queries[0])
+
+        if isinstance(self.tree.service.triples, list):
+            triples_str = '\n'.join([str(x).strip() for x in self.tree.service.triples])
+        else:
+            triples_str = str(self.tree.service.triples)
+        triples_str = triples_str.replace('<', '&lt;').replace('>', '&gt;')
+
         triples[name] = {
             'endpoint': self.server,
-            'triples': '\n'.join([str(x).strip() for x in self.tree.service.triples]) if isinstance(self.tree.service.triples, list) else str(self.tree.service.triples)
+            'triples': triples_str
         }
         return {'name': name, 'endpoint': self.server}, None
 
