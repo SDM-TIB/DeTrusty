@@ -1,3 +1,11 @@
+# v0.11.3 - 27 Apr 2023
+- Fix duplicated BIND clause when using NHJF
+- Fix query plan JSON for cases where the triples of an endpoint are not a list
+- Fix searching endpoints serving predicates with prefixes
+- Add operator name for Xfilter
+- Fix display of constants in query plan
+- Fix filter issue in triple-wise decomposition
+
 # v0.11.2 - 23 Feb 2023
 - Fix paths for query plan
 
