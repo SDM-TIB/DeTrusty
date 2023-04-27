@@ -726,6 +726,9 @@ class Decomposer(object):
             fvars[v] = False
         bgpvars = set()
 
+        if not isinstance(sl, list):
+            sl = [sl]
+
         for s in sl:
             bgpvars.update(set(utils.getVars(s)))
             vars_s = set()
