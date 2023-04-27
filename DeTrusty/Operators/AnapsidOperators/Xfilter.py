@@ -68,6 +68,8 @@ numerical = (int, int, float)
 
 class Xfilter(object):
 
+    name = "FILTER"
+
     def __init__(self, filter):
         self.input = Queue()
         self.qresults = Queue()
