@@ -6,7 +6,7 @@ from functools import partial
 
 from DeTrusty.Logger import get_logger
 from DeTrusty.Decomposer import Tree, utils
-from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind
+from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument
 
 logger = get_logger(__name__, '.decompositions.log')
 class Decomposer(object):
@@ -111,12 +111,12 @@ class Decomposer(object):
         else:
             return None
 
-    def search(self, predicate: str) -> list:
+    def search(self, predicate: Argument) -> list:
         """
         Returns a list of all endpoints serving the specified predicate.
         """
-        if predicate[0] == "<":
-            predicate = predicate[1:-1]
+        predicate = utils.getUri(predicate, self.prefixes)[1:-1]
+
         if predicate in self.config.predwrapidx:
             return list(self.config.predwrapidx[predicate])
         else:
@@ -128,7 +128,7 @@ class Decomposer(object):
         """
         views = []
         for sg in tl:
-            eps = self.search(sg.predicate.name)
+            eps = self.search(sg.predicate)
             if len(eps) == 1:
                 serv = Service(eps[0], sg)
                 views = views + [serv]
@@ -146,7 +146,7 @@ class Decomposer(object):
         qcl1 = collections.defaultdict(list)
 
         for sg in tl:
-            eps0 = self.search(sg.predicate.name)
+            eps0 = self.search(sg.predicate)
             if not eps0:
                 qcl0 = qcl1 = []
             elif len(eps0) == 1:
