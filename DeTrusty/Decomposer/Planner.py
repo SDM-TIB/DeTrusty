@@ -722,7 +722,7 @@ class IndependentOperator(object):
         name = 'SSQ' + str(sub_queries[0])
         triples[name] = {
             'endpoint': self.server,
-            'triples': '\n'.join([str(x).strip() for x in self.tree.service.triples])
+            'triples': '\n'.join([str(x).strip() for x in self.tree.service.triples]) if isinstance(self.tree.service.triples, list) else str(self.tree.service.triples)
         }
         return {'name': name, 'endpoint': self.server}, None
 
