@@ -424,16 +424,36 @@ def get_rdfmts_from_mapping(endpoint):
     for mapping_file in endpoint.params['mappings']:
         mapping_graph.parse(mapping_file, format='n3')
 
-    query = 'PREFIX rr: <http://www.w3.org/ns/r2rml#> ' \
+    query = 'PREFIX rr: <http://www.w3.org/ns/r2rml#>\n' \
+            'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n' \
             'SELECT DISTINCT ?t ?p ?r WHERE {\n' \
-            '  ?tm rr:subjectMap  ?sm. ?sm rr:class ?t .\n' \
-            '  ?tm rr:predicateObjectMap ?pom .\n' \
-            '  ?pom rr:predicate ?p .\n' \
-            '  OPTIONAL {\n' \
-            '    ?pom rr:objectMap ?om .\n' \
-            '    ?om rr:parentTriplesMap ?pt .\n' \
-            '    ?pt rr:subjectMap ?ptsm .\n' \
-            '    ?ptsm rr:class ?r .\n' \
+            '  {\n' \
+            '    ?tm rr:subjectMap  ?sm .\n' \
+            '    ?sm rr:class ?t .\n' \
+            '    ?tm rr:predicateObjectMap ?pom .\n' \
+            '    ?pom rr:predicate ?p .\n' \
+            '    OPTIONAL {\n' \
+            '      ?pom rr:objectMap ?om .\n' \
+            '      ?om rr:parentTriplesMap ?pt .\n' \
+            '      ?pt rr:subjectMap ?ptsm .\n' \
+            '      ?ptsm rr:class ?r .\n' \
+            '    }\n' \
+            '  }\n' \
+            '  UNION\n' \
+            '  {\n' \
+            '    ?tm rr:predicateObjectMap ?sm .\n' \
+            '    ?sm rr:predicate rdf:type .\n' \
+            '    ?sm rr:objectMap ?smo .\n' \
+            '    ?smo rr:template|rr:constant ?t .\n' \
+            '    FILTER(!regex(str(?t), "{.*}"))\n' \
+            '    ?tm rr:predicateObjectMap ?pom .\n' \
+            '    ?pom rr:predicate ?p .\n' \
+            '    OPTIONAL {\n' \
+            '      ?pom rr:objectMap ?om .\n' \
+            '      ?om rr:parentTriplesMap ?pt .\n' \
+            '      ?pt rr:subjectMap ?ptsm .\n' \
+            '      ?ptsm rr:class ?r .\n' \
+            '    }\n' \
             '  }\n' \
             '} ORDER BY ?t ?p ?r'
 
