@@ -1,3 +1,8 @@
+# v0.12.0 - 02 May 2023
+- Consider more cases for extracting the RDF class from an RML mapping
+- Complete the source description using the endpoint if the RML mapping includes template classes
+- Update dependencies
+
 # v0.11.3 - 27 Apr 2023
 - Fix duplicated BIND clause when using NHJF
 - Fix query plan JSON for cases where the triples of an endpoint are not a list

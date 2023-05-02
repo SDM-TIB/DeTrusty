@@ -1,4 +1,4 @@
 requests==2.28.1
-Flask==2.2.1
+Flask==2.3.2
 ply==3.11
 rdflib==6.2.0
