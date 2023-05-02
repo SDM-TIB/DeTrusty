@@ -159,13 +159,25 @@ def create_rdfmts(endpoints: list | dict,
 def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
     # get the typed concepts, predicates, etc. for one source
     if 'mappings' in endpoint.params:
-        molecules = get_rdfmts_from_mapping(endpoint)
-        tq.put(molecules)
-        tq.put('EOF')
-        return molecules
+        molecules, template_classes = get_rdfmts_from_mapping(endpoint)
+        if template_classes:
+            # get metadata for classes that use a template from the endpoint
+            classes = [mol['rootType'] for mol in molecules]
+            molecules.extend(get_rdfmts_from_endpoint(endpoint, set(classes)))
+    else:
+        molecules = get_rdfmts_from_endpoint(endpoint)
+    tq.put(molecules)
+    tq.put('EOF')
+    return molecules
 
+
+def get_rdfmts_from_endpoint(endpoint: Endpoint, ignore_classes=None):
     concepts = _get_typed_concepts(endpoint)
     logger.info(endpoint.url + ': ' + str(concepts))
+    if ignore_classes is not None:
+        logger.info(endpoint.url + ' ignoring classes: ' + str(ignore_classes))
+        concepts = [c for c in concepts if c not in ignore_classes]
+        logger.info(endpoint.url + ' considering only: ' + str(concepts))
     molecules = []
     for c in concepts:
         if '^^' in c:
@@ -198,8 +210,6 @@ def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
         })
 
     logger.info('=================================')
-    tq.put(molecules)
-    tq.put('EOF')
     return molecules
 
 
@@ -416,13 +426,24 @@ def _merge_mts(rdfmt, root_type, dsrdfmts):
     otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
 
 
-def get_rdfmts_from_mapping(endpoint):
+def get_rdfmts_from_mapping(endpoint: Endpoint):
     rdf_type = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
     policies = [{'dataset': endpoint.url, 'operator': 'PR'}]
 
     mapping_graph = Graph()
     for mapping_file in endpoint.params['mappings']:
         mapping_graph.parse(mapping_file, format='n3')
+
+    ask = 'PREFIX rr: <http://www.w3.org/ns/r2rml#>\n' \
+          'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n' \
+          'ASK {\n' \
+          '  ?tm rr:predicateObjectMap ?sm .\n' \
+          '  ?sm rr:predicate rdf:type .\n' \
+          '  ?sm rr:objectMap ?smo .\n' \
+          '  ?smo rr:template ?t .\n' \
+          '  FILTER(regex(str(?t), "{.*}"))\n' \
+          '}'
+    template_classes = mapping_graph.query(ask).askAnswer
 
     query = 'PREFIX rr: <http://www.w3.org/ns/r2rml#>\n' \
             'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n' \
@@ -500,4 +521,4 @@ def get_rdfmts_from_mapping(endpoint):
                 'wrapperType': 'SPARQLEndpoint'
             }]
         })
-    return molecules
+    return molecules, template_classes
