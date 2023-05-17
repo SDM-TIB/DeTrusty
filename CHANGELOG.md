@@ -1,3 +1,7 @@
+# v0.12.1 - 17 May 2023
+- Fix decomposition error for typed molecules including repeated predicates
+- Docker: update Python
+
 # v0.12.0 - 02 May 2023
 - Consider more cases for extracting the RDF class from an RML mapping
 - Complete the source description using the endpoint if the RML mapping includes template classes
