@@ -188,7 +188,7 @@ class Decomposer(object):
 
         for s in stars.copy():
             ltr = stars[s]
-            preds = [utils.getUri(tr.predicate, self.prefixes)[1:-1] for tr in ltr if tr.predicate.constant]
+            preds = list(set([utils.getUri(tr.predicate, self.prefixes)[1:-1] for tr in ltr if tr.predicate.constant]))
             starpreds[s] = preds
             typemols = self.checkRDFTypeStatemnt(ltr)
             if len(typemols) > 0:
