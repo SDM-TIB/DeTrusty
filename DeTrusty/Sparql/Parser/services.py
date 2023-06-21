@@ -47,7 +47,7 @@ class Service(object):
                 a = a and t.allTriplesLowSelectivity()
         else:
             a = self.triples.allTriplesLowSelectivity()
-        a = a or (self.filters != [])
+        a = a or (self.filters == [])
         return a
 
     def instantiate(self, d):
