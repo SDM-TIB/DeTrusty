@@ -1,3 +1,8 @@
+# v0.12.2 - 21 Jun 2023
+- Update dependencies
+- Docker: update Python
+- Fix selectivity of sub-queries with filters
+
 # v0.12.1 - 17 May 2023
 - Fix decomposition error for typed molecules including repeated predicates
 - Docker: update Python
