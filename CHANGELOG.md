@@ -1,3 +1,6 @@
+# v0.12.3 - 29 Jun 2023
+- Fix sub-query selectivity
+
 # v0.12.2 - 21 Jun 2023
 - Update dependencies
 - Docker: update Python
