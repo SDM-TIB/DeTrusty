@@ -5,10 +5,13 @@ __author__ = 'Kemele M. Endris and Philipp D. Rohde'
 import abc
 import json
 import os
+import re
 import time
 from base64 import b64encode
 
 import requests
+
+re_https = re.compile("https?://")
 
 
 class Config(object):
@@ -27,6 +30,22 @@ class Config(object):
             self.predidx = self.createPredicateIndex()
             self.predwrapidx = self.createPredicateWrapperIndex()
             self.endpoints = self.getEndpoints()
+
+    @staticmethod
+    def get_config(config_input: str|list[dict]):
+        if isinstance(config_input, list):
+            return JSONConfig(config_input)
+        else:
+            if os.path.isfile(config_input):
+                return ConfigFile(config_input)
+            elif re_https.match(config_input):
+                r = requests.get(config_input)
+                if r.status_code != 200:
+                    raise requests.RequestException('Something went wrong trying to download the configuration.')
+                config = JSONConfig(r.json())
+                config.orig_file = config_input
+                return config
+        return None
 
     @abc.abstractmethod
     def getAll(self):

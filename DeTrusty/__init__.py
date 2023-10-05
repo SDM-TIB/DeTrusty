@@ -1,15 +1,12 @@
 __author__ = "Philipp D. Rohde"
 
-import re, sys
+import sys
 import time
 from multiprocessing import Queue
 
 from DeTrusty.Decomposer import Decomposer, Planner
-from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty.Molecule.MTManager import ConfigFile, re_https
 from DeTrusty.Wrapper.RDFWrapper import contact_source
-
-
-re_https = re.compile("https?://")
 
 
 def run_query(query: str,
