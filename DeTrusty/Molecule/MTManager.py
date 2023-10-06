@@ -12,6 +12,22 @@ import requests
 from DeTrusty.utils import re_https
 
 
+def get_config(config_input: str | list[dict]):
+    if isinstance(config_input, list):
+        return JSONConfig(config_input)
+    else:
+        if os.path.isfile(config_input):
+            return ConfigFile(config_input)
+        elif re_https.match(config_input):
+            r = requests.get(config_input)
+            if r.status_code != 200:
+                raise requests.RequestException('Something went wrong trying to download the configuration.')
+            config = JSONConfig(r.json())
+            config.orig_file = config_input
+            return config
+    return None
+
+
 class Config(object):
     def __init__(self, configfile=None, json_data=None):
         self.configfile = configfile
@@ -28,22 +44,6 @@ class Config(object):
             self.predidx = self.createPredicateIndex()
             self.predwrapidx = self.createPredicateWrapperIndex()
             self.endpoints = self.getEndpoints()
-
-    @staticmethod
-    def get_config(config_input: str | list[dict]):
-        if isinstance(config_input, list):
-            return JSONConfig(config_input)
-        else:
-            if os.path.isfile(config_input):
-                return ConfigFile(config_input)
-            elif re_https.match(config_input):
-                r = requests.get(config_input)
-                if r.status_code != 200:
-                    raise requests.RequestException('Something went wrong trying to download the configuration.')
-                config = JSONConfig(r.json())
-                config.orig_file = config_input
-                return config
-        return None
 
     @abc.abstractmethod
     def getAll(self):

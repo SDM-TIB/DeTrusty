@@ -4,7 +4,7 @@ import time
 from multiprocessing import Queue
 
 from DeTrusty.Decomposer import Decomposer, Planner
-from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty.Molecule.MTManager import Config, get_config
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 from DeTrusty.utils import re_https
 
@@ -12,7 +12,7 @@ from DeTrusty.utils import re_https
 def run_query(query: str,
               decomposition_type: str = "STAR",
               sparql_one_dot_one: bool = False,
-              config: ConfigFile = ConfigFile('./Config/rdfmts.json'),
+              config: Config = get_config('./Config/rdfmts.json'),
               join_stars_locally: bool = True,
               print_result: bool = True,
               yasqe: bool = False):
@@ -36,7 +36,7 @@ def run_query(query: str,
         Indicates whether the query includes the SERVICE clause.
         'True' meaning the SERVICE clause is present in the query, 'False' otherwise.
         Default is 'False'.
-    config : DeTrusty.Molecule.MTManager.ConfigFile, optional
+    config : DeTrusty.Molecule.MTManager.Config, optional
         The configuration holding the metadata about the federation over which the
         SPARQL query should be executed. If no value is specified, DeTrusty will
         attempt to load the configuration from `./Config/rdfmts.json`.
