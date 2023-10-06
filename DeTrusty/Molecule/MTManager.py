@@ -5,13 +5,11 @@ __author__ = 'Kemele M. Endris and Philipp D. Rohde'
 import abc
 import json
 import os
-import re
 import time
 from base64 import b64encode
 
 import requests
-
-re_https = re.compile("https?://")
+from DeTrusty.utils import re_https
 
 
 class Config(object):
@@ -32,7 +30,7 @@ class Config(object):
             self.endpoints = self.getEndpoints()
 
     @staticmethod
-    def get_config(config_input: str|list[dict]):
+    def get_config(config_input: str | list[dict]):
         if isinstance(config_input, list):
             return JSONConfig(config_input)
         else:
