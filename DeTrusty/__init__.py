@@ -6,7 +6,7 @@ from multiprocessing import Queue
 from DeTrusty.Decomposer import Decomposer, Planner
 from DeTrusty.Molecule.MTManager import Config, get_config
 from DeTrusty.Wrapper.RDFWrapper import contact_source
-from DeTrusty.utils import is_url
+from DeTrusty.utils import is_url, get_query_string
 
 
 def run_query(query: str,
@@ -26,7 +26,8 @@ def run_query(query: str,
     Parameters
     ----------
     query : str
-        The SPARQL query to be executed.
+        The SPARQL query to be executed. Might be a string holding the SPARQL query or path to
+        a query file. The query file can be local or remote (accessible via GET request).
     decomposition_type : str, optional
         The decomposition type to be used for decomposing the query. Possible values
         are 'STAR' for a star-shaped decomposition, 'EG' for exclusive groups decomposition,
@@ -65,7 +66,7 @@ def run_query(query: str,
 
     """
     start_time = time.time()
-    decomposer = Decomposer(query, config,
+    decomposer = Decomposer(get_query_string(query), config,
                             decompType=decomposition_type,
                             joinstarslocally=join_stars_locally,
                             sparql_one_dot_one=sparql_one_dot_one)
