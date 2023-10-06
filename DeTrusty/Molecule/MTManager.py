@@ -9,7 +9,7 @@ import time
 from base64 import b64encode
 
 import requests
-from DeTrusty.utils import re_https
+from DeTrusty.utils import is_url, read_file_from_internet
 
 
 def get_config(config_input: str | list[dict]):
@@ -18,11 +18,8 @@ def get_config(config_input: str | list[dict]):
     else:
         if os.path.isfile(config_input):
             return ConfigFile(config_input)
-        elif re_https.match(config_input):
-            r = requests.get(config_input)
-            if r.status_code != 200:
-                raise requests.RequestException('Something went wrong trying to download the configuration.')
-            config = JSONConfig(r.json())
+        elif is_url(config_input):
+            config = JSONConfig(read_file_from_internet(config_input, json_response=True))
             config.orig_file = config_input
             return config
     return None

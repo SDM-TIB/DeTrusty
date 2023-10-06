@@ -6,7 +6,7 @@ from multiprocessing import Queue
 from DeTrusty.Decomposer import Decomposer, Planner
 from DeTrusty.Molecule.MTManager import Config, get_config
 from DeTrusty.Wrapper.RDFWrapper import contact_source
-from DeTrusty.utils import re_https
+from DeTrusty.utils import is_url
 
 
 def run_query(query: str,
@@ -88,7 +88,7 @@ def run_query(query: str,
         if print_result:
             res = {}
             for key, value in r.items():
-                res[key] = {"value": value, "type": "uri" if re_https.match(value) else "literal"}
+                res[key] = {"value": value, "type": "uri" if is_url(value) else "literal"}
             if not yasqe:
                 res['__meta__'] = {"is_verified": True}
 
