@@ -58,6 +58,28 @@ class Endpoint:
 def create_rdfmts(endpoints: list | dict,
                   output: Optional[str] = DEFAULT_OUTPUT_PATH,
                   interlinking: bool = False) -> Optional[JSONConfig]:
+
+    """Generating rdfmts.json, which need to be supplied during query execution using run_query
+
+    Parameters
+    ----------
+    endpoints : list or dict
+        The endpoints, from which informations will be collected.
+    output : str, optional
+        Path location in which the generated configuration will be saved. 
+
+        * In case of not supplied: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.json'
+        * In case of None is supplied: the config won't be saved, instead JSONConfig files will be returned.
+
+    interlinking : bool, optional
+        When supplied with True, the module will assume that there's an interlinks between endpoints, and thus generating configuration that suits this purpose. Default value is False.
+
+    Return
+    ------
+    JSONConfig, optional
+        only generating return value when output=None.
+
+    """
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
     logger_wrapper.setLevel(logging.WARNING)  # temporarily disable logging of contacting the source
 

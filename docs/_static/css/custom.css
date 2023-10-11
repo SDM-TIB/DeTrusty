@@ -33,3 +33,7 @@ figure.align-default {
     display: inline-block;
     text-align: center;
 }
+.red {
+    color: red;
+    font-weight: bold;
+}

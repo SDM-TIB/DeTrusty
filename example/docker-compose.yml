@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  detrusty:
+    image: sdmtib/detrusty:latest
+    container_name: detrusty
+    volumes:
+      - ./K4COVID:/DeTrusty/Config/
+    ports:
+      - "5000:5000"
+    environment:
+      - JOIN_STARS_LOCALLY=False

@@ -64,6 +64,16 @@ def run_query(query: str,
         It returns an error message in the 'error' field if something went wrong. Other metadata might
         be omitted in that case.
 
+    Examples
+    --------
+    The example calls assume that an object ``config`` with the source descriptions exists.
+
+    >>> run_query('SELECT ?s WHERE { ?s a <http://example.com/Person> }', config=config)
+
+    >>> run_query('./query.rq', config=config)
+
+    >>> run_query('http://example.com/queries/query.rq', config=config)
+
     """
     start_time = time.time()
     decomposer = Decomposer(get_query_string(query), config,

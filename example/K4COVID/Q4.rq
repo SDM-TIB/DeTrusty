@@ -1,0 +1,15 @@
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX k4covid: <http://research.tib.eu/covid-19/vocab/>
+PREFIX k4covide: <http://research.tib.eu/covid-19/entity/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+
+SELECT DISTINCT ?sameAsComorbidity ?icd10 ?risk WHERE {
+    ?treatment k4covid:hasCovidDrug ?covidDrug.
+    ?treatment k4covid:hasComorbidity ?comorbidity.
+    ?comorbidity k4covid:hasCUIAnnotation ?annotationComorbidity .
+    ?annotationComorbidity owl:sameAs ?sameAsComorbidity .
+    ?sameAsComorbidity dbo:icd10 ?icd10.
+    ?sameAsComorbidity dbo:meshId ?meshID .
+    ?sameAsComorbidity dbp:risks ?risk
+}

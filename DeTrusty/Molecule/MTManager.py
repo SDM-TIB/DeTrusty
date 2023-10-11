@@ -13,6 +13,39 @@ from DeTrusty.utils import is_url, read_file_from_internet
 
 
 def get_config(config_input: str | list[dict]):
+    """Creates an object with the internal representation of the source descriptions.
+
+    Based on the type of input, this function will create a ``Config`` object either
+    from a local file, remote file, or a list of dictionaries. The source descriptions
+    are later used by DeTrusty for the source selection and decomposition. The main
+    usage of this function is to read stored source descriptions from a file (local or remote)
+    in order to reuse them for query execution over the same federation.
+
+    Parameters
+    ----------
+    config_input: str | list[dict]
+        The source description to transform into the internal representation. Might be a string holding the path
+        to a configuration file. The configuration file can be local or remote (accessible via GET request).
+        The source description can also be a parsed JSON, i.e., a list of Python dictionaries. Each dictionary
+        represents a so-called *RDF Molecule Template*.
+
+    Returns
+    -------
+    Config
+        The object holding the internal representation of the source descriptions. The result might be ``None``
+        if there was an issue while reading the source descriptions that did not lead to an exception.
+
+    Examples
+    --------
+    The example calls assume that the file ``rdftms.json`` is a valid source description file created by DeTrusty.
+    See `Creating Source Descriptions <https://sdm-tib.github.io/DeTrusty/library.html#creating-source-descriptions>`_
+    for more information.
+
+    >>> get_config('./rdfmts.json')
+
+    >>> get_config('http://example.com/rdfmts.json')
+
+    """
     if isinstance(config_input, list):
         return JSONConfig(config_input)
     else:
@@ -167,10 +200,14 @@ class Config(object):
 
 class ConfigFile(Config):
     def __init__(self, configfile):
+        self.orig_file = configfile
         if os.path.isfile(configfile):
             super().__init__(configfile=configfile)
         else:
             super().__init__()
+
+    def __repr__(self):
+        return 'ConfigFile(' + str(self.orig_file) + ')'
 
     def getAll(self):
         return self.read_json_file(self.configfile)

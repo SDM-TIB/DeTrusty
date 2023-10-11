@@ -1,0 +1,28 @@
+PREFIX wb: <http://worldbank.org/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?country_code ?country_name ?year (AVG(?year_exp_WB) AS ?exp_wb) (AVG(?year_exp) AS ?exp_wiki)
+WHERE {
+    ?country a wb:Country .
+    ?country dc:identifier ?country_code .
+    ?country rdfs:label ?country_name.
+    ?country owl:sameAs ?sameAsCountry .
+    ?country wb:hasAnnualIndicatorEntry ?annualIndicator .
+    ?annualIndicator wb:hasIndicator <http://worldbank.org/Indicator/SP.DYN.LE00.IN> .
+    ?annualIndicator owl:hasValue ?year_exp_WB .
+    ?annualIndicator time:year ?year .
+
+    ?sameAsCountry p:P2250 ?itemLifeExpectancy .
+    ?itemLifeExpectancy ps:P2250 ?year_exp .
+    ?itemLifeExpectancy pq:P585 ?time .
+    BIND(year(?time) AS ?year)
+    FILTER(?year=2017)
+}
+GROUP BY ?country_code ?country_name ?year
+ORDER BY ?country_code

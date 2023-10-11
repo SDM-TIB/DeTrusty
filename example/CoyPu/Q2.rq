@@ -1,0 +1,33 @@
+PREFIX wb: <http://worldbank.org/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?year (AVG(?value/?population) AS ?gdp_per_capita) (AVG(?value1/?population)*1000000 AS ?carbon_per_capita)
+WHERE {
+    ?indicator a wb:AnnualIndicatorEntry .
+    ?indicator wb:hasIndicator <http://worldbank.org/Indicator/NY.GDP.MKTP.CD> .
+    ?indicator wb:hasCountry ?country .
+    ?indicator owl:hasValue ?value .
+    ?indicator time:year ?year .
+    ?country dc:identifier 'DEU' .
+
+    ?indicator1 a wb:AnnualIndicatorEntry .
+    ?indicator1 wb:hasIndicator <http://worldbank.org/Indicator/EN.ATM.CO2E.KT> .
+    ?indicator1 wb:hasCountry ?country1 .
+    ?indicator1 owl:hasValue ?value1 .
+    ?indicator1 time:year ?year .
+    ?country dc:identifier 'DEU' .
+
+    ?countryWiki wdt:P298 'DEU' .
+    ?countryWiki p:P1082 ?itemP .
+    ?itemP pq:P585 ?time.
+    ?itemP ps:P1082 ?population .
+    BIND(year(?time) AS ?year)
+}
+GROUP BY ?year
+ORDER BY ?year

@@ -1,0 +1,24 @@
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX k4covid: <http://research.tib.eu/covid-19/vocab/>
+PREFIX k4covide: <http://research.tib.eu/covid-19/entity/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+
+SELECT DISTINCT ?treatment ?sameAsCovidDrug ?excretion ?metabolism ?routes ?dbDrugBank ?dbSmiles ?tradeName
+WHERE {
+    ?treatment k4covid:hasCovidDrug ?covidDrug.
+    ?treatment k4covid:hasComorbidity k4covide:Asthma.
+    ?treatment k4covid:hasComorbidityDrug ?comorbidityDrug.
+    ?comorbidityDrug k4covid:hasCUIAnnotation ?CUIComorbidityDrug.
+    ?CUIComorbidityDrug owl:sameAs ?sameAsComorbidityDrug .
+    ?covidDrug k4covid:hasCUIAnnotation ?CUICovidDrug.
+    ?CUICovidDrug owl:sameAs ?sameAsCovidDrug .
+    ?sameAsCovidDrug dbp:excretion ?excretion.
+    ?sameAsCovidDrug dbp:metabolism ?metabolism.
+    ?sameAsCovidDrug dbp:routesOfAdministration ?routes.
+    ?sameAsCovidDrug dbp:chembl ?dbCheml.
+    ?sameAsCovidDrug dbp:kegg ?dbKegg.
+    ?sameAsCovidDrug dbo:drugbank ?dbDrugBank .
+    ?sameAsCovidDrug dbp:smiles ?dbSmiles .
+    ?sameAsCovidDrug dbp:tradename ?tradeName.
+} ORDER BY ?treatment

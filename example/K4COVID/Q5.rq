@@ -1,0 +1,24 @@
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX k4covid: <http://research.tib.eu/covid-19/vocab/>
+PREFIX k4covide: <http://research.tib.eu/covid-19/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+
+SELECT DISTINCT ?treatment ?sameAsComorbidityDrug ?sameAsCovidDrug ?idDrug ?mass ?excretation
+WHERE {
+  ?treatment k4covid:hasCovidDrug ?covidDrug.
+  ?treatment k4covid:hasComorbidity k4covide:Cardiopathy .
+  ?treatment k4covid:hasComorbidityDrug ?comorbidityDrug.
+  ?comorbidityDrug k4covid:hasCUIAnnotation ?CUIComorbidityDrug.
+  ?CUIComorbidityDrug owl:sameAs ?sameAsComorbidityDrug .
+  ?covidDrug k4covid:hasCUIAnnotation ?CUICovidDrug.
+  ?CUICovidDrug owl:sameAs ?sameAsCovidDrug .
+  {
+    ?sameAsComorbidityDrug wdt:P592 ?idDrug .
+    ?sameAsComorbidityDrug wdt:P2067 ?mass .
+  }
+  UNION
+  {
+    ?sameAsComorbidityDrug dbp:excretion ?excretation .
+  }
+}
