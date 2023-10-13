@@ -1,3 +1,8 @@
+# v0.13.0 - 13 Oct 2023
+- Add documentation to GitHub pages
+- Add feature to get source description file via GET request
+- Add feature to get query string from file via GET request
+
 # v0.12.3 - 29 Jun 2023
 - Fix sub-query selectivity
 
