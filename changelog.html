@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; DeTrusty 0.13.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="reference.html" />
+    <link rel="prev" title="DeTrusty as a Service" href="service.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html">
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="source_description.html">Source Descriptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decomposition.html">Decomposition Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="library.html">DeTrusty as a Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">DeTrusty as a Service</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeTrusty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="v0-13-0-13-oct-2023">
+<h2>v0.13.0 - 13 Oct 2023<a class="headerlink" href="#v0-13-0-13-oct-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add documentation to GitHub pages</p></li>
+<li><p>Add feature to get source description file via GET request</p></li>
+<li><p>Add feature to get query string from file via GET request</p></li>
+</ul>
+</section>
+<section id="v0-12-3-29-jun-2023">
+<h2>v0.12.3 - 29 Jun 2023<a class="headerlink" href="#v0-12-3-29-jun-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix sub-query selectivity</p></li>
+</ul>
+</section>
+<section id="v0-12-2-21-jun-2023">
+<h2>v0.12.2 - 21 Jun 2023<a class="headerlink" href="#v0-12-2-21-jun-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Update dependencies</p></li>
+<li><p>Docker: update Python</p></li>
+<li><p>Fix selectivity of sub-queries with filters</p></li>
+</ul>
+</section>
+<section id="v0-12-1-17-may-2023">
+<h2>v0.12.1 - 17 May 2023<a class="headerlink" href="#v0-12-1-17-may-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix decomposition error for typed molecules including repeated predicates</p></li>
+<li><p>Docker: update Python</p></li>
+</ul>
+</section>
+<section id="v0-12-0-02-may-2023">
+<h2>v0.12.0 - 02 May 2023<a class="headerlink" href="#v0-12-0-02-may-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Consider more cases for extracting the RDF class from an RML mapping</p></li>
+<li><p>Complete the source description using the endpoint if the RML mapping includes template classes</p></li>
+<li><p>Update dependencies</p></li>
+</ul>
+</section>
+<section id="v0-11-3-27-apr-2023">
+<h2>v0.11.3 - 27 Apr 2023<a class="headerlink" href="#v0-11-3-27-apr-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix duplicated BIND clause when using NHJF</p></li>
+<li><p>Fix query plan JSON for cases where the triples of an endpoint are not a list</p></li>
+<li><p>Fix searching endpoints serving predicates with prefixes</p></li>
+<li><p>Add operator name for Xfilter</p></li>
+<li><p>Fix display of constants in query plan</p></li>
+<li><p>Fix filter issue in triple-wise decomposition</p></li>
+</ul>
+</section>
+<section id="v0-11-2-23-feb-2023">
+<h2>v0.11.2 - 23 Feb 2023<a class="headerlink" href="#v0-11-2-23-feb-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix paths for query plan</p></li>
+</ul>
+</section>
+<section id="v0-11-1-14-feb-2023">
+<h2>v0.11.1 - 14 Feb 2023<a class="headerlink" href="#v0-11-1-14-feb-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix query variables when using SERVICE clause</p></li>
+</ul>
+</section>
+<section id="v0-11-0-03-feb-2023">
+<h2>v0.11.0 - 03 Feb 2023<a class="headerlink" href="#v0-11-0-03-feb-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Docker: update Python and PIP</p></li>
+<li><p>Add query plan visualization at route <code class="docutils literal notranslate"><span class="pre">/query_plan</span></code></p></li>
+</ul>
+</section>
+<section id="v0-10-0-31-jan-2023">
+<h2>v0.10.0 - 31 Jan 2023<a class="headerlink" href="#v0-10-0-31-jan-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added collecting source descriptions from Wikidata</p></li>
+<li><p>Added feature to disable interlinking in source description collection</p></li>
+</ul>
+</section>
+<section id="v0-9-1-06-dec-2022">
+<h2>v0.9.1 - 06 Dec 2022<a class="headerlink" href="#v0-9-1-06-dec-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed not pushing down BIND in some cases</p></li>
+<li><p>Fixed missing module error in <code class="docutils literal notranslate"><span class="pre">create_rdfmts.py</span></code></p></li>
+</ul>
+</section>
+<section id="v0-9-0-24-nov-2022">
+<h2>v0.9.0 - 24 Nov 2022<a class="headerlink" href="#v0-9-0-24-nov-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added GROUP BY clause</p></li>
+<li><p>Added aggregates</p></li>
+<li><p>Added BIND clause</p></li>
+<li><p>Added ability to process simple expressions</p></li>
+<li><p>Added function <code class="docutils literal notranslate"><span class="pre">year</span></code></p></li>
+</ul>
+</section>
+<section id="v0-8-0-05-nov-2022">
+<h2>v0.8.0 - 05 Nov 2022<a class="headerlink" href="#v0-8-0-05-nov-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Improved Xunion operator</p></li>
+<li><p>Fixed issue for filters with different data types</p></li>
+<li><p>Improved the RDF wrapper</p></li>
+<li><p>Updated Python base image to 3.11.0</p></li>
+</ul>
+</section>
+<section id="v0-7-2-30-sep-2022">
+<h2>v0.7.2 - 30 Sep 2022<a class="headerlink" href="#v0-7-2-30-sep-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix bug when config file is empty</p></li>
+<li><p>Disable caching for YASGUI</p></li>
+<li><p>Update YASGUI</p></li>
+</ul>
+</section>
+<section id="v0-7-1-19-sep-2022">
+<h2>v0.7.1 – 19 Sep 2022<a class="headerlink" href="#v0-7-1-19-sep-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix bug where sub-queries with constants where not considered for merging</p></li>
+</ul>
+</section>
+<section id="v0-7-0-17-sep-2022">
+<h2>v0.7.0 – 17 Sep 2022<a class="headerlink" href="#v0-7-0-17-sep-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added feature to restrict the metadata collection of an endpoint to specific classes</p></li>
+</ul>
+</section>
+<section id="v0-6-4-16-sep-2022">
+<h2>v0.6.4 – 16 Sep 2022<a class="headerlink" href="#v0-6-4-16-sep-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix quoted special chars in query string</p></li>
+</ul>
+</section>
+<section id="v0-6-3-05-sep-2022">
+<h2>v0.6.3 – 05 Sep 2022<a class="headerlink" href="#v0-6-3-05-sep-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added basic authentication with Base64 encoding</p></li>
+</ul>
+</section>
+<section id="v0-6-2-31-aug-2022">
+<h2>v0.6.2 – 31 Aug 2022<a class="headerlink" href="#v0-6-2-31-aug-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add possibility to create configuration instance from JSON string</p></li>
+<li><p>Add method to save a configuration instance to file</p></li>
+<li><p>Update Python base image to 3.9.13 on bullseye</p></li>
+</ul>
+</section>
+<section id="v0-6-1-16-aug-2022">
+<h2>v0.6.1 – 16 Aug 2022<a class="headerlink" href="#v0-6-1-16-aug-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix a type hint for Python versions &lt; 3.10</p></li>
+<li><p>Create config object on import of <code class="docutils literal notranslate"><span class="pre">DeTrusty.Molecule.MTCreation</span></code></p></li>
+<li><p>Raise exceptions during metadata collection instead of just logging them</p></li>
+<li><p>Fix issue when using a list of endpoints and not a dictionary</p></li>
+<li><p>Prevent generation of parsetab.py</p></li>
+<li><p>Rename log from metadata creation to <code class="docutils literal notranslate"><span class="pre">.rdfmts.log</span></code></p></li>
+</ul>
+</section>
+<section id="v0-6-0-13-aug-2022">
+<h2>v0.6.0 – 13 Aug 2022<a class="headerlink" href="#v0-6-0-13-aug-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Exclude tests from Docker image</p></li>
+<li><p>Fix loggers</p></li>
+<li><p>Update dependencies</p></li>
+<li><p>Add capability to query private knowledge graphs</p></li>
+<li><p>Update RDF Molecule Template creation</p>
+<ul>
+<li><p>Collect metadata from private endpoints</p></li>
+<li><p>Gather metadata from RML mappings</p></li>
+</ul>
+</li>
+<li><p>Fix issue with non-ASCII characters in query</p></li>
+</ul>
+</section>
+<section id="v0-5-1-27-jul-2022">
+<h2>v0.5.1 – 27 Jul 2022<a class="headerlink" href="#v0-5-1-27-jul-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add checks (directory exists, file writeable) for the metadata output file before collecting the metadata</p></li>
+<li><p>Keep a list of all triple patterns in the decomposer</p></li>
+<li><p>Remove Flask from the list of dependencies of the library</p></li>
+</ul>
+</section>
+<section id="v0-5-0-26-jul-2022">
+<h2>v0.5.0 – 26 Jul 2022<a class="headerlink" href="#v0-5-0-26-jul-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Some changes in order to use DeTrusty as a library and a service</p></li>
+</ul>
+</section>
+<section id="v0-4-5-30-jun-2022">
+<h2>v0.4.5 – 30 Jun 2022<a class="headerlink" href="#v0-4-5-30-jun-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed use of incorrect set of variables for OPTIONALs</p></li>
+</ul>
+</section>
+<section id="v0-4-4-14-jun-2022">
+<h2>v0.4.4 – 14 Jun 2022<a class="headerlink" href="#v0-4-4-14-jun-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed request payload to work with the Wikidata endpoint (<a class="reference external" href="https://query.wikidata.org/sparql">https://query.wikidata.org/sparql</a>)</p></li>
+</ul>
+</section>
+<section id="v0-4-3-22-may-2022">
+<h2>v0.4.3 – 22 May 2022<a class="headerlink" href="#v0-4-3-22-may-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed issue in response header when the SELECT clause included an asterisk (*) to retrieve all variables</p></li>
+</ul>
+</section>
+<section id="v0-4-2-21-may-2022">
+<h2>v0.4.2 – 21 May 2022<a class="headerlink" href="#v0-4-2-21-may-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix endpoint path behind proxy</p></li>
+</ul>
+</section>
+<section id="v0-4-1-20-may-2022">
+<h2>v0.4.1 – 20 May 2022<a class="headerlink" href="#v0-4-1-20-may-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix for joining sub-queries at remote source configuration</p></li>
+</ul>
+</section>
+<section id="v0-4-0-20-may-2022">
+<h2>v0.4.0 – 20 May 2022<a class="headerlink" href="#v0-4-0-20-may-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Web interface using YASGUI added</p></li>
+<li><p>Configuration for joining sub-queries at remote source</p></li>
+</ul>
+</section>
+<section id="v0-3-0-19-may-2022">
+<h2>v0.3.0 – 19 May 2022<a class="headerlink" href="#v0-3-0-19-may-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Support for VALUES clause</p></li>
+<li><p>Update of installation method</p></li>
+<li><p>Update of dependencies</p></li>
+<li><p>Support for new decomposition types</p>
+<ul>
+<li><p>Triple-wise</p></li>
+<li><p>Exclusive Groups</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="v0-2-0-07-feb-2022">
+<h2>v0.2.0 – 07 Feb 2022<a class="headerlink" href="#v0-2-0-07-feb-2022" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Support for SERVICE clause</p></li>
+<li><p>Minor fixes for the use as a service</p></li>
+</ul>
+</section>
+<section id="v0-1-0-17-dec-2020">
+<h2>v0.1.0 – 17 Dec 2020<a class="headerlink" href="#v0-1-0-17-dec-2020" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>First version of DeTrusty as a SPARQL 1.0 federated query engine</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="service.html" class="btn btn-neutral float-left" title="DeTrusty as a Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2023, Philipp D. Rohde, Avellino and Mazen Bechara.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

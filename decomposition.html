@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decomposition Types &mdash; DeTrusty 0.13.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="DeTrusty as a Library" href="library.html" />
+    <link rel="prev" title="Source Descriptions" href="source_description.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html">
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="source_description.html">Source Descriptions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Decomposition Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#triple-wise">Triple-wise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exclusive-groups">Exclusive Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#star-shaped-sub-queries">Star-shaped Sub-queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#combined-star-shaped-sub-queries">Combined Star-shaped Sub-queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-using-an-example">Comparison using an Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="library.html">DeTrusty as a Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">DeTrusty as a Service</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeTrusty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Decomposition Types</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="decomposition-types">
+<h1>Decomposition Types<a class="headerlink" href="#decomposition-types" title="Permalink to this heading"></a></h1>
+<p>The primary goal of query decomposition is to transform a high-level query into the internal representation.
+During query decomposition, the query is checked syntactically.
+In distributed systems, as part of query restructuring, the original query is split into sub-queries.
+This is done since in most scenarios no source will be able to answer all triple patterns of the query.
+There are several approaches to how to build the sub-queries from the original one.
+The following describes the different decomposition types implemented in DeTrusty.
+At the end, a comparison of the presented decomposition types based on an example query is provided.</p>
+<section id="triple-wise">
+<h2>Triple-wise<a class="headerlink" href="#triple-wise" title="Permalink to this heading"></a></h2>
+<p><em>Triple-wise decomposition</em> considers each triple pattern of the query as a separate sub-query.
+The single-triple-pattern sub-queries are executed by all sources that serve the predicate.
+This decomposition type may lead to very expensive query plans.</p>
+</section>
+<section id="exclusive-groups">
+<h2>Exclusive Groups<a class="headerlink" href="#exclusive-groups" title="Permalink to this heading"></a></h2>
+<p>When using <em>Exclusive Groups</em> <span id="id1">[<a class="reference internal" href="reference.html#id4" title="Andreas Schwarte, Peter Haase, Katja Hose, Ralf Schenkel, and Michael Schmidt. FedX: Optimization Techniques for Federated Query Processing on Linked Data. In The Semantic Web – ISWC 2011, 601–616. Berlin, Heidelberg, 2011. Springer. doi:10.1007/978-3-642-25073-6_38.">2</a>]</span>, the query is decomposed in such a way that each sub-query consists of triple patterns that can be exclusively answered by one source.
+Triple patterns with predicates occurring in several sources produce single-triple-pattern sub-queries that are executed by all sources that serve the predicate.
+Hence, queries with predicates that occur in multiple sources may be expensive following this type of decomposition.</p>
+</section>
+<section id="star-shaped-sub-queries">
+<h2>Star-shaped Sub-queries<a class="headerlink" href="#star-shaped-sub-queries" title="Permalink to this heading"></a></h2>
+<p>Following the <em>star-shaped sub-queries</em> decomposition <span id="id2">[<a class="reference internal" href="reference.html#id5" title="Maria-Esther Vidal, Edna Ruckhaus, Tomas Lampo, Amad\'ıs Mart\'ınez, Javier Sierra, and Axel Polleres. Efficiently Joining Group Patterns in SPARQL Queries. In The Semantic Web: Research and Applications. ESWC 2010, 228–242. Berlin, Heidelberg, 2010. Springer. doi:10.1007/978-3-642-13486-9_16.">3</a>]</span>, the query is decomposed in such a way that the triple patterns with the same subject form one sub-query.
+This mitigates the previously mentioned issue of predicates occurring in several sources since the combination of all predicates belonging to the sub-query is preferred.</p>
+</section>
+<section id="combined-star-shaped-sub-queries">
+<h2>Combined Star-shaped Sub-queries<a class="headerlink" href="#combined-star-shaped-sub-queries" title="Permalink to this heading"></a></h2>
+<p>When using the <em>combined star-shaped sub-queries</em> decomposition, the query is decomposed according to the star-shaped sub-query decomposition as described above.
+However, sub-queries that can be answered by the same source are merged into one sub-query if they can be joined.
+This type of decomposition exceeds if the source can perform the join efficiently and joining the sub-queries in the source reduces the size of the intermediate result significantly.</p>
+</section>
+<section id="comparison-using-an-example">
+<h2>Comparison using an Example<a class="headerlink" href="#comparison-using-an-example" title="Permalink to this heading"></a></h2>
+<p>This example serves to visualize the differences of the above-mentioned decomposition types.
+Consider a federation of knowledge graphs with the following characteristics as used in the project <a class="reference external" href="https://coypu.org">CoyPu</a>.
+The statistics and execution times were collected on 2023-10-10 and are subject to change.</p>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Knowledge Graph</p></th>
+<th class="head"><p>Triples</p></th>
+<th class="head"><p>Classes</p></th>
+<th class="head"><p>Predicates</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CoyPu Internal</p></td>
+<td><p>691,161,990</p></td>
+<td><p>328</p></td>
+<td><p>5,733</p></td>
+</tr>
+<tr class="row-odd"><td><p>World Bank</p></td>
+<td><p>250,097,215</p></td>
+<td><p>23</p></td>
+<td><p>131</p></td>
+</tr>
+<tr class="row-even"><td><p>Wikidata (old)</p></td>
+<td><p>272,348</p></td>
+<td><p>Q6256 (countries) only</p></td>
+<td><p>1,519</p></td>
+</tr>
+<tr class="row-odd"><td><p>Wikidata</p></td>
+<td><p>287,369</p></td>
+<td><p>Q6256 (countries) only</p></td>
+<td><p>1,592</p></td>
+</tr>
+</tbody>
+</table>
+<p>The SPARQL query <em>“Retrieve the GDP per capita and carbon emission per capita for Germany per year”</em> is used for showing the differences of the decomposition types.</p>
+<div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">wb</span><span class="p">:</span> <span class="nl">&lt;http://worldbank.org/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">dc</span><span class="p">:</span> <span class="nl">&lt;http://purl.org/dc/elements/1.1/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">time</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2006/time#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">wdt</span><span class="p">:</span> <span class="nl">&lt;http://www.wikidata.org/prop/direct/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">p</span><span class="p">:</span> <span class="nl">&lt;http://www.wikidata.org/prop/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">ps</span><span class="p">:</span> <span class="nl">&lt;http://www.wikidata.org/prop/statement/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">pq</span><span class="p">:</span> <span class="nl">&lt;http://www.wikidata.org/prop/qualifier/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
+
+<span class="k">SELECT</span> <span class="nv">?year</span> <span class="p">(</span><span class="nf">AVG</span><span class="p">(</span><span class="nv">?value</span><span class="o">/</span><span class="nv">?population</span><span class="p">)</span> <span class="k">AS</span> <span class="nv">?gdp_per_capita</span><span class="p">)</span> <span class="p">(</span><span class="nf">AVG</span><span class="p">(</span><span class="nv">?value1</span><span class="o">/</span><span class="nv">?population</span><span class="p">)</span><span class="o">*</span><span class="mi">1000000</span> <span class="k">AS</span> <span class="nv">?carbon_per_capita</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="p">{</span>
+    <span class="nv">?indicator</span> <span class="k">a</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">AnnualIndicatorEntry</span> <span class="p">.</span>
+    <span class="nv">?indicator</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasIndicator</span> <span class="nl">&lt;http://worldbank.org/Indicator/NY.GDP.MKTP.CD&gt;</span> <span class="p">.</span>
+    <span class="nv">?indicator</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasCountry</span> <span class="nv">?country</span> <span class="p">.</span>
+    <span class="nv">?indicator</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">hasValue</span> <span class="nv">?value</span> <span class="p">.</span>
+    <span class="nv">?indicator</span> <span class="nn">time</span><span class="p">:</span><span class="nt">year</span> <span class="nv">?year</span> <span class="p">.</span>
+    <span class="nv">?country</span> <span class="nn">dc</span><span class="p">:</span><span class="nt">identifier</span> <span class="s">&#39;DEU&#39;</span> <span class="p">.</span>
+
+    <span class="nv">?indicator1</span> <span class="k">a</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">AnnualIndicatorEntry</span> <span class="p">.</span>
+    <span class="nv">?indicator1</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasIndicator</span> <span class="nl">&lt;http://worldbank.org/Indicator/EN.ATM.CO2E.KT&gt;</span> <span class="p">.</span>
+    <span class="nv">?indicator1</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasCountry</span> <span class="nv">?country1</span> <span class="p">.</span>
+    <span class="nv">?indicator1</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">hasValue</span> <span class="nv">?value1</span> <span class="p">.</span>
+    <span class="nv">?indicator1</span> <span class="nn">time</span><span class="p">:</span><span class="nt">year</span> <span class="nv">?year</span> <span class="p">.</span>
+    <span class="nv">?country</span> <span class="nn">dc</span><span class="p">:</span><span class="nt">identifier</span> <span class="s">&#39;DEU&#39;</span> <span class="p">.</span>
+
+    <span class="nv">?countryWiki</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P298</span> <span class="s">&#39;DEU&#39;</span> <span class="p">.</span>
+    <span class="nv">?countryWiki</span> <span class="nn">p</span><span class="p">:</span><span class="nt">P1082</span> <span class="nv">?itemP</span> <span class="p">.</span>
+    <span class="nv">?itemP</span> <span class="nn">pq</span><span class="p">:</span><span class="nt">P585</span> <span class="nv">?time</span><span class="p">.</span>
+    <span class="nv">?itemP</span> <span class="nn">ps</span><span class="p">:</span><span class="nt">P1082</span> <span class="nv">?population</span> <span class="p">.</span>
+    <span class="k">BIND</span><span class="p">(</span><span class="nf">year</span><span class="p">(</span><span class="nv">?time</span><span class="p">)</span> <span class="k">AS</span> <span class="nv">?year</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">GROUP BY</span> <span class="nv">?year</span>
+<span class="k">ORDER BY</span> <span class="nv">?year</span>
+</pre></div>
+</div>
+<p>Click on an image of a query plan to enlarge it and view all the details.</p>
+<table class="colwidths-given borderless docutils align-center" style="width: 70%">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 7%" />
+<col style="width: 13%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Decomposition Type</p></th>
+<th class="head"><p>Cardinality</p></th>
+<th class="head"><p>Execution Time</p></th>
+<th class="head"><p>Query Plan</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Triple-wise</p></td>
+<td><p><span class="red">0</span></p></td>
+<td><p><span class="red">&gt; 1 hour (timeout)</span></p></td>
+<td><a class="reference external image-reference" href="_images/query_plan_triple_full.png"><img alt="_images/query_plan_triple.png" class="align-center" src="_images/query_plan_triple.png" /></a>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Exclusive Groups</p></td>
+<td><p><span class="red">0</span></p></td>
+<td><p>76.318 seconds</p></td>
+<td><a class="reference external image-reference" href="_images/query_plan_eg_full.png"><img alt="_images/query_plan_eg.png" class="align-center" src="_images/query_plan_eg.png" /></a>
+</td>
+</tr>
+<tr class="row-even"><td><p>Star-shaped Sub-query</p></td>
+<td><p>18</p></td>
+<td><p>35.445 seconds</p></td>
+<td><a class="reference external image-reference" href="_images/query_plan_ssq_full.png"><img alt="_images/query_plan_ssq.png" class="align-center" src="_images/query_plan_ssq.png" /></a>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Combined Star-shaped Sub-query</p></td>
+<td><p>18</p></td>
+<td><p>9.816 seconds</p></td>
+<td><a class="reference external image-reference" href="_images/query_plan_ssq-combined_full.png"><img alt="_images/query_plan_ssq-combined.png" class="align-center" src="_images/query_plan_ssq-combined.png" /></a>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The query execution times are slow due to the use of the public endpoint of Wikidata.
+They are not an indication of the performance of DeTrusty but show the differences in the performance of the decomposition types.
+Unfortunately, the query cannot be executed with the <em>triple-wise</em> and <em>Exclusive Groups</em> decomposition.
+These decomposition types lead to non-selective and very expensive sub-queries.
+<em>Exclusive Groups</em> is finishing the execution.
+However, some sub-queries sent to Wikidata are failing to to the 60 seconds timeout of the public SPARQL endpoint of Wikidata.
+This results in the plan created following <em>Exclusive Groups</em> to return no results.
+The plan created with the <em>triple-wise</em> decomposition is the most expensive one and timed out after one hour.
+This is due to the very long execution times of the non-selective sub-queries and the many joins of large intermediate results.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="source_description.html" class="btn btn-neutral float-left" title="Source Descriptions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="library.html" class="btn btn-neutral float-right" title="DeTrusty as a Library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2023, Philipp D. Rohde, Avellino and Mazen Bechara.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
