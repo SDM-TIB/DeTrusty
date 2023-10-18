@@ -64,12 +64,12 @@ def sparql():
 
 @app.route('/sparql', methods=['GET'])
 def query_editor():
-    return render_template('query-editor.html', title=app.config['VERSION_STRING'])
+    return render_template('query-editor.jinja2', title=app.config['VERSION_STRING'])
 
 
 @app.route('/query_plan', methods=['GET'])
 def query_editor_plan():
-    return render_template('query-plan.html', title=app.config['VERSION_STRING'])
+    return render_template('query-plan.jinja2', title=app.config['VERSION_STRING'])
 
 
 @app.route('/query_plan', methods=['POST'])
