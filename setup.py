@@ -15,6 +15,12 @@ setuptools.setup(
     author='Philipp D. Rohde',
     author_email='philipp.rohde@tib.eu',
     url='https://github.com/SDM-TIB/DeTrusty',
+    project_urls={
+        'Documentation': 'https://sdm-tib.github.io/DeTrusty/',
+        'Changes': 'https://sdm-tib.github.io/DeTrusty/changelog.html',
+        'Source Code': 'https://github.com/SDM-TIB/DeTrusty',
+        'Issue Tracker': 'https://github.com/SDM-TIB/DeTrusty/issues'
+    },
     download_url='https://github.com/SDM-TIB/DeTrusty/archive/refs/tags/v' + version + '.tar.gz',
     long_description=long_description,
     long_description_content_type="text/markdown",
