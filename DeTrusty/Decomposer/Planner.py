@@ -345,28 +345,20 @@ class Planner(object):
             lowSelectivityRight = right.allTriplesLowSelectivity()
             join_variables = l.vars & right.vars
             dependent_op = False
-            # if left.operator.__class__.__name__ == "NestedHashJoinFilter":
-            #     l = TreePlan(Xgoptional(left.vars, right.vars), all_variables, l, right)
+
             # Case 1: left operator is highly selective and right operator is low selective
-            if not (lowSelectivityLeft) and lowSelectivityRight and not (isinstance(right, TreePlan)):
+            if isinstance(right, IndependentOperator) and not lowSelectivityLeft and lowSelectivityRight:
                 l = TreePlan(NestedHashOptional(l.vars, right.vars), all_variables, l, right)
                 dependent_op = True
 
             # Case 2: left operator is low selective and right operator is highly selective
-            elif lowSelectivityLeft and not (lowSelectivityRight) and not (isinstance(right, TreePlan)):
+            elif isinstance(left, IndependentOperator) and lowSelectivityLeft and not lowSelectivityRight:
                 l = TreePlan(NestedHashOptional(l.vars, right.vars), all_variables, right, l)
                 dependent_op = True
 
-            elif not lowSelectivityLeft and lowSelectivityRight and not (isinstance(left, TreePlan) and (left.operator.__class__.__name__ == "NestedHashJoinFilter" or left.operator.__class__.__name__ == "Xgjoin")) \
-                    and not (isinstance(right, IndependentOperator)) \
-                    and not (right.operator.__class__.__name__ == "NestedHashJoinFilter" or right.operator.__class__.__name__ == "Xgjoin") \
-                    and (right.operator.__class__.__name__ == "Xunion"):
-                l = TreePlan(NestedHashOptional(l.vars, right.vars), all_variables, l, right)
-                dependent_op = True
-            # Case 3: both operators are low selective
+            # Case 3: both operators are low selective or an instance of TreePlan
             else:
                 l = TreePlan(Xgoptional(l.vars, right.vars), all_variables, l, right)
-                # print "Planner CASE 3: xgoptional"
 
             if isinstance(l.left, IndependentOperator) and isinstance(l.left.tree, Leaf) and not l.left.tree.service.allTriplesGeneral():
                 if l.left.constantPercentage() <= 0.5:
