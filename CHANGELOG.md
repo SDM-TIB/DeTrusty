@@ -1,3 +1,9 @@
+# v0.13.1 - 25 Oct 2023
+- Change extension of Jinja templates
+- Add project URLs to setup.py
+- Add support for Python 3.12
+- Fix planning of OPTIONAL, i.e., which implementation to choose
+
 # v0.13.0 - 13 Oct 2023
 - Add documentation to GitHub pages
 - Add feature to get source description file via GET request
