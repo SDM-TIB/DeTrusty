@@ -1,3 +1,7 @@
+# v0.13.2 - 01 Nov 2023
+- Fix argument parsing in create_rdfmts.py
+- Docker: update Python
+
 # v0.13.1 - 25 Oct 2023
 - Change extension of Jinja templates
 - Add project URLs to setup.py
