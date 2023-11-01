@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim-bullseye
+FROM python:3.11.6-slim-bullseye
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
 ENV VERSION="0.13.1"
