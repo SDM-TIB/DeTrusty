@@ -5,15 +5,18 @@ import json
 import pathlib
 import sys
 
-PACKAGE_DETRUSTY = str(pathlib.Path(__file__).parent.parent.resolve())
-sys.path.append(PACKAGE_DETRUSTY)
-from DeTrusty.Molecule.MTCreation import DEFAULT_OUTPUT_PATH, create_rdfmts, logger
-sys.path.remove(PACKAGE_DETRUSTY)
+try:
+    from DeTrusty.Molecule.MTCreation import DEFAULT_OUTPUT_PATH, create_rdfmts, logger
+except ImportError:
+    PACKAGE_DETRUSTY = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(PACKAGE_DETRUSTY)
+    from DeTrusty.Molecule.MTCreation import DEFAULT_OUTPUT_PATH, create_rdfmts, logger
+    sys.path.remove(PACKAGE_DETRUSTY)
 
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, 'h:s:o:j:i')
+        opts, args = getopt.getopt(argv, 'hs:o:ji')
     except getopt.GetoptError:
         usage()
         sys.exit(1)
