@@ -363,9 +363,10 @@ def evaluateAggregate(agg, extracted): # type(extracted) always list <-> automat
             if el[0] not in ignored:
                 return el[0], el[1], el[2]
 
-
     elif op.upper() == 'SUM':
-        tmp = list(val[0] for val in extracted if val[0] not in ignored)  
+        tmp = list(val[0] for val in extracted if val[0] not in ignored)
+        if dist:
+            tmp = set(tmp)
         try:
             ret = sum(tmp)
             if type(ret) is float:
