@@ -30,13 +30,16 @@ class Decomposer(object):
 
     def decompose(self):
 
-        if not self.query: # handling empty or whitespaces-filled queries, TODO: review error message from DeTrusty/__init__.py, it is not quite specific
+        if not self.query:
             return None
 
         self.query.body = self.decomposeUnionBlock(self.query.body) if not self.sparql_one_dot_one else self.query.body
 
         if not self.query.body:
             return None
+
+        if self.query.order_by == -1: # can be deleted after merging parser
+            self.query.order_by = []
 
         logger.info('Decomposition obtained')
         logger.info(self.query)
@@ -102,7 +105,7 @@ class Decomposer(object):
                 return None
 
         fl1 = self.includeFilter(sl, fl)
-        fl = list(set(fl) - set(fl1)) # in case VALUES with variables from multiple sources, the values object won't be removed
+        fl = list(set(fl) - set(fl1)) # in case VALUES with variables from multiple sources, the VALUES object won't be removed
         if sl:
             if len(sl) == 1 and isinstance(sl[0], UnionBlock) and fl != []:
                 sl[0] = self.updateFilters(sl[0], fl)
@@ -771,7 +774,7 @@ class Decomposer(object):
 
     '''
     ===================================================
-    ========= MAKE PLAN =================================
+    ========= MAKE PLAN ===============================
     ===================================================
     '''
     def makePlanQuery(self, q):

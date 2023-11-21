@@ -35,7 +35,7 @@ class Xproject(object):
                     alias = None
                     if isinstance(var, Expression) or isinstance(var, Aggregate):
                         tmp = Xexpression.simplifyExp(var, tuple)
-                        tuple.update({var.alias[1:]: str(tmp)})
+                        tuple.update({var.alias[1:]: Xexpression.translateToDict(tmp)})
                         var = var.alias[1:]
                     else:
                         if var.alias is not None:

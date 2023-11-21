@@ -67,6 +67,7 @@ class Xgjoin(Join):
 
             # Try to get and process tuple from left queue.
             if tuple1 != "EOF":
+                # print(tuple1)
                 try:
                     tuple1 = self.left.get(False)
                     # print ("tuple1", tuple1)
@@ -124,9 +125,10 @@ class Xgjoin(Join):
             # Get the resource associated to the tuples.
             resource = ''
             #print(tuple)
+            # print(self.vars, flush=True)
             for var in self.vars:
                 if var in tuple:
-                    val = tuple[var]
+                    val = tuple[var]['value']
                     if "^^<" in val:
                         val = val[:val.find('^^<')]
                     resource = resource + str(val)

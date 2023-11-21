@@ -55,6 +55,7 @@ class NestedHashOptionalFilter(Optional):
 
             try:
                 tuple1 = self.left_queue.get(False)
+                # print(tuple1)
                 # print "tuple1", tuple1
                 # Try to get and process tuple from left queue
                 if not (tuple1 == "EOF"):
@@ -66,7 +67,7 @@ class NestedHashOptionalFilter(Optional):
                     if instance:  # the join variables have not been used to
                         # instanciate the right_operator
                         filter_bag.append(tuple1)
-                    # print "filter_bag", len(filter_bag)
+                    # print(filter_bag)
 
                     if len(filter_bag) >= WINDOW_SIZE:
                         new_right_operator = self.makeInstantiation(filter_bag, self.right_operator)
@@ -127,7 +128,7 @@ class NestedHashOptionalFilter(Optional):
         for tuple in self.bag:
             res_right = {}
             for var in self.vars_right:
-                res_right.update({var: ''})
+                res_right.update({var: {'value': ''}})
             res = res_right
             res.update(tuple)
             self.qresults.put(res)
@@ -139,7 +140,7 @@ class NestedHashOptionalFilter(Optional):
     def getResource(self, tuple):
         resource = ''
         for var in self.vars:
-            val = tuple[var]
+            val = tuple[var]['value']
             if "^^<" in val:
                 val = val[:val.find('^^<')]
             resource = resource + val
@@ -160,7 +161,7 @@ class NestedHashOptionalFilter(Optional):
                 and_expr = []
                 for var in self.vars:
                     # aux = "?" + var + "==" + tuple[var]
-                    v = tuple[var]
+                    v = tuple[var]['value']
                     if v.find("http") == 0:  # uris must be passed between < .. >
                         v = "<" + v + ">"
                     else:
@@ -192,7 +193,6 @@ class NestedHashOptionalFilter(Optional):
         # print "in probeAndInsert1", tuple
         record = Record(tuple, time, 0)
         r = self.getResource(tuple)
-        # print "resource", r, tuple
         if r in table1:
             records = table1[r]
             for t in records:

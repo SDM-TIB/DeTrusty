@@ -60,7 +60,7 @@ class Xorderby(object):
             res.update(tuple)
             # print "tuple", tuple
             for arg in self.args:
-                res.update({arg.name[1:]: self.extractValue(tuple[arg.name[1:]])})
+                res.update({arg.name[1:]: self.extractValue(tuple[arg.name[1:]]['value'])})
             res.update({'__id__': tuple_id})
             results.append(res)
             tuple_id = tuple_id + 1

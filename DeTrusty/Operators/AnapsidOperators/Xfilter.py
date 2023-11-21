@@ -144,7 +144,7 @@ class Xfilter(object):
             if expr_right.constant:
                 res_right = expr_right.name
             else:
-                res_right = self.extractValue(tuple[expr_right.name[1:]])
+                res_right = self.extractValue(tuple[expr_right.name[1:]]['value'])
             res = self.evaluateOperator(operator, res_left, res_right)
 
         # Case 3: Inductive case binary operator OP(Arg, Expr)
@@ -154,7 +154,7 @@ class Xfilter(object):
             if expr_left.constant:
                 res_left = (expr_left.name, str)
             else:
-                res_left = self.extractValue(tuple[expr_left.name[1:]])
+                res_left = self.extractValue(tuple[expr_left.name[1:]]['value'])
             res_right = self.evaluateComplexExpression(tuple, expr_right.op, (expr_right.left, type_left),
                                                        (expr_right.right, type_right))
             res = self.evaluateOperator(operator, res_left, res_right)
@@ -173,11 +173,11 @@ class Xfilter(object):
             if expr_left.constant:
                 res_left = expr_left.name, str
             else:
-                res_left = self.extractValue(tuple[expr_left.name[1:]])
+                res_left = self.extractValue(tuple[expr_left.name[1:]]['value'])
             if expr_right.constant:
                 res_right = (expr_right.name, str)
             else:
-                res_right = self.extractValue(tuple[expr_right.name[1:]])
+                res_right = self.extractValue(tuple[expr_right.name[1:]]['value'])
             # print "res left, right ", res_left, operator, res_right
             res = self.evaluateOperator(operator, res_left, res_right)
             # print res
@@ -188,7 +188,7 @@ class Xfilter(object):
             if expr_left.constant:
                 res_left = expr_left.name
             else:
-                res_left = self.extractValue(tuple[expr_left.name[1:]])
+                res_left = self.extractValue(tuple[expr_left.name[1:]]['value'])
             res = self.evaluateOperator(operator, res_left, None)
         else:
             pass

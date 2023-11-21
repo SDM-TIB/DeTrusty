@@ -42,7 +42,7 @@ class HashJoin(Join):
             if not(tuple1 == "EOF"):
                 try:
                     tuple1 = qleft.get(False)
-                    #print tuple1
+                    # print(tuple1)
                     self.left.append(tuple1)
                 except Exception:
                     # This catch:
@@ -82,7 +82,7 @@ class HashJoin(Join):
         # Get the attribute(s) to apply hash.
         att = ''
         for var in self.vars:
-            att = att + tuple[var]
+            att = att + tuple[var]['value']
         i = hash(att) % table1.size
 
         # Insert record in partition.

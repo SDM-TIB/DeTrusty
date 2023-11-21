@@ -1,13 +1,14 @@
 """
-Created on 23/10/2022.
+Created on 26/09/2022.
 
-Implements the temporary handling of Expression. 
-Note that this handle only Arithmetic expression for now.
+Implements the Xexpression module.
+The result is triple consisting of value, type, datatype.
 
 @author: Avellino
 """
 
-from DeTrusty.Sparql.Parser.services import Argument, Aggregate, Expression
+from DeTrusty.Sparql.Parser.services import Argument, Aggregate
+from dateutil.parser import * 
 import operator
 
 arithmetic_operators = {
@@ -17,188 +18,429 @@ arithmetic_operators = {
     '-': operator.sub
 }
 
+logical_connectives = {
+    '||': operator.or_,
+    '&&': operator.and_
+}
+
+test_operators = {
+    '=': operator.eq,
+    '!=': operator.ne,
+    '<': operator.lt,
+    '>': operator.gt,
+    '<=': operator.le,
+    '>=': operator.ge,
+}
+
+xsd = "http://www.w3.org/2001/XMLSchema#"
+
+# TODO: handle other derived types?
+data_types = {
+    xsd + 'integer': int,
+    xsd + 'decimal': float,
+    xsd + 'float': float,
+    xsd + 'double': float,
+    xsd + 'string': str,
+    xsd + 'boolean': bool,
+    xsd + 'dateTime': parse,
+    # from numeric derived types
+    xsd + 'nonPositiveInteger': int,
+    xsd + 'negativeInteger': int,
+    xsd + 'long': int,
+    xsd + 'int': int,
+    xsd + 'short': int,
+    xsd + 'byte': int,
+    xsd + 'nonNegativeInteger': int,
+    xsd + 'unsignedLong': int,
+    xsd + 'unsignedInt': int,
+    xsd + 'unsignedShort': int,
+    xsd + 'unsignedByte': int,
+    xsd + 'positiveInteger': int,
+    # additional datatypes (need further testing)
+    xsd + 'anyURI': str
+}
+
 def simplifyExp(exp, tuple):
     if type(exp) is Argument:
         if exp.constant: 
-            if exp.name == '*':
-                for el in tuple:
-                    if type(el) is list:
-                        return el
-            return exp.name
+            try:
+                return data_types.get(exp.datatype.strip('<>'))(exp.name.strip('\"').strip('\'')), exp.gen_type, exp.datatype.strip('<>') 
+            except:
+                if exp.gen_type == 'literal' or exp.gen_type == 'uri' or exp.name.strip("\'").strip("\"") == '':
+                    return exp.name.strip('\'').strip('\"'), exp.gen_type, exp.datatype
+                return None, None, None # in case of mismatch
         else:
-            return tuple[exp.name[1:]]
+            if exp.name != '?ALL':
+                return extractValue(tuple[exp.name[1:]])
+            else:
+                for var in tuple:
+                    return extractValue(tuple[var])
     else:
         return evaluateOperator(exp, tuple)
 
+# order of evaluation is important here! TODO: test and recheck
 def evaluateOperator(exp, tuple):
 
-    if type(exp) is Aggregate:
-        if type(exp.exp) is Expression or type(exp.exp) is Argument:
-            ls = simplifyExp(exp.exp, tuple)
-        return evaluateAggregate(exp.op, exp.distinct, exp.sep, ls)
+    if type(exp) is Aggregate: # grouped aggregate only
+        if type(exp.exp) is not tuple and type(exp.exp) is not list:
+            extracted = simplifyExp(exp.exp, tuple)
+        return evaluateAggregate(exp, extracted)
 
-    if type(exp.left) is Expression or type(exp.left) is Argument or type(exp.left) is Aggregate:
-        simp_left = simplifyExp(exp.left, tuple)
+    #  if exp.exp_type == 'builtInNil': # add operators that requires no input here, for example RAND()
+        #  return '', None, None
 
-    if type(exp.right) is Expression or type(exp.right) is Argument or type(exp.right) is Aggregate: 
-        simp_right = simplifyExp(exp.right, tuple)
+    if type(exp.left) is not tuple and type(exp.left) is not list:
+        extracted_left = simplifyExp(exp.left, tuple)
+
+    if exp.exp_type == 'unary':
+        if type(extracted_left) is list:
+            ret = list()
+            for el in extracted_left:
+                ret.append(evaluateUnaryOperator(el, exp.op))
+            return ret
+        return evaluateUnaryOperator(extracted_left, exp.op)
+
+    if exp.exp_type == 'builtInUnary':
+        if type(extracted_left) is list:
+            ret = list()
+            for el in extracted_left:
+                ret.append(evaluateBuiltInUnary(el, exp.op))
+            return ret
+        return evaluateBuiltInUnary(extracted_left, exp.op)
+
+    if (type(exp.right) is not tuple and type(exp.right) is not list): 
+        extracted_right = simplifyExp(exp.right, tuple)
 
     if exp.exp_type == 'arithmetic':
-        if type(simp_left) is list and type(simp_right) is list:
+        if type(extracted_left) is list and type(extracted_right) is list:
             ret = list()
-            for el1 in simp_left:
-                for el2 in simp_right:
+            for el1 in extracted_left:
+                for el2 in extracted_right:
                     ret.append(evaluateArithmetic(el1, exp.op, el2))
             return ret
-        if type(simp_left) is list:
+        if type(extracted_left) is list:
             ret = list()
-            for el in simp_left:
-                ret.append(evaluateArithmetic(el, exp.op, simp_right))
+            for el in extracted_left:
+                ret.append(evaluateArithmetic(el, exp.op, extracted_right))
             return ret
-        if type(simp_right) is list:
+        if type(extracted_right) is list:
             ret = list()
-            for el in simp_right:
-                ret.append(evaluateArithmetic(simp_left, exp.op, el))
+            for el in extracted_right:
+                ret.append(evaluateArithmetic(extracted_left, exp.op, el))
             return ret
-        return evaluateArithmetic(simp_left, exp.op, simp_right)
+        return evaluateArithmetic(extracted_left, exp.op, extracted_right)
+
+    if exp.exp_type == 'relational':
+        if exp.op.upper() == 'IN':
+            extracted_right = list()
+            for el in exp.right:
+                extracted_right.append(simplifyExp(el, tuple))
+            if type(extracted_left) is list:
+                ret = list()
+                for el in extracted_left:
+                    ret.append(evaluateTest(el, exp.op, extracted_right))
+                return ret
+            return evaluateTest(extracted_left, exp.op, extracted_right)
+        if type(extracted_left) is list and type(extracted_right) is list:
+            ret = list()
+            for el1 in extracted_left:
+                for el2 in extracted_right:
+                    ret.append(evaluateTest(el1, exp.op, el2))
+            return ret
+        if type(extracted_left) is list:
+            ret = list()
+            for el in extracted_left:
+                ret.append(evaluateTest(el, exp.op, extracted_right))
+            return ret
+        if type(extracted_right) is list:
+            ret = list()
+            for el in extracted_right:
+                ret.append(evaluateTest(extracted_left, exp.op, el))
+            return ret
+        return evaluateTest(extracted_left, exp.op, extracted_right)
+
+    if exp.exp_type == 'logical':
+        if type(extracted_left) is list and type(extracted_right) is list:
+            ret = list()
+            for el1 in extracted_left:
+                for el2 in extracted_right:
+                    ret.append(evaluateLogicalConnective(el1, exp.op, el2))
+            return ret
+        if type(extracted_left) is list:
+            ret = list()
+            for el in extracted_left:
+                ret.append(evaluateLogicalConnective(el, exp.op, extracted_right))
+            return ret
+        if type(extracted_right) is list:
+            ret = list()
+            for el in extracted_right:
+                ret.append(evaluateLogicalConnective(extracted_left, exp.op, el))
+            return ret
+        return evaluateLogicalConnective(extracted_left, exp.op, extracted_right)
+
+    # TODO: adding more coverages later on
+    return ('', None, None)
 
 def evaluateArithmetic(left, op, right):
+
+    val_left, left_type, xsl_type = left
+    val_right, right_type, xsr_type = right
+
     try:
-        return arithmetic_operators[op](float(left), float(right))
+        ret = arithmetic_operators[op](val_left, val_right)
+        if type(ret) == float:
+            return (ret, 'typed-literal', xsd + 'decimal')
+        elif type(ret) == int :
+            return (ret, 'typed-literal', xsd + 'integer')
+        return ret, 'literal', None 
     except:
-        return ''
+        return ('', None, None)
+
+def evaluateUnaryOperator(left, op):
+
+    val, gen_type, xsd_type = left
+
+    if op == '!':
+        if gen_type is not bool:
+            return (not evaluateEBV(left)[0], 'typed-literal', xsd + 'boolean')
+        else:
+            return (not val, gen_type, xsd_type)
+
+    if op == '+':
+        if xsd_type == xsd + 'integer' or xsd_type == xsd + 'decimal':
+            return (val, gen_type, xsd_type)
+        else:
+            return ('', None, None)
+
+    if op == '-':
+        if xsd_type == xsd + 'integer' or xsd_type == xsd + 'decimal':
+            return (0 - val, gen_type, xsd_type)
+        else:
+            return ('', None, None)
+
+def evaluateTest(left, op, right):
+
+    if op.upper() == "IN":
+        for ex in right:
+            if left[0] == ex[0]: # TODO: test, whether such comparison of tuple working flawlessly or not
+                return (True, 'typed-literal', xsd + 'boolean')
+        return (False, 'typed-literal', xsd + 'boolean')
+
+    val_left, left_type, xsl_type = left
+    val_right, right_type, xsr_type = right
+
+    try: 
+        return (test_operators[op](val_left, val_right), 'typed-literal', xsd + 'boolean') # TODO: test, and check whether it covers the spec. completely or not
+    except :
+        return '', None, None
+
+def evaluateLogicalConnective(left, op, right):
+
+    val_left, left_type, xsl_type = left
+    val_right, right_type, xsr_type = right
+
+    try:
+        return (logical_connectives[op](val_left, val_right), 'typed-literal', xsd + 'boolean')
+    except:
+        return '', None, None
+
+
+def evaluateBuiltInUnary(left, op): 
+
+    val, gen_type, xsd_type = left
+    if op.upper() == 'YEAR':
+        if xsd_type == xsd + 'dateTime':
+            return (val.year, 'typed-literal', xsd + 'integer')
+        else:
+            return '', None, None
+
+    if op.upper() == 'DATATYPE':
+        if xsd_type is not None:
+            return (xsd_type, 'uri', None)
+        else:
+            return '', None, None
+
 
 # distinction of RDF literal: https://www.w3.org/TR/rdf-concepts/#section-Literal-Equality
-def evaluateAggregate(op, dist, sep, ls):
+def evaluateAggregate(agg, extracted): # type(extracted) always list <-> automatic grouping if necessary. This supposed to reduce time complexity, by reducing comparison
+
+    op, dist, sep = agg.op, agg.distinct, agg.sep 
+
+    ignored = list() # list of ignored values, not sure if this correct.
+    ignored.append('') # optional, or error value
+    ignored.append(None) # mismatch between provided xsd and value (cannot be casted into)
 
     if op.upper() == 'COUNT':
+        count = 0
         if dist:
             rec = list()
-            count = 0
-            for val in ls:
-                if val not in rec and val != '': 
-                    rec.append(val)
+            rec += ignored
+            for val in extracted:
+                if val[0] not in rec: # depend only on the value, not respecting the gen_type and xsd_type, correct? Yes, from prev. discussion
+                    rec.append(val[0])
                     count += 1
-            return count
+            return (count, 'typed-literal', xsd + 'integer')
 
         else:
-            count = 0
-            for val in ls:
-                if val != '':
+            for val in extracted:
+                if val[0] not in ignored:
                     count += 1
-            return count
+            return (count, 'typed-literal', xsd + 'integer')
 
-    if op.upper() == 'GROUP_CONCAT':
+
+    elif op.upper() == 'GROUP_CONCAT':
+        tmp = list()
         if dist:
-            tmp = set(ls)
-            if '' in tmp:
-                tmp.remove('')
-            if len(tmp) > 0:
-                tmp1 = str(tmp)
-                if sep:
-                    tmp2 = tmp1.replace("'", "")
-                    ret = tmp2.replace(", ", sep[1:len(sep)-1])
-                else:
-                    ret = tmp1.replace("'", "")
-                return ret[1:len(ret)-1]
+            for val in extracted:
+                if val[0] not in ignored:
+                    tmp.append(val[0])
+            tmp = str(set(tmp)).strip('{}')
+            if sep:
+                tmp1 = tmp.replace("'", "")
+                ret = tmp1.replace(", ", sep[1:len(sep)-1])
             else:
-                return ''
+                ret = tmp.replace("'", "")
+            return ret, 'literal', None
         else:
-            tmp = ls.copy()
-            while '' in tmp:
-                tmp.remove('')
-            if len(tmp) > 0:
-                tmp1 = str(tmp)
-                if sep:
-                    tmp2 = tmp1.replace("'", "")
-                    ret = tmp2.replace(", ", sep[1:len(sep)-1])
-                else:
-                    ret = tmp1.replace("'", "")
-                return ret[1:len(ret)-1]
+            for val in extracted:
+                if val[0] not in ignored:
+                    tmp.append(val[0])
+            tmp = str(tmp).strip('[]')
+            if sep:
+                tmp1 = tmp.replace("'", "")
+                ret = tmp1.replace(", ", sep[1:len(sep)-1])
             else:
-                return ''
+                ret = tmp.replace("'", "")
+            return ret, 'literal', None
 
-    if op.upper() == 'SAMPLE':
-        for val in ls:
-            if val != '':
-                return val
-        return ''
 
-    if op.upper() == 'MIN':
-        tmp = None
+    elif op.upper() == 'MIN':
+        tmp = list(val[0] for val in extracted if val[0] not in ignored) 
+        try:
+            ret = min(tmp)
+            if type(ret) is float:
+                return ret, 'typed-literal', xsd + 'decimal'
+            elif type(ret) is int:
+                return ret, 'typed-literal', xsd + 'integer'
+            return ret, 'literal', None # this is not quite correct according spec. Supposed to check every xsd_type of val in extracted to determine output xsd_type 
+        except:
+            return '', None, None
+
+    elif op.upper() == 'MAX':
+        tmp = list(val[0] for val in extracted if val[0] not in ignored) 
+        try:
+            ret = max(tmp)
+            if type(ret) is float:
+                return ret, 'typed-literal', xsd + 'decimal'
+            elif type(ret) is int:
+                return ret, 'typed-literal', xsd + 'integer'
+            return ret, 'literal', None # this is not quite correct according spec. Supposed to check every xsd_type of val in extracted to determine output xsd_type 
+        except:
+            return '', None, None
+
+    elif op.upper() == 'AVG':
+        tmp = list(val[0] for val in extracted if val[0] not in ignored)
         if dist:
-            tmp = set(ls)
-            if '' in tmp:
-                tmp.remove('')
-            tmp = list(tmp)
+            tmp = set(tmp)
+            try:
+                ret = sum(tmp)/len(tmp)
+                if type(ret) is float:
+                    return ret, 'typed-literal', xsd + 'decimal'
+                return ret, 'typed-literal', xsd + 'integer'
+            except:
+                return '', None, None
         else:
-            tmp = ls.copy()
-            while '' in tmp:
-                tmp.remove('')
-        tmp.sort()
-        if tmp:
-            return tmp[0]
-        else:
-            return ''
+            try:
+                ret = sum(tmp)/len(tmp)
+                if type(ret) is float:
+                    return ret, 'typed-literal', xsd + 'decimal'
+                return ret, 'typed-literal', xsd + 'integer'
+            except:
+                return '', None, None
 
-    if op.upper() == 'MAX':
-        tmp = None
-        if dist:
-            tmp = set(ls)
-            if '' in tmp:
-                tmp.remove('')
-            tmp = list(tmp)
-        else:
-            tmp = ls.copy()
-            while '' in tmp:
-                tmp.remove('')
-        tmp.sort(reverse=True)
-        if tmp:
-            return tmp[0]
-        else:
-            return ''
+    elif op.upper() == 'SAMPLE':
+        for el in extracted: 
+            if el[0] not in ignored:
+                return el[0], el[1], el[2]
 
-    if op.upper() == 'SUM':
-        ret = 0
-        if dist:
-            tmp = list()
-            for val in ls:
-                if val != '' and val not in tmp:
-                    tmp.append(val)
-                    try:
-                        ret += float(val)
-                    except:
-                        return ''
-        else:
-            for val in ls:
-                if val != '':
-                    try:
-                        ret += float(val)
-                    except:
-                        return ''
-        return ret
 
-    if op.upper() == 'AVG':
-        ret = 0
-        val_count = 0
-        if dist:
-            tmp = list()
-            for val in ls:
-                if val != '' and val not in tmp:
-                    tmp.append(val)
-                    try:
-                        ret += float(val)
-                    except:
-                        return ''
-                    val_count += 1
-        else:
-            for val in ls:
-                if val != '':
-                    try:
-                        ret += float(val)
-                    except:
-                        return ''
-                    val_count += 1
-        if val_count != 0:
-            ret = ret / val_count
-        return ret
+    elif op.upper() == 'SUM':
+        tmp = list(val[0] for val in extracted if val[0] not in ignored)  
+        try:
+            ret = sum(tmp)
+            if type(ret) is float:
+                return ret, 'typed-literal', xsd + 'decimal'
+            return ret, 'typed-literal', xsd + 'integer'
+        except:
+            return '', None, None
+
+
+'''
+evaluateEBV: calculates whether an argument is an Effective Boolean Value (EBV)
+             according to the definition in the SPARQL documentation 
+             See: http://www.w3.org/TR/sparql11-query/#ebv and https://www.w3.org/TR/xpath-functions/#func-boolean
+'''
+
+def evaluateEBV(value):
+    (val, val_type, xsd_type) = value
+
+    # The EBV of any literal whose type is xsd:boolean or numeric is false if the lexical form is not valid for that datatype (e.g. "abc"^^xsd:integer).
+    if val in ['', None]:
+        return (False, 'typed-literal', xsd + 'boolean')
+
+    # If $arg is a singleton value of type xs:boolean or a derived from xs:boolean, fn:boolean returns $arg.
+    if (type(val) is bool):
+        return (val, val_type, xsd_type)
+
+    # If $arg is a singleton value of type xs:string or a type derived from xs:string, xs:anyURI or a type derived from xs:anyURI, or xs:untypedAtomic, fn:boolean returns false if the operand value has zero length; otherwise it returns true.
+    # If the argument is a plain literal or a typed literal with a datatype of xsd:string, the EBV is false if the operand value has zero length; otherwise the EBV is true.
+    if val_type == 'literal':
+        if len(val) != 0:
+            return (True, 'typed-literal', xsd + 'boolean')
+        return (False, 'typed-literal', xsd + 'boolean')
+
+    # If $arg is a singleton value of any numeric type or a type derived from a numeric type, fn:boolean returns false if the operand value is NaN or is numerically equal to zero; otherwise it returns true.
+    if (val_type == 'typed-literal'):
+        if val == 0 or val == 'NaN':
+            return (False, 'typed-literal', xsd + 'boolean')
+        return (True, 'typed-literal', xsd + 'boolean')
+
+    # other cases
+    return ('', None, None)
+
+
+def extractValue(val):
+    if type(val) is list:
+        tmp = list()
+        for el in val:
+            if el.get('type') == 'literal' or el.get('type') == 'uri' or el.get('value') == '':
+                tup = el.get('value'), el.get('type'), el.get('datatype')
+                tmp.append(tup)
+            else:
+                try:
+                    tup = data_types.get(el.get('datatype'))(el.get('value')), el.get('type'), el.get('datatype')
+                    tmp.append(tup)
+                except:
+                    tup = None, None, None
+                    tmp.append(tup)
+        return tmp
+    else:
+        if val.get('type') == 'literal' or val.get('type') == 'uri' or val.get('value') == '':
+            return val.get('value'), val.get('type'), val.get('datatype') 
+        try:
+            return data_types.get(val.get('datatype'))(val.get('value')), val.get('type'), val.get('datatype')
+        except:
+            return None, None, None # in case of mismatch, or unknown data_types
+
+def translateToDict(tuple):
+    ret = dict()
+    if tuple[1]:
+        ret.update({'type': tuple[1]})
+    ret.update({'value': str(tuple[0])})
+    if tuple[2]:
+        ret.update({'datatype': tuple[2]})
+    return ret
+
+class SPARQLTypeError(Exception):
+    """Base class for exceptions in this module."""
+    pass

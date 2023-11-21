@@ -14,9 +14,10 @@ class Xgroupby(object):                                                    # ens
 
     name = "GROUP BY"
 
-    def __init__(self, args):
+    def __init__(self, args, over_all_triple):
         self.qresults = Queue()                                            # end res.
         self.args = args                                                   # GROUP BY vars
+        self.overall = over_all_triple
 
     def execute(self, left, dummy, out, processqueue=Queue()):
         self.left = left
@@ -24,8 +25,24 @@ class Xgroupby(object):                                                    # ens
         arg_list = list()
         tmp = list()                                                       # [tup1,tup2,...]
 
+        if self.overall:
+            tuple = self.left.get(True)
+            ret = dict()
+            for var in tuple:
+                ret.update({var: [tuple[var]]})
+            tuple = self.left.get(True)
+            while (tuple != "EOF"):
+                for var in tuple.keys():
+                    ret[var].append(tuple[var]) 
+                tuple = self.left.get(True)
+            self.qresults.put(ret)
+            self.qresults.put("EOF")
+            return
+
         for arg in self.args:
             arg_list.append(arg.name[1:])
+            if arg.alias:
+                arg_list.append(arg.alias[1:])
 
         tuple = self.left.get(True)
 
@@ -63,7 +80,7 @@ class Xgroupby(object):                                                    # ens
             tuple = self.left.get(True)
 
         ###DEBUG###
-        # print("GROUP BY vars:", arg_list)
+        # print("group by vars:", arg_list)
         # for i in range(len(tmp)):
             # tmp_dict = tmp[i]
             # for attr in tmp_dict:

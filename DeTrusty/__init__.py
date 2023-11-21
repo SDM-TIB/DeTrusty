@@ -88,6 +88,9 @@ def run_query(query: str,
     planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
     plan = planner.createPlan()
 
+    print(plan)
+    # sys.exit()
+
     output = Queue()
     plan.execute(output)
 
@@ -99,7 +102,7 @@ def run_query(query: str,
         if print_result:
             res = {}
             for key, value in r.items():
-                res[key] = {"value": value, "type": "uri" if is_url(value) else "literal"}
+                res[key] = value
             if not yasqe:
                 res['__meta__'] = {"is_verified": True}
 

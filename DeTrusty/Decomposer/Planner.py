@@ -41,18 +41,14 @@ class Planner(object):
 
         query = self.query
         operatorTree = self.includePhysicalOperatorsQuery()
-        aggs = list()
+        over_all_triples = False
 
-        over_all_triples = utils.collectVars(query.args, query.group_by, query.having, aggs)  # TODO: test & fix
-        # print(query.args, query.group_by, query.having, aggs, over_all_triples)
-
-        # Adds the group by operator to the plan.
-        if (len(query.group_by) > 0):
-            operatorTree = TreePlan(Xgroupby(query.group_by), operatorTree.vars, operatorTree)
+        if not query.group_by:
+            over_all_triples = utils.collectVars(query.args, query.having)  # TODO: test & fix
 
         # Adds the group by operator to the plan.
-        # if aggs:
-            # operatorTree = TreePlan(Xaggregate(aggs, over_all_triples, query.group_by, query.prefs), operatorTree.vars, operatorTree)
+        if (len(query.group_by) > 0 or over_all_triples):
+            operatorTree = TreePlan(Xgroupby(query.group_by, over_all_triples), operatorTree.vars, operatorTree)
 
         # Adds the having operator to the plan.
         if query.having is not None:
@@ -75,7 +71,6 @@ class Planner(object):
 
         # Adds the limit operator to the plan.
         if (query.limit != -1):
-            # print "query.limit", query.limit
             operatorTree = TreePlan(Xlimit(None, query.limit), operatorTree.vars, operatorTree)
 
         return operatorTree
@@ -134,12 +129,12 @@ class Planner(object):
             if isinstance(tl[0], TreePlan) and (isinstance(tl[0].operator, Xfilter) or isinstance(tl[0].operator, Xbind)):
                 return nf
             else:
-                if len(jb.filters) > 0 and isinstance(tl[0].operator, Xfilter):
+                if len(jb.filters) > 0:
                     for f in jb.filters:
-                        nf = TreePlan(Xfilter(f), nf.vars, nf)
-                if len(jb.filters) > 0 and isinstance(tl[0].operator, Xbind):
-                    for f in jb.filters:
-                        nf = TreePlan(Xbind(f), nf.vars, nf)
+                        if(isinstance (f, Filter)):
+                            nf = TreePlan(Xfilter(f), nf.vars, nf)
+                        elif(isinstance (f, Bind)):
+                            nf = TreePlan(Xbind(f), nf.vars, nf)
                     return nf
                 else:
                     return nf
@@ -358,6 +353,7 @@ class Planner(object):
 
             # Case 3: both operators are low selective or an instance of TreePlan
             else:
+                # print (l.vars, right.vars)
                 l = TreePlan(Xgoptional(l.vars, right.vars), all_variables, l, right)
 
             if isinstance(l.left, IndependentOperator) and isinstance(l.left.tree, Leaf) and not l.left.tree.service.allTriplesGeneral():

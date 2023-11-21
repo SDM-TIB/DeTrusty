@@ -551,6 +551,7 @@ class JoinBlock(object):
     def setGeneral(self, ps, genPred):
         if isinstance(self.triples, list):
             for t in self.triples:
+                #  print(t)
                 t.setGeneral(ps, genPred)
         else:
             self.triples.setGeneral(ps, genPred)
@@ -941,6 +942,7 @@ class Optional(object):
 
 
 unaryFunctor = {
+    'IN',
      '!',
     'BOUND',
     'bound',
@@ -1050,10 +1052,10 @@ class Expression(object):
 
     def getVars(self):
         # if (self.op=='REGEX' or self.op == 'xsd:integer' or self.op=='!' or self.op == 'BOUND' or self.op == 'ISIRI' or self.op == 'ISURI' or self.op == 'ISBLANK' or self.op == 'ISLITERAL' or self.op == 'STR' or self.op == 'LANG' or self.op == 'DATATYPE'):
-        if ((self.op in unaryFunctor) or (self.right is  None)):
+        if ((self.op.upper() in unaryFunctor) or (self.right is  None)):
             return self.left.getVars()
         else:
-            return self.left.getVars()+self.right.getVars()
+            return self.left.getVars() + self.right.getVars()
 
     def getConsts(self):
         if self.op in unaryFunctor or self.right is None:
@@ -1106,7 +1108,9 @@ class Expression(object):
             if type(self.left) is Expression:
                 return self.left.aggInside()
             return False
-        return self.left.aggInside() or self.right.aggInside()
+        if self.op not in unaryFunctor:
+            return self.left.aggInside() or self.right.aggInside()
+        return self.left.aggInside()
 
 class Triple(object):
     def __init__(self, subject, predicate, theobject):
@@ -1227,11 +1231,14 @@ class Argument(object):
         if self.alias:
             return self.alias
         else:
-            arg = str(self.name)
-            if self.datatype is not None:
-                arg += "^^" + self.datatype
-            if self.lang is not None:
-                arg += "@" + self.lang
+            if self.constant:
+                arg = str(self.name)
+                if self.datatype is not None:
+                    arg += "^^" + self.datatype
+                if self.lang is not None:
+                    arg += "@" + self.lang
+            else:
+                arg = str(self.name)
             return arg
 
     def __str__(self):
@@ -1336,48 +1343,6 @@ class Aggregate(object):
 
     def __ne__(self, other):
         return not self == other
-
-
-#######################################################
-
-
-class HavingHelper(object):
-
-    def __init__(self, agg, op, num):
-        self.agg = agg
-        self.op = op
-        self.num = num
-
-    def getVars(self):
-        return self.agg.getVars()
-
-    # def __repr__(self):
-        # return '?' + self.getName()
-
-    # def __eq__(self, other):
-        # return self.var == other.var and self.distinct == other.distinct and self.op == other.op
-
-    # def __ne__(self, other):
-        # return not self == other
-
-
-#######################################################
-
-
-class Having(object):
-
-    def __init__(self, args, log_op=None):
-        self.args = args
-        self.log_op = log_op
-    
-    def getVars(self):
-        ret = list()
-        for arg in self.args:
-                ret += arg.getVars()
-        return ret
-
-    def __repr__(self):
-        return str(tuple([self.args, self.log_op]))
 
 
 #######################################################

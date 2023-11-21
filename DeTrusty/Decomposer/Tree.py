@@ -240,6 +240,7 @@ class Leaf(Tree):
         vars_group_by = [x for v in query.group_by for x in v.getVars() if x in vs]
         vars_having = list()
         if query.having:
+            print(query.having)
             vars_having = [v for v in query.having.getVars() if v in vs]
         # print "subvar 1: ", subvars
         if subvars == []:

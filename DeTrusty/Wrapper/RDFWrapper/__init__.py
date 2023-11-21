@@ -27,6 +27,7 @@ def contact_source(server, query, queue, config, limit=-1):
 
         while True:
             query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+            # print(query_copy)
             b, card = contact_source_aux(server, query_copy, queue, config)
             cardinality += card
             if card < limit:
@@ -44,6 +45,7 @@ def contact_source_aux(server, query, queue, config=None):
     b = None
     cardinality = 0
 
+    # print(query)
     payload = {'query': query, 'format': 'JSON'}
     headers = {"User-Agent":
                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
@@ -63,26 +65,28 @@ def contact_source_aux(server, query, queue, config=None):
                 b = res.get('boolean', None)
 
                 if 'results' in res:
-                    # print "raw results from endpoint", res
+                    # print ("===DEBUG: raw results from endpoint===\n", json.dumps(res, indent=4))
                     for x in res['results']['bindings']:
                         for key, props in x.items():
-                            # Handle typed-literals and language tags
-                            suffix = ''
-#                            if props['type'] == 'typed-literal':
-#                                if isinstance(props['datatype'], bytes):
-#                                    suffix = "^^<" + props['datatype'].decode('utf-8') + ">"
-#                                else:
-#                                    suffix = "^^<" + props['datatype'] + ">"
-#                            elif "xml:lang" in props:
-#                                suffix = '@' + props['xml:lang']
-                            try:
-                                if isinstance(props['value'], bytes):
-                                    x[key] = props['value'].decode('utf-8') + suffix
-                                else:
-                                    x[key] = props['value'] + suffix
-                            except:
-                                x[key] = props['value'] + suffix
+                            for key_ins, props_ins in props.items():
+                                # Handle typed-literals and language tags
+                                suffix = ''
+    #                            if props['type'] == 'typed-literal':
+    #                                if isinstance(props['datatype'], bytes):
+    #                                    suffix = "^^<" + props['datatype'].decode('utf-8') + ">"
+    #                                else:
+    #                                    suffix = "^^<" + props['datatype'] + ">"
+    #                            elif "xml:lang" in props:
+    #                                suffix = '@' + props['xml:lang']
+                                try:
+                                    if isinstance(props_ins, bytes):
+                                        props_ins = props_ins.decode('utf-8') + suffix
+                                    else:
+                                        props_ins = props_ins + suffix
+                                except:
+                                    props_ins = props_ins + suffix
 
+                        # print(x)
                         queue.put(x)
                         cardinality += 1
                     # Every tuple is added to the queue.

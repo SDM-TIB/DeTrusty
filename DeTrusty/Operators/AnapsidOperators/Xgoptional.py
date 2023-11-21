@@ -46,31 +46,30 @@ class Xgoptional(Optional):
         tuple2 = None
 
         # Get the tuples from the queues.
-        while (not(tuple1 == "EOF") or not(tuple2 == "EOF")):
+        while (not (tuple1 == "EOF") or not (tuple2 == "EOF")):
             # Try to get and process tuple from left queue.
 
-            if (not(tuple1 == "EOF")):
+            if (not (tuple1 == "EOF")):
 
                 try:
                     tuple1 = self.left.get(False)
-                    if not(tuple1 == "EOF"):
+                    if not (tuple1 == "EOF"):
                         self.bag.append(tuple1)
-                    self.stage1(tuple1, self.left_table, self.right_table, self.vars_right)
+                    self.stage1(tuple1, self.left_table, self.right_table)
                     #print  "bag after stage 1: ", self.bag
                 except Exception  as e:
                     # This catch:
-                 #   print "Exception ", e.message
                     # Empty: in tuple2 = self.right.get(False), when the queue is empty.
                     # TypeError: in resource = resource + tuple[var], when the tuple is "EOF".
                     pass
 
             # Try to get and process tuple from right queue.
-            if (not(tuple2 == "EOF")):
+            if (not (tuple2 == "EOF")):
 
                 try:
                     tuple2 = self.right.get(False)
-                    if not(tuple2 == "EOF"):
-                        self.stage1(tuple2, self.right_table, self.left_table, self.vars_left)
+                    if not (tuple2 == "EOF"):
+                        self.stage1(tuple2, self.right_table, self.left_table)
                 except Exception:
                     # This catch:
                     # Empty: in tuple2 = self.right.get(False), when the queue is empty.
@@ -81,16 +80,16 @@ class Xgoptional(Optional):
         self.stage3()
 
 
-    def stage1(self, tuple, tuple_rjttable, other_rjttable, vars):
+    def stage1(self, tuple, tuple_rjttable, other_rjttable):
         # Stage 1: While one of the sources is sending data.
         #print "stage 1"
         # Get the resource associated to the tuples.
         resource = ''
         for var in self.vars:
-            resource = resource + tuple[var]
+            resource = resource + tuple[var]['value']
         #print "probe"
         # Probe the tuple against its RJT table.
-        probeTS = self.probe(tuple, resource, tuple_rjttable, vars)
+        probeTS = self.probe(tuple, resource, tuple_rjttable)
         #print "creating record"
         # Create the records.
         record = Record(tuple, probeTS, time())
@@ -150,7 +149,7 @@ class Xgoptional(Optional):
             #print 'stage 3 loop in bag'
             res_right = {}
             for var in self.vars_right:
-                res_right.update({var:''})
+                res_right.update({var: {'value': ''}})
             res = res_right
             res.update(tuple)
             self.qresults.put(res)
@@ -159,7 +158,7 @@ class Xgoptional(Optional):
         self.qresults.put("EOF")
         return
 
-    def probe(self, tuple, resource, rjttable, vars):
+    def probe(self, tuple, resource, rjttable):
         probeTS = time()
         # If the resource is in table, produce results.
         try:
@@ -175,8 +174,8 @@ class Xgoptional(Optional):
                 for record in list_records:
                     #print "record: ", type(record.tuple), record.tuple
                     if isinstance(record.tuple, dict):
-                        res = record.tuple.copy()
-                        res.update(tuple)
+                        res = tuple.copy()
+                        res.update(record.tuple)
                         self.qresults.put(res)
 
                         # Delete tuple from bag.

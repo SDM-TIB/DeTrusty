@@ -41,6 +41,7 @@ class Xunion(_Union):
         # print "left", hex(id(left)), "right", hex(id(right)), "out", hex(id(out))
 
         # Identify the kind of union to perform.
+        print(self.vars_left, self.vars_right)
         if self.vars_left == self.vars_right:
             self.same_variables()
         else:
@@ -85,10 +86,10 @@ class Xunion(_Union):
 
         # Add empty values to variables of the other argument.
         for v in self.vars_right:
-            v1.update({v: ''})
+            v1.update({v: {'value': ''}})
 
         for v in self.vars_left:
-            v2.update({v: ''})
+            v2.update({v: {'value': ''}})
 
         p_left = Process(target=self.__insert_result, args=(self.left, self.qresults, v1))
         p_left.start()

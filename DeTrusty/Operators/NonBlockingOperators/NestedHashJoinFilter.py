@@ -17,7 +17,7 @@ from queue import Empty
 from DeTrusty.Operators.Join import Join
 from DeTrusty.Sparql.Parser import queryParser as qp
 from .OperatorStructures import Table, Partition, Record
-from .NestedHashJoin import NestedHashJoin
+# from .NestedHashJoin import NestedHashJoin
 from ...Sparql.Parser.services import Bind
 
 WINDOW_SIZE = 20
@@ -34,13 +34,13 @@ class NestedHashJoinFilter(Join):
         self.right_operator = None
         self.qresults = Queue()
 
-    def instantiate(self, d):
-        newvars = self.vars - set(d.keys())
-        return NestedHashJoin(newvars)
+    # def instantiate(self, d):
+    #     newvars = self.vars - set(d.keys())
+    #     return NestedHashJoin(newvars)
 
-    def instantiateFilter(self, d, filter_str):
-        newvars = self.vars - set(d)
-        return NestedHashJoin(newvars)
+    # def instantiateFilter(self, d, filter_str):
+    #     newvars = self.vars - set(d)
+    #     return NestedHashJoin(newvars)
 
     def execute(self, left_queue, right_operator, out, processqueue=Queue()):
         self.left_queue = left_queue
@@ -131,7 +131,7 @@ class NestedHashJoinFilter(Join):
     def getResource(self, tuple):
         resource = ''
         for var in self.vars:
-            val = tuple[var]
+            val = tuple[var]['value']
             if "^^<" in val:
                 val = val[:val.find('^^<')]
             resource = resource + val
@@ -151,7 +151,7 @@ class NestedHashJoinFilter(Join):
                 and_expr = []
                 for var in self.vars:
                     # aux = "?" + var + "==" + tuple[var]
-                    v = tuple[var]
+                    v = tuple[var]['value']
                     if v.find("http") == 0:  # uris must be passed between < .. >
                         v = "<" + v + ">"
                         v = "?" + var + "=" + v
@@ -202,7 +202,7 @@ class NestedHashJoinFilter(Join):
                             and_expr = []
                             for var in self.vars:
                                 # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
+                                v = str(tuple[var]['value'])
                                 if v.find("http") == 0:  # uris must be passed between < .. >
                                     v = "<" + v + ">"
                                 else:
@@ -225,7 +225,7 @@ class NestedHashJoinFilter(Join):
                             and_expr = []
                             for var in self.vars:
                                 # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
+                                v = str(tuple[var]['value'])
                                 if v.find("http") == 0:  # uris must be passed between < .. >
                                     v = "<" + v + ">"
                                 else:
@@ -248,7 +248,7 @@ class NestedHashJoinFilter(Join):
                         and_expr = []
                         for var in self.vars:
                             # aux = "?" + var + "==" + tuple[var]
-                            v = str(tuple[var])
+                            v = str(tuple[var]['value'])
                             if v.find("http") == 0:  # uris must be passed between < .. >
                                 v = "<" + v + ">"
                             else:
@@ -274,7 +274,7 @@ class NestedHashJoinFilter(Join):
                             and_expr = []
                             for var in self.vars:
                                 # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
+                                v = str(tuple[var]['value'])
                                 if v.find("http") == 0:  # uris must be passed between < .. >
                                     v = "<" + v + ">"
                                 else:
@@ -297,7 +297,7 @@ class NestedHashJoinFilter(Join):
                             and_expr = []
                             for var in self.vars:
                                 # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
+                                v = str(tuple[var]['value'])
                                 if v.find("http") == 0:  # uris must be passed between < .. >
                                     v = "<" + v + ">"
                                 else:
@@ -321,7 +321,7 @@ class NestedHashJoinFilter(Join):
                         and_expr = []
                         for var in self.vars:
                             # aux = "?" + var + "==" + tuple[var]
-                            v = str(tuple[var])
+                            v = str(tuple[var]['value'])
                             if v.find("http") == 0:  # uris must be passed between < .. >
                                 v = "<" + v + ">"
                             else:
@@ -350,7 +350,7 @@ class NestedHashJoinFilter(Join):
                     and_expr = []
                     for var in self.vars:
                         # aux = "?" + var + "==" + tuple[var]
-                        v = str(tuple[var])
+                        v = str(tuple[var]['value'])
                         if v.find("http") == 0:  # uris must be passed between < .. >
                             v = "<" + v + ">"
                         else:

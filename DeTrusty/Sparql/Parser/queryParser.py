@@ -2,9 +2,8 @@ import urllib.parse
 from ply import lex, yacc
 import sys
 # not all module needed (TODO: check after integrating expression to Having, Aggregate)
-from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Having, HavingHelper, Service
+from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Service
 
-test = list()
 
 # Lexer
 reserved = {
@@ -405,7 +404,6 @@ def p_group_by_0(p):
    """
    group_by : GROUP BY group_var group_var_list
    """
-   test.append(p[3].name[1:])
    p[0] = [p[3]] + p[4]
 
 
@@ -425,23 +423,30 @@ def p_group_var_0(p):
 
 def p_group_var_1(p):                          
    """                                        
-   group_var : LPAR expression AS VARIABLE RPAR                         
+   group_var : LPAR VARIABLE AS VARIABLE RPAR                         
    """
    p[0] = Argument(p[2], False, alias=p[4])
 
 
-def p_group_var_2(p):                          
-   """                                        
-   group_var : LPAR expression RPAR                         
-   """
-   p[0] = Argument(p[1], False)
-
-
-def p_group_var_3(p):                          
-   """                                        
-   group_var : built_in_call
-   """
-   p[0] = Argument(p[1], False)
+#  def p_group_var_1(p):
+   #  """
+   #  group_var : LPAR expression AS VARIABLE RPAR
+   #  """
+   #  p[0] = Argument(p[2], False, alias=p[4])
+#
+#
+#  def p_group_var_2(p):
+   #  """
+   #  group_var : LPAR expression RPAR
+   #  """
+   #  p[0] = Argument(p[1], False)
+#
+#
+#  def p_group_var_3(p):
+   #  """
+   #  group_var : built_in_call
+   #  """
+   #  p[0] = Argument(p[1], False)
 
 
 def p_group_var_list_0(p):
@@ -480,44 +485,58 @@ def p_order_by_1(p):
 
 def p_order_by_condition_0(p):
     """
-    order_by_condition : ASC constraint order_by_condition 
+    order_by_condition : ASC constraint order_by_list 
     """
     p[0] = [Argument(p[2], desc=False)] + p[3]
 
 
 def p_order_by_condition_1(p):
     """
-    order_by_condition : DESC constraint order_by_condition
+    order_by_condition : DESC constraint order_by_list
     """
     p[0] = [Argument(p[2], desc=True)] + p[3]
     
 
 def p_order_by_condition_2(p):
     """
-    order_by_condition : constraint order_by_condition
+    order_by_condition : constraint order_by_list
     """
     p[0] =  [Argument(p[1], desc=False)] + p[2] # by default ASC
 
 
 def p_order_by_condition_3(p):
     """
-    order_by_condition : ASC VARIABLE order_by_condition
+    order_by_condition : ASC VARIABLE order_by_list
     """
     p[0] =  [Argument(p[2], desc=False)] + p[3]
 
 
 def p_order_by_condition_4(p):
     """
-    order_by_condition : DESC VARIABLE order_by_condition
+    order_by_condition : DESC VARIABLE order_by_list
     """
     p[0] =  [Argument(p[2], desc=True)] + p[3]
 
 
 def p_order_by_condition_5(p):
     """
-    order_by_condition : VARIABLE 
+    order_by_condition : VARIABLE order_by_list
     """
-    p[0] =  [Argument(p[1], desc=True)]
+    p[0] =  [Argument(p[1], desc=False)] + p[2]
+
+
+def p_order_by_list_0(p):
+    """
+    order_by_list : empty
+    """
+    p[0] = []
+
+
+def P_order_by_list_1(p):
+    """
+    order_by_list : order_by_condition
+    """
+    p[0] = p[1]
 
 
 ############################################################
@@ -587,7 +606,7 @@ def p_having_clause_1(p):
     """
     having_clause : HAVING constraint
     """
-    p[0] = p[1]
+    p[0] = p[2]
 
 
 ############################################################
@@ -1256,7 +1275,7 @@ def p_primary_expression_0(p):
 
 def p_primary_expression_1(p):
     """
-     primary_expression :  	bracketted_expression
+    primary_expression :  	bracketted_expression
                             | iri_or_function
                             | built_in_call
                             | rdf_literal
@@ -1330,9 +1349,9 @@ def p_rdf_literal(p):
     """
     c = p[1].strip()
     if "@" in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype="<" + xsd + "string>", lang=c[c.rfind("@")+1:], gen_type = str)
+        p[0] = Argument(c[:c.find("^")], True, datatype = '<' +  xsd + "string" + '>', lang=c[c.rfind("@")+1:], gen_type = 'typed-literal')
     elif xsd in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^")+1:], gen_type = None)
+        p[0] = Argument(c[:c.find("^")], True, datatype = c[c.rfind("^")+1:], gen_type = 'typed-literal')
     else:
         p[0] = Argument(p[1], True)
 
@@ -1341,18 +1360,18 @@ def p_numeric_literal_0(p):
    """
    numeric_literal : NUMBER
    """
-   p[0] = Argument(p[1], True)
+   p[0] = Argument("\"" + p[1] + "\"", True, datatype = '<' + xsd + 'integer' + '>', gen_type = 'typed-literal')
 
 
 def p_numeric_literal_1(p):
    """
    numeric_literal : NUMBER POINT NUMBER
    """
-   decimalNumber = str(p[1]) + p[2] + str(p[3])
-   p[0] = Argument(decimalNumber, True)
+   decimalNumber = "\"" + str(p[1]) + p[2] + str(p[3]) + "\""
+   p[0] = Argument(decimalNumber, True, datatype = '<' + xsd + 'decimal' + '>', gen_type = 'typed-literal')
 
 
-# TODO: add double (with EXPONENT token)
+# TODO: add double (with EXPONENT token) ???
 
 
 def p_boolean_literal(p):
@@ -1360,7 +1379,7 @@ def p_boolean_literal(p):
    boolean_literal : TRUE
                     | FALSE
    """
-   p[0] = Argument(p[1], True, datatype = xsd + 'boolean', gen_type = bool)
+   p[0] = Argument(p[1], True, datatype = '<' + xsd + 'boolean' + '>', gen_type = 'typed-literal')
 
 
 # TODO: builtInCall need to be rechecked, and developing new strategy, so that it won't take too much comparison during execution
@@ -1491,7 +1510,7 @@ def p_aggregate_0(p):
     """
     aggregate : COUNT LPAR distinct ALL RPAR
     """
-    p[0] = Aggregate(Argument(p[4], True), p[3], p[1])
+    p[0] = Aggregate(Argument('?ALL', False), p[3], p[1])
 
 
 def p_aggregate_1(p):
