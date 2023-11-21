@@ -193,7 +193,9 @@ class Decomposer(object):
             ltr = stars[s]
             preds = list(set([utils.getUri(tr.predicate, self.prefixes)[1:-1] for tr in ltr if tr.predicate.constant]))
             starpreds[s] = preds
-            typemols = self.checkRDFTypeStatemnt(ltr)
+            typemols, error = self.checkRDFTypeStatemnt(ltr)
+            if error:
+                return []
             if len(typemols) > 0:
                 selectedmolecules[s] = typemols
                 for m in typemols:
@@ -201,7 +203,7 @@ class Decomposer(object):
                     pinter = set(properties).intersection(preds)
                     if len(pinter) != len(preds):
                         print("Subquery: ", stars[s], "\nCannot be executed, because it contains properties that "
-                                                      "does not exist in this federations of datasets.")
+                                                      "do not exist in this federation")
                         return []
                 continue
 
@@ -596,12 +598,16 @@ class Decomposer(object):
     def checkRDFTypeStatemnt(self, ltr):
         types = self.getRDFTypeStatement(ltr)
         typemols = []
+        error = False
         for t in types:
             tt = utils.getUri(t.theobject, self.prefixes)[1:-1]
             if tt in self.config.metadata:
                 typemols.append(tt)
+            else:
+                error = True
+                print('No molecule found for class:', tt)
 
-        return typemols
+        return typemols, error
 
     def getStarsConnections(self, stars):
         """
