@@ -1,5 +1,6 @@
 __author__ = "Philipp D. Rohde"
 
+import multiprocessing
 import time
 from multiprocessing import Queue
 
@@ -88,9 +89,6 @@ def run_query(query: str,
     planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
     plan = planner.createPlan()
 
-    print(plan)
-    # sys.exit()
-
     output = Queue()
     plan.execute(output)
 
@@ -109,6 +107,12 @@ def run_query(query: str,
             result.append(res)
         r = output.get()
     end_time = time.time()
+
+    # sometimes, subprocesses are still running even though they are done
+    # TODO: this is supposed to be a workaround, we should solve the issue at the source
+    active = multiprocessing.active_children()
+    for child in active:
+        child.kill()
 
     return {"head": {"vars": decomposed_query.variables()},
             "cardinality": card,
