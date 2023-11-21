@@ -434,6 +434,8 @@ def extractValue(val):
 
 def translateToDict(tuple):
     ret = dict()
+    if tuple is None:
+        return {'value': ''}
     if tuple[1]:
         ret.update({'type': tuple[1]})
     ret.update({'value': str(tuple[0])})
