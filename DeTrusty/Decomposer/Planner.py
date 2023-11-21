@@ -52,6 +52,8 @@ class Planner(object):
 
         # Adds the having operator to the plan.
         if query.having is not None:
+            if not query.group_by:
+                raise SyntaxError('HAVING has to be preceded by GROUP BY.')
             operatorTree = TreePlan(Xhaving(query.having), operatorTree.vars, operatorTree)
 
         # Adds the order by operator to the plan.
