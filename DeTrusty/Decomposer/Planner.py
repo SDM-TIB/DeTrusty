@@ -48,6 +48,9 @@ class Planner(object):
             if implicit_group_by:
                 query.group_by = implicit_group_by
 
+        if query.group_by and not utils.valid_proj_vars(query.args, query.group_by):
+            raise SyntaxError('Query contains projections that are neither grouping variables nor aggregates.')
+
         # Adds the group by operator to the plan.
         if (len(query.group_by) > 0 or over_all_triples):
             operatorTree = TreePlan(Xgroupby(query.group_by, over_all_triples), operatorTree.vars, operatorTree)

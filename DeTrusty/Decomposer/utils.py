@@ -66,3 +66,14 @@ def collect_vars(proj):
             implicit_grouping.append(var)
 
     return (False if implicit_grouping else agg_exist), implicit_grouping
+
+
+def valid_proj_vars(proj, group_by):
+    for var in proj:
+        if isinstance(var, Aggregate):
+            continue
+        if isinstance(var, Expression) and var.aggInside():
+            continue
+        if var not in group_by:
+            return False
+    return True
