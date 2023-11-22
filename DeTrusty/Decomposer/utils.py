@@ -51,18 +51,18 @@ def getTemplatesPerMolecule(molecules):
 
 ###################################################################
 
-def collectVars(proj, having):
+
+def collect_vars(proj):
     agg_exist = False
+    implicit_grouping = []
 
     for var in proj:
-        if type(var) is Aggregate: 
+        if isinstance(var, Aggregate):
             agg_exist = True
-            break
-        if type(var) is Expression:
+        elif isinstance(var, Expression):
             if not agg_exist:
                 agg_exist = var.aggInside()
+        else:
+            implicit_grouping.append(var)
 
-    if having:
-        agg_exist = having.aggInside()
-
-    return agg_exist
+    return (False if implicit_grouping else agg_exist), implicit_grouping

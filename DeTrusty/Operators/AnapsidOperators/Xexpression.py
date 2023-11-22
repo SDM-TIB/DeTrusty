@@ -74,23 +74,26 @@ def simplifyExp(exp, tuple):
                 return extractValue(tuple[exp.name[1:]])
             else:
                 for var in tuple:
+                    if not isinstance(tuple[var], list):
+                        continue
                     return extractValue(tuple[var])
+                return None, None, None  # in case no grouped variables exist
     else:
         return evaluateOperator(exp, tuple)
 
-# order of evaluation is important here! TODO: test and recheck
-def evaluateOperator(exp, tuple):
 
-    if type(exp) is Aggregate: # grouped aggregate only
-        if type(exp.exp) is not tuple and type(exp.exp) is not list:
-            extracted = simplifyExp(exp.exp, tuple)
+# order of evaluation is important here! TODO: test and recheck
+def evaluateOperator(exp, tuple_):
+    if isinstance(exp, Aggregate):  # grouped aggregate only
+        if not isinstance(exp.exp, tuple) and not isinstance(exp.exp, list):
+            extracted = simplifyExp(exp.exp, tuple_)
         return evaluateAggregate(exp, extracted)
 
     #  if exp.exp_type == 'builtInNil': # add operators that requires no input here, for example RAND()
         #  return '', None, None
 
     if type(exp.left) is not tuple and type(exp.left) is not list:
-        extracted_left = simplifyExp(exp.left, tuple)
+        extracted_left = simplifyExp(exp.left, tuple_)
 
     if exp.exp_type == 'unary':
         if type(extracted_left) is list:
@@ -109,7 +112,7 @@ def evaluateOperator(exp, tuple):
         return evaluateBuiltInUnary(extracted_left, exp.op)
 
     if (type(exp.right) is not tuple and type(exp.right) is not list): 
-        extracted_right = simplifyExp(exp.right, tuple)
+        extracted_right = simplifyExp(exp.right, tuple_)
 
     if exp.exp_type == 'arithmetic':
         if type(extracted_left) is list and type(extracted_right) is list:
@@ -134,7 +137,7 @@ def evaluateOperator(exp, tuple):
         if exp.op.upper() == 'IN':
             extracted_right = list()
             for el in exp.right:
-                extracted_right.append(simplifyExp(el, tuple))
+                extracted_right.append(simplifyExp(el, tuple_))
             if type(extracted_left) is list:
                 ret = list()
                 for el in extracted_left:
@@ -282,6 +285,8 @@ def evaluateAggregate(agg, extracted): # type(extracted) always list <-> automat
             return (count, 'typed-literal', xsd + 'integer')
 
         else:
+           # print('extracted:', extracted)
+
             for val in extracted:
                 if val[0] not in ignored:
                     count += 1

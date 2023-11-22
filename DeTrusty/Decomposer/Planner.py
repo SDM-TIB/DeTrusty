@@ -44,7 +44,9 @@ class Planner(object):
         over_all_triples = False
 
         if not query.group_by:
-            over_all_triples = utils.collectVars(query.args, query.having)  # TODO: test & fix
+            over_all_triples, implicit_group_by = utils.collect_vars(query.args)
+            if implicit_group_by:
+                query.group_by = implicit_group_by
 
         # Adds the group by operator to the plan.
         if (len(query.group_by) > 0 or over_all_triples):
