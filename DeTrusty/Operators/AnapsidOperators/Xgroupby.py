@@ -7,12 +7,12 @@ The intermediate results are represented in a queue.
 @author: Avellino
 """
 
-# TODO: the grouping is quite wrong in case of implicit grouping, reference: 18.2.4.1 in spec.
 from multiprocessing import Queue
 
-class Xgroupby(object):                                                    # ensure backward comp.
 
-    name = "GROUP BY"
+class Xgroupby(object):
+
+    name = 'GROUP BY'
 
     def __init__(self, args, over_all_triple):
         self.qresults = Queue()                                            # end res.
@@ -26,17 +26,17 @@ class Xgroupby(object):                                                    # ens
         tmp = list()                                                       # [tup1,tup2,...]
 
         if self.overall:
-            tuple = self.left.get(True)
+            tuple_ = self.left.get(True)
             ret = dict()
-            for var in tuple:
-                ret.update({var: [tuple[var]]})
-            tuple = self.left.get(True)
-            while (tuple != "EOF"):
-                for var in tuple.keys():
-                    ret[var].append(tuple[var]) 
-                tuple = self.left.get(True)
+            for var in tuple_:
+                ret.update({var: [tuple_[var]]})
+            tuple_ = self.left.get(True)
+            while tuple_ != 'EOF':
+                for var in tuple_.keys():
+                    ret[var].append(tuple_[var])
+                tuple_ = self.left.get(True)
             self.qresults.put(ret)
-            self.qresults.put("EOF")
+            self.qresults.put('EOF')
             return
 
         for arg in self.args:
@@ -44,9 +44,9 @@ class Xgroupby(object):                                                    # ens
             if arg.alias:
                 arg_list.append(arg.alias[1:])
 
-        tuple = self.left.get(True)
+        tuple_ = self.left.get(True)
 
-        while (tuple != "EOF"):
+        while tuple_ != 'EOF':
             match = [0] * len(tmp)
             append = True
 
@@ -54,45 +54,35 @@ class Xgroupby(object):                                                    # ens
                 tmp_dict = tmp[i]
                 for arg in self.args:                                       # type(arg) always Argument
                     if arg.alias is not None:
-                        if tuple[arg.name[1:]] == tmp_dict[arg.alias[1:]]:
+                        if tuple_[arg.name[1:]] == tmp_dict[arg.alias[1:]]:
                             match[i] += 1                                   # record matches based on tmp index
                     else:
-                        if tuple[arg.name[1:]] == tmp_dict[arg.name[1:]]:
+                        if tuple_[arg.name[1:]] == tmp_dict[arg.name[1:]]:
                             match[i] += 1
 
             for j in range(len(match)):
                 if match[j] == len(self.args): 
                     append = False
-                    for var in tuple:
+                    for var in tuple_:
                         if var not in arg_list:
                             tmp_dict = tmp[j]
-                            tmp_dict[var].append(tuple[var])
+                            if var not in tmp_dict.keys():
+                                tmp_dict[var] = []
+                            tmp_dict[var].append(tuple_[var])
 
             if append:
                 for arg in self.args:
                     if arg.alias is not None:
-                        tuple.update({arg.alias[1:]: tuple[arg.name[1:]]})
-                for key in tuple:
+                        tuple_.update({arg.alias[1:]: tuple_[arg.name[1:]]})
+                for key in tuple_:
                     if key not in arg_list:
-                        tuple.update({key: [tuple[key]]})
-                tmp.append(tuple)
+                        tuple_.update({key: [tuple_[key]]})
+                tmp.append(tuple_)
 
-            tuple = self.left.get(True)
-
-        ###DEBUG###
-        # print("group by vars:", arg_list)
-        # for i in range(len(tmp)):
-            # tmp_dict = tmp[i]
-            # for attr in tmp_dict:
-                # string = attr + ": " 
-                # if type(tmp_dict[attr]) == list:
-                    # string = string + str(len(tmp_dict[attr]))
-                # else:
-                    # string = string + tmp_dict[attr]
-                # print(string)
+            tuple_ = self.left.get(True)
 
         tmp.reverse()
         while tmp:
             self.qresults.put(tmp.pop())
-        self.qresults.put("EOF")
+        self.qresults.put('EOF')
         return
