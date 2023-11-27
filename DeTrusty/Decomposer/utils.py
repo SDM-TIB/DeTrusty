@@ -65,6 +65,9 @@ def collect_vars(proj):
         else:
             implicit_grouping.append(var)
 
+    if not agg_exist:
+        implicit_grouping = []  # no grouping needed
+
     return (False if implicit_grouping else agg_exist), implicit_grouping
 
 
