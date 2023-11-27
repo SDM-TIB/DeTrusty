@@ -105,6 +105,7 @@ class Planner(object):
         if len(r) == 1:
             n = r[0]
             for f in ub.filters:
+                f.expr.replace_prefix(self.query.prefs)
                 n = TreePlan(Xfilter(f), n.vars, n)
             return n
         else:
@@ -140,8 +141,10 @@ class Planner(object):
                 if len(jb.filters) > 0:
                     for f in jb.filters:
                         if isinstance(f, Filter):
+                            f.expr.replace_prefix(self.query.prefs)
                             nf = TreePlan(Xfilter(f), nf.vars, nf)
                         elif isinstance(f, Bind):
+                            f.expr.replace_prefix(self.query.prefs)
                             nf = TreePlan(Xbind(f), nf.vars, nf)
                     return nf
                 else:
@@ -159,6 +162,7 @@ class Planner(object):
                     for f in tree.filters:
                         vars_f = f.getVarsName()
                         if set(n.vars) & set(vars_f) == set(vars_f):
+                            f.expr.replace_prefix(self.query.prefs)
                             n = TreePlan(Xfilter(f), n.vars, n)
                     return n
             elif isinstance(tree.service, UnionBlock):
@@ -171,6 +175,7 @@ class Planner(object):
                     for f in tree.filters:
                         vars_f = f.getVarsName()
                         if set(n.vars) & set(vars_f) == set(vars_f):
+                            f.expr.replace_prefix(self.query.prefs)
                             n = TreePlan(Xfilter(f), n.vars, n)
                     return n
             else:
@@ -188,12 +193,17 @@ class Planner(object):
                     vars_f = f.getVarsName()
                     if set(n.vars) & set(vars_f) == set(vars_f):
                         if isinstance(f, Filter):
+                            f.expr.replace_prefix(self.query.prefs)
                             n = TreePlan(Xfilter(f), n.vars, n)
                         elif isinstance(f, Values):
+                            for dbv in f.data_block_val:
+                                for arg in dbv:
+                                    arg.replace_prefix(self.query.prefs)
                             n = TreePlan(Xvalues(f), n.vars, n)
                     if isinstance(f, Bind):
                         n.vars = set(n.vars) | set(vars_f)
                         if n.vars & set(vars_f) == set(vars_f):
+                            f.expr.replace_prefix(self.query.prefs)
                             n = TreePlan(Xbind(f), n.vars, n)
             return n
 

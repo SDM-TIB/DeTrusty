@@ -998,12 +998,16 @@ binaryFunctor = {
 
 class Expression(object):
 
-    def __init__(self, op, left = None, right = None, exp_type = None, alias = None):
+    def __init__(self, op, left=None, right=None, exp_type=None, alias=None):
         self.op = op
         self.left = left
         self.right = right
         self.exp_type = exp_type
         self.alias = alias
+
+    def replace_prefix(self, prefixes):
+        self.left.replace_prefix(prefixes)
+        self.right.replace_prefix(prefixes)
 
     def __repr__(self):
         if self.alias:
@@ -1051,8 +1055,7 @@ class Expression(object):
             return self.left.getConsts() + self.right.getConsts()
 
     def instantiate(self, d):
-        return Expression(self.op, self.left.instantiate(d),
-                          self.right.instantiate(d))
+        return Expression(self.op, self.left.instantiate(d), self.right.instantiate(d))
 
     def instantiateFilter(self, d, filter_str):
         return Expression(self.op, self.left.instantiateFilter(d, filter_str),
@@ -1204,13 +1207,22 @@ class Triple(object):
 class Argument(object):
 
     def __init__(self, name, constant=False, desc=False, datatype=None, lang=None, alias=None, gen_type=None):
-        self.name = name if not constant else urllib.parse.quote(name, safe='<:/#>"\'^') # this supposed to be easily differentiated later after obtaining the datatype and gen_type from directly from EP json output
+        self.name = name if not constant else urllib.parse.quote(name, safe='<:/#>"\'^')  # this supposed to be easily differentiated later after obtaining the datatype and gen_type from directly from EP json output
         self.constant = constant
         self.desc = desc
         self.datatype = datatype
         self.lang = lang
         self.alias = alias
         self.gen_type = gen_type
+
+    def replace_prefix(self, prefixes):
+        for prefix in prefixes:
+            prefix, uri = prefix.split('<')
+            uri = uri[:-1]
+
+            if prefix in self.name:
+                self.name = '<' + uri + self.name.split(prefix)[1] + '>'
+                return
 
     def __repr__(self):
         if self.alias:
@@ -1255,7 +1267,6 @@ class Argument(object):
             return [self.name]
 
     def getConsts(self):
-
         if self.constant:
             n = self.name
             if self.datatype is not None:
