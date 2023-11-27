@@ -107,7 +107,7 @@ class Decomposer(object):
                 return None
 
         fl1 = self.includeFilter(sl, fl)
-        fl = list(set(fl) - set(fl1))  # in case VALUES with variables from multiple sources, the VALUES object won't be removed
+        fl = list(set(fl) - set(fl1))
         if sl:
             if len(sl) == 1 and isinstance(sl[0], UnionBlock) and fl != []:
                 sl[0] = self.updateFilters(sl[0], fl)
@@ -671,18 +671,21 @@ class Decomposer(object):
     def includeFilter(self, jb_triples, fl):
         fl1 = []
         for jb in jb_triples:
-
             if isinstance(jb, list):
                 for f in fl:
                     fl2 = self.includeFilterAux(f, jb)
                     fl1 = fl1 + fl2
-            elif (isinstance(jb, UnionBlock)):
+            elif isinstance(jb, UnionBlock):
                 for f in fl:
                     fl2 = self.includeFilterUnionBlock(jb, f)
                     fl1 = fl1 + fl2
-            elif (isinstance(jb, Service)):
+            elif isinstance(jb, Service):
                 for f in fl:
                     fl2 = self.includeFilterAuxSK(f, jb.triples, jb)
+                    fl1 = fl1 + fl2
+            elif isinstance(jb, Optional):
+                for f in fl:
+                    fl2 = self.includeFilterUnionBlock(jb.bgg, f)
                     fl1 = fl1 + fl2
         return fl1
 

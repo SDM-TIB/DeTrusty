@@ -139,9 +139,9 @@ class Planner(object):
             else:
                 if len(jb.filters) > 0:
                     for f in jb.filters:
-                        if(isinstance (f, Filter)):
+                        if isinstance(f, Filter):
                             nf = TreePlan(Xfilter(f), nf.vars, nf)
-                        elif(isinstance (f, Bind)):
+                        elif isinstance(f, Bind):
                             nf = TreePlan(Xbind(f), nf.vars, nf)
                     return nf
                 else:
