@@ -4,11 +4,13 @@ import collections
 from enum import Enum
 from functools import partial
 
-from DeTrusty.Logger import get_logger
 from DeTrusty.Decomposer import Tree, utils
+from DeTrusty.Logger import get_logger
 from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument
 
 logger = get_logger(__name__, '.decompositions.log')
+
+
 class Decomposer(object):
 
     def __init__(self, query, config, decompType="STAR", joinstarslocally=True, sparql_one_dot_one=False):
@@ -105,7 +107,7 @@ class Decomposer(object):
                 return None
 
         fl1 = self.includeFilter(sl, fl)
-        fl = list(set(fl) - set(fl1)) # in case VALUES with variables from multiple sources, the VALUES object won't be removed
+        fl = list(set(fl) - set(fl1))  # in case VALUES with variables from multiple sources, the VALUES object won't be removed
         if sl:
             if len(sl) == 1 and isinstance(sl[0], UnionBlock) and fl != []:
                 sl[0] = self.updateFilters(sl[0], fl)
@@ -695,10 +697,6 @@ class Decomposer(object):
             if set(vars_s) & set(vars_f) == set(vars_f):
                 s.include_filter(f)
                 fl1 = fl1 + [f]
-            elif type(f) is Values and set(vars_s) & set(vars_f) != set():
-                fl2 = f.instantiate(set(vars_s) & set(vars_f))
-                s.include_filter(fl2) # the new decomposed clause need to be reconsidered
-                fl1 = fl1 + [fl2]
         return fl1
 
     def includeFilterUnionBlock(self, jb, f):
@@ -708,11 +706,7 @@ class Decomposer(object):
                 if isinstance(jbUS, Service):
                     vars_s = set(jbUS.getVars())
                     vars_f = f.getVars()
-                    if type(f) is Values and set(vars_s) & set(vars_f) != set():
-                        fl2 = f.instantiate(set(vars_s) & set(vars_f))
-                        jbUS.include_filter(fl2)
-                        fl1 = fl1 + [fl2]
-                    elif set(vars_s) & set(vars_f) == set(vars_f):
+                    if set(vars_s) & set(vars_f) == set(vars_f):
                         jbUS.include_filter(f)
                         fl1 = fl1 + [f]
         return fl1
@@ -741,33 +735,22 @@ class Decomposer(object):
         for s in sl:
             bgpvars.update(set(utils.getVars(s)))
             vars_s = set()
-            if (isinstance(s, Triple)):
+            if isinstance(s, Triple):
                 vars_s.update(set(utils.getVars(s)))
             else:
                 for t in s.triples:
                     vars_s.update(set(utils.getVars(t)))
 
-            if set(vars_s) & set(vars_f) == set(vars_f): # Bind supposed to fall to this category
-                serviceFilter = True
-
-            if type(f) is Values and set(vars_s) & set(vars_f) != set():
-                fl2 = f.instantiate(set(vars_s) & set(vars_f))
+            if set(vars_s) & set(vars_f) == set(vars_f):  # Bind supposed to fall to this category
                 serviceFilter = True
 
         for v in bgpvars:
             if v in fvars:
                 fvars[v] = True
 
-        # if type(f) is Bind: # why is this here? Investigate later
-        #     fvars[f.alias] = True
-
         if serviceFilter:
-            if type(f) is Values:
-                sr.include_filter(fl2)
-                fl1 = fl1 + [fl2]
-            else:
-                sr.include_filter(f)
-                fl1 = fl1 + [f]
+            sr.include_filter(f)
+            fl1 = fl1 + [f]
         else:
             fs = [v for v in fvars if not fvars[v]]
             if len(fs) == 0:

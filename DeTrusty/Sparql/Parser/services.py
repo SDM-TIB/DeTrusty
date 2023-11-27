@@ -164,19 +164,20 @@ class Service(object):
 
 class Query(object):
 
-    def __init__(self, prefs, args, body, distinct, group_by=[], order_by=[], limit=-1, offset=-1, having=None, filter_nested='', extra_vars=[]):
+    def __init__(self, prefs, args, body, distinct, group_by=None, order_by=None, limit=-1, offset=-1, having=None,
+                 filter_nested='', extra_vars=None):
         self.prefs = prefs
         self.args = args
         self.body = body
         self.distinct = distinct
         self.join_vars = self.getJoinVars()
-        self.order_by = order_by
-        self.group_by = group_by
+        self.order_by = order_by if order_by is not None else []
+        self.group_by = group_by if group_by is not None else []
         self.limit = limit
         self.offset = offset
         self.having = having
         self.filter_nested = filter_nested
-        self.extra_vars = extra_vars
+        self.extra_vars = extra_vars if extra_vars is not None else []
         genPred = []  # readGeneralPredicates('ontario/common/parser/generalPredicates')
         self.body.setGeneral(getPrefs(self.prefs), genPred)
 
@@ -747,30 +748,16 @@ class Filter(object):
         # return self.constantNumber()/self.places()
 
 
-# TODO: fix spacing problem in __repr__ somewhere else
 class Values(object):
-    def __init__(self, var, data_block_val, clause_type = None):
+    def __init__(self, var, data_block_val):
         self.var = var
         self.data_block_val = data_block_val
-        self.info = clause_type
 
     def __repr__(self):
-        ret = ''
-        if self.info == 'single':
-            ret += '\n        VALUES '
-            for tmp in self.var:
-                ret += tmp.name + ' '
-            ret += '{ '
-            for tmp in self.data_block_val:
-                ret += tmp.name + ' '
-            ret += '}'
-        else:
-            for i in range(len(self.var)):
-                ret += '\n        VALUES '
-                ret += self.var[i].name + ' {' 
-                for tmp in self.data_block_val:
-                    ret += ' ' + tmp[i].name
-                ret += ' }'
+        ret = '\n  VALUES (' + ' '.join([var.name for var in self.var]) + ') {\n'
+        for dbv in self.data_block_val:
+            ret += '    (' + ' '.join([val.name for val in dbv]) + ')\n'
+        ret += '  }'
         return ret
 
     def show(self, x):
@@ -784,7 +771,7 @@ class Values(object):
 
     def getConsts(self):
         c = []
-        for row in self.data_block:
+        for row in self.data_block_val:
             for arg in row:
                 const = arg.getConsts() if isinstance(arg, Argument) else 'UNDEF'
                 c = c + const
@@ -805,17 +792,17 @@ class Values(object):
         return
 
     def places(self):
-        vars_len = len(self.vars)
-        return vars_len + vars_len * len(self.data_block)
+        vars_len = len(self.var)
+        return vars_len + vars_len * len(self.data_block_val)
 
     def allTriplesGeneral(self):
         return False
 
     def allTriplesLowSelectivity(self):
-        return True
+        return False
 
     def instantiate(self, used_var):
-        tmp_var = [] # saving things in dictionary may make things easier
+        tmp_var = []
         tmp_dbv = []
         if len(used_var) == len(self.var):
             return self
@@ -824,14 +811,11 @@ class Values(object):
                 if v.name == v1:
                     tmp_var.append(v)
                     for t in self.data_block_val:
-                        if t[self.var.index(v)].name != "UNDEF":
-                            tmp_dbv.append(t[self.var.index(v)])
-        if len(tmp_var) > 1:
-            return Values(tmp_var, tmp_dbv)
-        return Values(tmp_var, tmp_dbv, 'single')
+                        tmp_dbv.append(t[self.var.index(v)])
+        return Values(tmp_var, tmp_dbv)
 
     def instantiateFilter(self, d, filter_str):
-        return Values(self.vars, self.data_block)
+        return Values(self.var, self.data_block_val)
 
     def constantNumber(self):
         return len(self.getConsts())
@@ -883,7 +867,7 @@ class Bind(object):
         return False
 
     def allTriplesLowSelectivity(self):
-        return True
+        return False
 
     def instantiate(self):
         return Bind(self.expr, self.alias)
@@ -896,7 +880,8 @@ class Bind(object):
 
     def constantPercentage(self):
         return self.constantNumber()/self.places()
-        
+
+
 class Optional(object):
     def __init__(self, bgg):
         self.bgg = bgg

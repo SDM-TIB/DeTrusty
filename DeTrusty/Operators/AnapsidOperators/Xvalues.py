@@ -1,5 +1,7 @@
-from multiprocessing import Queue
 import datetime
+from multiprocessing import Queue
+
+from DeTrusty.Sparql.Parser.services import Argument
 
 data_types = {
     'integer': (int, 'numerical'),
@@ -23,6 +25,8 @@ data_types = {
     'positiveInteger': (int, 'numerical')
 }
 
+UNDEF = Argument('UNDEF')
+
 
 class Xvalues(object):
 
@@ -31,49 +35,50 @@ class Xvalues(object):
     def __init__(self, values): 
         self.input = Queue()
         self.qresults = Queue()
-        self.values = values  
+        self.values = values
+        self.left = None
 
     def execute(self, left, dummy, out, processqueue=Queue()):
         self.left = left
         self.qresults = out
-        tuple = self.left.get(True)
+        tuple_ = self.left.get(True)
 
-        while (tuple != "EOF"):
-            shouldInclude = self.filterByValues(tuple)
-            if shouldInclude:
-                self.qresults.put(tuple)
+        while tuple_ != "EOF":
+            should_include = self.filterByValues(tuple_)
+            if should_include:
+                self.qresults.put(tuple_)
 
-            tuple = self.left.get(True)           
+            tuple_ = self.left.get(True)
 
         # Put EOF in queue and exit.
         self.qresults.put("EOF")
 
-    def filterByValues(self, tuple):        
+    def filterByValues(self, tuple_):
         for row in self.values.data_block_val:
-            isValid = True
+            is_valid = True
             for idx, variable in enumerate(self.values.var): 
-                value = tuple[variable.name[1:]]
-                rowArg = row[idx]
-                if rowArg is None:
+                value = tuple_[variable.name[1:]]['value']
+                row_arg = row[idx]
+                if row_arg == UNDEF:
                     continue 
-                extractedRowValue = self.extractValue(rowArg.name)
-                rowValue = extractedRowValue[1:-1]
+                extracted_row_value = self.extractValue(row_arg.name)
+                row_value = extracted_row_value[1:-1]
                 
-                if value != rowValue:
-                    isValid = False
+                if value != row_value:
+                    is_valid = False
                     break
-            if isValid:
+            if is_valid:
                 return True
         return False 
 
     def extractValue(self, val):
         pos = val.find("^^")
         # Handles when the literal is typed.
-        if (pos > -1):
+        if pos > -1:
             for t in data_types.keys():
-                if (t in val[pos:]):
+                if t in val[pos:]:
                     (python_type, general_type) = data_types[t]
-                    if (general_type == bool):
+                    if general_type == bool:
                         return val[:pos]
                     else:
                         return python_type(val[:pos])

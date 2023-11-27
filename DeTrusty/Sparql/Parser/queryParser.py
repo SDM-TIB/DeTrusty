@@ -1,9 +1,8 @@
 import urllib.parse
-from ply import lex, yacc
-import sys
-# not all module needed (TODO: check after integrating expression to Having, Aggregate)
-from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Service
 
+from ply import lex, yacc
+
+from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Service
 
 # Lexer
 reserved = {
@@ -11,10 +10,8 @@ reserved = {
     'UNION': 'UNION',
     'FILTER': 'FILTER',
     'OPTIONAL': 'OPTIONAL',
-    
-    'VALUES' : 'VALUES',
-    'UNDEF' : 'UNDEF',
-
+    'VALUES': 'VALUES',
+    'UNDEF': 'UNDEF',
     'BIND': 'BIND',
     'AS': 'AS',
     'SERVICE': 'SERVICE',
@@ -27,8 +24,8 @@ reserved = {
     'BY': 'BY',
     'DESC': 'DESC',
     'ASC': 'ASC',
-    'IN' : 'IN',
-    'NOT' : 'NOT',
+    'IN': 'IN',
+    'NOT': 'NOT',
     'FALSE': 'FALSE',
     'TRUE': 'TRUE',
     'GROUP': 'GROUP',
@@ -279,6 +276,7 @@ def p_uri_0(p):
     """
     p[0] = p[1] + p[2] + p[3]
 
+
 def p_uri_1(p):
     """
     uri : ID COLON URI
@@ -299,11 +297,13 @@ def p_uri_3(p):
     """
     p[0] = p[1] + p[2] + p[3]
 
+
 def p_uri_4(p):
     """
     uri : ID COLON ID NUMBER
     """
     p[0] = p[1] + p[2] + p[3] + p[4]
+
 
 def p_uri_5(p):
     """
@@ -347,10 +347,6 @@ def p_single_var_list_0(p):
     """
     var_list : VARIABLE
     """
-    # if p[1][1:] not in test:
-    #     p_error(p[1])
-        # print('grouping variable should be in aggregate')
-        # sys.exit()
     p[0] = [Argument(p[1], False)]
 
 
@@ -362,21 +358,10 @@ def p_single_var_list_1(p):
     p[0] = [p[2]]
 
 
-# def p_single_var_list_2(p): 
-    # """
-    # var_list : VARIABLE AS VARIABLE
-    # """
-    # p[0] = [Argument(p[1], False, alias=p[3])]
-
-
 def p_var_list_0(p):
     """
     var_list : VARIABLE var_list 
     """
-    # if p[1][1:] not in test:
-    #     p_error(p[1])
-        # print('grouping variable should be in aggregate')
-        # sys.exit()
     p[0] = [Argument(p[1], False)] + p[2]
 
 
@@ -388,87 +373,51 @@ def p_var_list_1(p):
     p[0] = [p[2]] + p[6]
 
 
-# def p_var_list_2(p):
-    # """
-    # var_list : VARIABLE AS VARIABLE var_list
-    # """
-    # p[0] = [Argument(p[1], False, alias=p[3])] + p[4]
-
-
-################################################################
-# TODO: Adjust until Xgroupby.py                               #
-################################################################
-
-
 def p_group_by_0(p):
-   """
-   group_by : GROUP BY group_var group_var_list
-   """
-   p[0] = [p[3]] + p[4]
+    """
+    group_by : GROUP BY group_var group_var_list
+    """
+    p[0] = [p[3]] + p[4]
 
 
 def p_group_by_1(p):
-   """
-   group_by : empty
-   """
-   p[0] = []
+    """
+    group_by : empty
+    """
+    p[0] = []
 
 
 def p_group_var_0(p):                          
-   """                                        
-   group_var : VARIABLE                        
-   """
-   p[0] = Argument(p[1], False)
+    """
+    group_var : VARIABLE
+    """
+    p[0] = Argument(p[1], False)
 
 
 def p_group_var_1(p):                          
-   """                                        
-   group_var : LPAR VARIABLE AS VARIABLE RPAR                         
-   """
-   p[0] = Argument(p[2], False, alias=p[4])
-
-
-#  def p_group_var_1(p):
-   #  """
-   #  group_var : LPAR expression AS VARIABLE RPAR
-   #  """
-   #  p[0] = Argument(p[2], False, alias=p[4])
-#
-#
-#  def p_group_var_2(p):
-   #  """
-   #  group_var : LPAR expression RPAR
-   #  """
-   #  p[0] = Argument(p[1], False)
-#
-#
-#  def p_group_var_3(p):
-   #  """
-   #  group_var : built_in_call
-   #  """
-   #  p[0] = Argument(p[1], False)
+    """
+    group_var : LPAR VARIABLE AS VARIABLE RPAR
+    """
+    p[0] = Argument(p[2], False, alias=p[4])
 
 
 def p_group_var_list_0(p):
-   """
-   group_var_list : group_var group_var_list
-   """
-   p[0] = [p[1]] + p[2]
+    """
+    group_var_list : group_var group_var_list
+    """
+    p[0] = [p[1]] + p[2]
 
 
 def p_group_var_list_1(p):
-   """
-   group_var_list : empty
-   """
-   p[0] = []
+    """
+    group_var_list : empty
+    """
+    p[0] = []
 
 
-
-########################### TODO #############################################
-# -> Adjust the orderby module & services.py (for multiple condition)        #
-##############################################################################
-
-
+#
+# TODO: Adjust the orderby module & services.py (for multiple condition)
+#
 def p_order_by_0(p):
     """
     order_by : ORDER BY order_by_condition
@@ -501,28 +450,28 @@ def p_order_by_condition_2(p):
     """
     order_by_condition : constraint order_by_list
     """
-    p[0] =  [Argument(p[1], desc=False)] + p[2] # by default ASC
+    p[0] = [Argument(p[1], desc=False)] + p[2]  # by default ASC
 
 
 def p_order_by_condition_3(p):
     """
     order_by_condition : ASC VARIABLE order_by_list
     """
-    p[0] =  [Argument(p[2], desc=False)] + p[3]
+    p[0] = [Argument(p[2], desc=False)] + p[3]
 
 
 def p_order_by_condition_4(p):
     """
     order_by_condition : DESC VARIABLE order_by_list
     """
-    p[0] =  [Argument(p[2], desc=True)] + p[3]
+    p[0] = [Argument(p[2], desc=True)] + p[3]
 
 
 def p_order_by_condition_5(p):
     """
     order_by_condition : VARIABLE order_by_list
     """
-    p[0] =  [Argument(p[1], desc=False)] + p[2]
+    p[0] = [Argument(p[1], desc=False)] + p[2]
 
 
 def p_order_by_list_0(p):
@@ -589,12 +538,6 @@ def p_offset_1(p):
     p[0] = -1
 
 
-######################### TODO #############################
-# -> Multiple constrain ?                                  #
-# -> fix until Xhaving.py                                  #
-############################################################
-
-
 def p_having_clause_0(p):
     """
     having_clause : empty
@@ -634,7 +577,7 @@ def p_union_block_1(p):
     union_block : pjoin_block rest_union_block pjoin_block
     """
     punion = [JoinBlock(p[1])] + p[2]
-    if p[3] != []:
+    if p[3]:
         pjoin = [UnionBlock(punion)] + p[3]
         p[0] = [JoinBlock(pjoin)]
     else:
@@ -673,11 +616,11 @@ def p_join_block_0(p):
     """
     join_block : LKEY union_block RKEY rest_join_block
     """
-    if p[4] != [] and isinstance(p[4][0], Filter):
+    if p[4] and isinstance(p[4][0], Filter):
         p[0] = [UnionBlock(p[2])] + p[4]
-    if p[4] != [] and isinstance(p[4][0], Values):
+    if p[4] and isinstance(p[4][0], Values):
         p[0] = [UnionBlock(p[2])] + p[4]
-    elif p[4] != []:
+    elif p[4]:
         p[0] = [UnionBlock(p[2])] + [JoinBlock(p[4])]
     else:
         p[0] = [UnionBlock(p[2])]
@@ -765,7 +708,7 @@ def p_join_block_service_0(p):
     join_block_service : LKEY bgp_service rest_join_block_service RKEY rest_join_block_service
     """
     jb_list = [p[2]] + p[3]
-    if p[5] != [] and isinstance(p[5][0], Filter):
+    if p[5] and isinstance(p[5][0], Filter):
         p[0] = [UnionBlock([JoinBlock(jb_list)])] + p[5]
     elif isinstance(p[2], UnionBlock):
         p[0] = [p[2]] + p[3] + p[5]
@@ -871,7 +814,7 @@ def p_bgp_7(p):
     """
     bgp : VALUES VARIABLE LKEY data_block_value RKEY
     """
-    p[0] = Values([Argument(p[2])], p[4], 'single')
+    p[0] = Values([Argument(p[2])], p[4])
 
 
 def p_bgp_8(p):
@@ -1128,7 +1071,7 @@ def p_relational_expression_7(p):
     relational_expression : numeric_expression NOT IN expression_list
     """
     inner_exp = Expression(p[3], p[1], p[4], 'relational')
-    p[0] = Expression('!', inner_exp, exp_type = 'unary')
+    p[0] = Expression('!', inner_exp, exp_type='unary')
 
 
 def p_relational_expression_8(p):
@@ -1177,7 +1120,7 @@ def p_additive_expression(p):
     """
     additive_expression : multiplicative_expression arith_op
     """
-    if p[2] != None:
+    if p[2] is not None:
         op, right = p[2]
         p[0] = Expression(op, p[1], right, 'arithmetic')
     else:
@@ -1203,7 +1146,7 @@ def p_plus_or_minus(p):
     plus_or_minus : PLUS multiplicative_expression arith_op
                    | MINUS multiplicative_expression arith_op
     """
-    if p[3] != None:
+    if p[3] is not None:
         op, right = p[3]
         p[0] = p[1], Expression(op, p[2], right, 'arithmetic')
     else:
@@ -1225,7 +1168,7 @@ def p_mult_div_unary_0(p):
     """
     mult_div_unary : ALL unary_expression mult_div_unary
     """
-    if p[3] != None:
+    if p[3] is not None:
         op, right = p[3]
         p[0] = p[1], Expression(op, p[2], right, 'arithmetic')
     else:
@@ -1236,7 +1179,7 @@ def p_mult_div_unary_1(p):
     """
     mult_div_unary : DIV unary_expression mult_div_unary
     """
-    if p[3] != None:
+    if p[3] is not None:
         op, right = p[3]
         p[0] = p[1], Expression(op, p[2], right, 'arithmetic')
     else:
@@ -1300,7 +1243,7 @@ def p_iri_or_function_0(p):
     p[0] = Argument(p[1], True)
 
 
-# TODO: follow the spec. This is hardly simplified
+# TODO: follow the spec. This is simplified a lot
 def p_iri_or_function_1(p):
     """
     iri_or_function : type_casting VARIABLE
@@ -1308,7 +1251,7 @@ def p_iri_or_function_1(p):
     p[0] = Expression(p[1], Argument(p[2], False))
 
 
-# TODO: follow the spec. This is hardly simplified
+# TODO: follow the spec. This is simplified a lot
 def p_iri_or_function_2(p):
     """
     iri_or_function : type_casting CONSTANT
@@ -1316,7 +1259,7 @@ def p_iri_or_function_2(p):
     p[0] = Expression(p[1], Argument(p[2], True))
 
 
-# TODO: supposed to be uri and not constrained to the type_casting
+# TODO: supposed to be URI and not constrained to the type_casting
 def p_type_casting_0(p):
     """
     type_casting : DOUBLE 
@@ -1349,37 +1292,37 @@ def p_rdf_literal(p):
     """
     c = p[1].strip()
     if "@" in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype = '<' +  xsd + "string" + '>', lang=c[c.rfind("@")+1:], gen_type = 'typed-literal')
+        p[0] = Argument(c[:c.find("^")], True, datatype='<' + xsd + "string" + '>', lang=c[c.rfind("@")+1:], gen_type='typed-literal')
     elif xsd in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype = c[c.rfind("^")+1:], gen_type = 'typed-literal')
+        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^")+1:], gen_type='typed-literal')
     else:
         p[0] = Argument(p[1], True)
 
 
 def p_numeric_literal_0(p):
-   """
-   numeric_literal : NUMBER
-   """
-   p[0] = Argument("\"" + p[1] + "\"", True, datatype = '<' + xsd + 'integer' + '>', gen_type = 'typed-literal')
+    """
+    numeric_literal : NUMBER
+    """
+    p[0] = Argument("\"" + p[1] + "\"", True, datatype='<' + xsd + 'integer' + '>', gen_type='typed-literal')
 
 
 def p_numeric_literal_1(p):
-   """
-   numeric_literal : NUMBER POINT NUMBER
-   """
-   decimalNumber = "\"" + str(p[1]) + p[2] + str(p[3]) + "\""
-   p[0] = Argument(decimalNumber, True, datatype = '<' + xsd + 'decimal' + '>', gen_type = 'typed-literal')
+    """
+    numeric_literal : NUMBER POINT NUMBER
+    """
+    decimal_number = "\"" + str(p[1]) + p[2] + str(p[3]) + "\""
+    p[0] = Argument(decimal_number, True, datatype='<' + xsd + 'decimal' + '>', gen_type='typed-literal')
 
 
 # TODO: add double (with EXPONENT token) ???
 
 
 def p_boolean_literal(p):
-   """
-   boolean_literal : TRUE
-                    | FALSE
-   """
-   p[0] = Argument(p[1], True, datatype = '<' + xsd + 'boolean' + '>', gen_type = 'typed-literal')
+    """
+    boolean_literal : TRUE
+                     | FALSE
+    """
+    p[0] = Argument(p[1], True, datatype='<' + xsd + 'boolean' + '>', gen_type='typed-literal')
 
 
 # TODO: builtInCall need to be rechecked, and developing new strategy, so that it won't take too much comparison during execution
@@ -1418,7 +1361,7 @@ def p_built_in_call_0(p):
                     | ISNUMERIC LPAR expression RPAR
                     | BNODE LPAR expression RPAR
     """
-    p[0] = Expression(p[1], p[3], exp_type = 'builtInUnary')
+    p[0] = Expression(p[1], p[3], exp_type='builtInUnary')
 
 
 def p_built_in_call_1(p):
@@ -1446,7 +1389,7 @@ def p_built_in_call_2(p):
                     | STRUUID NIL
                     | BNODE NIL
     """
-    p[0] = Expression(p[1], exp_type = 'builtInNil')
+    p[0] = Expression(p[1], exp_type='builtInNil')
 
 
 def p_built_in_call_3(p):
@@ -1585,9 +1528,8 @@ def p_predicate_rdftype(p):
     """
     if p[1] == 'a':
         value = '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'
-        p[0] = Argument(value,True)
+        p[0] = Argument(value, True)
     else:
-        print('raising')
         p_error(p[1])
         raise SyntaxError
 
@@ -1647,7 +1589,6 @@ def p_object_constant(p):
 
 
 def p_error(p):
-    # print(type(p))
     if isinstance(p, str):
         value = p
     else:

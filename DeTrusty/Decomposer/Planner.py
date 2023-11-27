@@ -18,10 +18,11 @@ from DeTrusty.Operators.AnapsidOperators.Xoffset import Xoffset
 from DeTrusty.Operators.AnapsidOperators.Xorderby import Xorderby
 from DeTrusty.Operators.AnapsidOperators.Xproject import Xproject
 from DeTrusty.Operators.AnapsidOperators.Xunion import Xunion
+from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues
 from DeTrusty.Operators.BlockingOperators.Union import Union
 from DeTrusty.Operators.NonBlockingOperators.NestedHashJoinFilter import NestedHashJoinFilter as NestedHashJoin
 from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalFilter import  NestedHashOptionalFilter as NestedHashOptional
-from DeTrusty.Sparql.Parser.services import Bind, Filter, Service, Optional, UnionBlock, JoinBlock
+from DeTrusty.Sparql.Parser.services import Bind, Filter, Values, Service, Optional, UnionBlock, JoinBlock
 
 
 class Planner(object):
@@ -52,7 +53,7 @@ class Planner(object):
             raise SyntaxError('Query contains projections that are neither grouping variables nor aggregates.')
 
         # Adds the group by operator to the plan.
-        if (len(query.group_by) > 0 or over_all_triples):
+        if (len(query.group_by) > 0) or over_all_triples:
             operatorTree = TreePlan(Xgroupby(query.group_by, over_all_triples), operatorTree.vars, operatorTree)
 
         # Adds the having operator to the plan.
@@ -188,6 +189,8 @@ class Planner(object):
                     if set(n.vars) & set(vars_f) == set(vars_f):
                         if isinstance(f, Filter):
                             n = TreePlan(Xfilter(f), n.vars, n)
+                        elif isinstance(f, Values):
+                            n = TreePlan(Xvalues(f), n.vars, n)
                     if isinstance(f, Bind):
                         n.vars = set(n.vars) | set(vars_f)
                         if n.vars & set(vars_f) == set(vars_f):

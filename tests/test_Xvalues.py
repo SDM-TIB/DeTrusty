@@ -12,30 +12,36 @@ def value_one():
 
 @pytest.fixture
 def value_two():
-    vars2 = Values([Argument('?disease_name')], [[None, True]])
+    vars2 = Values([Argument('?disease_name')], [[Argument('UNDEF'), True]])
     return Xvalues(vars2)
 
 
 def test_xvalues_filter_by_value_valid(value_one):
-    tuple_ = {'disease_name': 'Attention-deficit_hyperactivity_disorder'}
+    tuple_ = {'disease_name': {'type': 'literal', 'value': 'Attention-deficit_hyperactivity_disorder'}}
     assert value_one.filterByValues(tuple_) is True
 
 
 def test_xvalues_filter_by_value_undef(value_two):
-    tuple_ = {'disease_name': 'Rheumatoid_arthritis'}
+    tuple_ = {'disease_name': {'type': 'literal', 'value': 'Rheumatoid_arthritis'}}
     assert value_two.filterByValues(tuple_) is True
 
 
 def test_xvalues_filter_by_value_invalid(value_one):
-    tuple_ = {'disease_name': 'Rheumatoid_arthritis'}
+    tuple_ = {'disease_name': {'type': 'literal', 'value': 'Rheumatoid_arthritis'}}
     assert value_one.filterByValues(tuple_) is False
 
 
 def test_xvalues_filter_by_value_multi_var_input_valid(value_one):
-    tuple_ = {'disease_name': 'Attention-deficit_hyperactivity_disorder', 'drug_gn': 'Methylphenidate'}
+    tuple_ = {
+        'disease_name': {'type': 'literal', 'value': 'Attention-deficit_hyperactivity_disorder'},
+        'drug_gn': {'type': 'literal', 'value': 'Methylphenidate'}
+    }
     assert value_one.filterByValues(tuple_) is True
 
 
 def test_xvalues_filter_by_value_multi_var_input_invalid(value_one):
-    tuple_ = {'disease_name': 'Response to morphine-6-glucuronide', 'drug_gn': 'Heroin'}
+    tuple_ = {
+        'disease_name': {'type': 'literal', 'value': 'Response to morphine-6-glucuronide'},
+        'drug_gn': {'type': 'literal', 'value': 'Heroin'}
+    }
     assert value_one.filterByValues(tuple_) is False
