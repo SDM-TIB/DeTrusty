@@ -51,20 +51,20 @@ class Xorderby(object):
         results_copy = []
 
         # Read all the results.
-        tuple = self.left.get(True)
-        # print "tuple", tuple
+        tuple_ = self.left.get(True)
+        # print "tuple", tuple_
         tuple_id = 0
-        while (tuple != "EOF"):
-            results_copy.append(tuple)
+        while tuple_ != "EOF":
+            results_copy.append(tuple_)
             res = {}
-            res.update(tuple)
-            # print "tuple", tuple
+            res.update(tuple_)
+            # print "tuple", tuple_
             for arg in self.args:
-                res.update({arg.name[1:]: self.extractValue(tuple[arg.name[1:]]['value'])})
+                res.update({arg.name[1:]: self.extractValue(tuple_[arg.name[1:]])})
             res.update({'__id__': tuple_id})
             results.append(res)
             tuple_id = tuple_id + 1
-            tuple = self.left.get(True)
+            tuple_ = self.left.get(True)
 
         # Sorting.
         self.args.reverse()
@@ -74,28 +74,22 @@ class Xorderby(object):
             results = sorted(results, key=eval(order_by), reverse=arg.desc)
 
         # Add results to output queue.
-        for tuple in results:
-            self.qresults.put(results_copy[tuple['__id__']])
+        for tuple_ in results:
+            self.qresults.put(results_copy[tuple_['__id__']])
 
         # Put EOF in queue and exit.
         self.qresults.put("EOF")
         return
 
     def extractValue(self, val):
-        pos = val.find("^^")
-
-        # Handles when the literal is typed.
-        if (pos > -1):
-            for t in data_types.keys():
-                if (t in val[pos]):
-                    (python_type, general_type) = data_types[t]
-
-                    if (general_type == bool):
-                        return val[:pos]
-
-                    else:
-                        return python_type(val[:pos])
-
-        # Handles non-typed literals.
+        if val['type'] == 'literal' or val['type'] == 'uri':
+            return val['value']
+        elif val['type'] == 'typed-literal':
+            datatype = val['datatype'].lstrip('http://www.w3.org/2001/XMLSchema#')
+            python_type, general_type = data_types[datatype]
+            if general_type == bool:
+                return val['value']
+            else:
+                return python_type(val['value'])
         else:
-            return str(val)
+            raise Exception("Unknown value type '%s'" % (val['type'], ))
