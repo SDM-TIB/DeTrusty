@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Changelog &mdash; DeTrusty 0.13.2 documentation</title>
+  <title>Changelog &mdash; DeTrusty 0.14.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -34,7 +34,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.13.2
+                0.14.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -84,6 +84,34 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<section id="v0-14-0-28-nov-2023">
+<h2>v0.14.0 - 28 Nov 2023<a class="headerlink" href="#v0-14-0-28-nov-2023" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add complex expressions</p></li>
+<li><p>Update return format to match with the SPARQL specification, i.e., include type and datatype, not just the value</p></li>
+<li><p>Fix minor issues in aggregate functions</p></li>
+<li><p>Fix implicit grouping</p></li>
+<li><p>Fix error of executing a query with no matched source if only rdf:type statement in query</p></li>
+<li><p>Fix issue with non-grouped optional variables</p></li>
+<li><p>Fix filters</p>
+<ul>
+<li><p>… for URIs</p></li>
+<li><p>… over optional variables</p></li>
+</ul>
+</li>
+<li><p>Fix wrong splitting of VALUES clause when using multiple variables</p></li>
+<li><p>Throw error if</p>
+<ul>
+<li><p>projected variables are not grouped or aggregates</p></li>
+<li><p>projected variables are not defined in the body</p></li>
+<li><p>variables in ORDER BY are not projected</p></li>
+<li><p>variables in GROUP BY are not defined in the body</p></li>
+</ul>
+</li>
+<li><p>Add functionality for ordering by multiple variables</p></li>
+<li><p>Adjust Xorderby to use datatypes</p></li>
+</ul>
+</section>
 <section id="v0-13-2-01-nov-2023">
 <h2>v0.13.2 - 01 Nov 2023<a class="headerlink" href="#v0-13-2-01-nov-2023" title="Permalink to this heading"></a></h2>
 <ul class="simple">

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Library &mdash; DeTrusty 0.13.2 documentation</title>
+  <title>DeTrusty as a Library &mdash; DeTrusty 0.14.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -34,7 +34,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.13.2
+                0.14.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -71,7 +71,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#creating-source-descriptions">Creating Source Descriptions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Creating Source Descriptions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#standard-case">Standard Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#private-endpoints">Private Endpoints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#source-descriptions-from-rml-mappings">Source Descriptions from RML Mappings</a></li>
@@ -156,7 +156,102 @@ We refer the reader to the chapter <a class="reference internal" href="source_de
 Additionally, we refer to <a class="reference internal" href="decomposition.html"><span class="doc">Decomposition Types</span></a> for more details about what decomposition is and an overview of different decomposition types.</p>
 </div>
 <p>DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">run_query</span></code> for executing SPARQL queries.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'STAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparql_one_dot_one</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_stars_locally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yasqe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Executes a SPARQL query over a federation of SPARQL endpoints.</p>
+<p>The SPARQL query is decomposed based on the specified decomposition type.
+DeTrusty identifies the possible sources for each sub-query using the
+metadata collected previously. If the query contains the SERVICE clause,
+DeTrusty executed the sub-query at the specified endpoint instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The SPARQL query to be executed. Might be a string holding the SPARQL query or path to
+a query file. The query file can be local or remote (accessible via GET request).</p></li>
+<li><p><strong>decomposition_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The decomposition type to be used for decomposing the query. Possible values
+are ‘STAR’ for a star-shaped decomposition, ‘EG’ for exclusive groups decomposition,
+and ‘TRIPLE’ for a triple-wise decomposition, i.e., each triple pattern of the query
+produces a sub-query. Default is ‘STAR’.</p></li>
+<li><p><strong>sparql_one_dot_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the query includes the SERVICE clause.
+‘True’ meaning the SERVICE clause is present in the query, ‘False’ otherwise.
+Default is ‘False’.</p></li>
+<li><p><strong>config</strong> (<em>DeTrusty.Molecule.MTManager.Config</em><em>, </em><em>optional</em>) – The configuration holding the metadata about the federation over which the
+SPARQL query should be executed. If no value is specified, DeTrusty will
+attempt to load the configuration from <cite>./Config/rdfmts.json</cite>.</p></li>
+<li><p><strong>join_stars_locally</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether joins should be performed at the query engine.
+‘True’ meaning joins will be performed in DeTrusty, ‘False’ leads to joins
+being executed in the sources if possible. Default behavior is join execution
+at the query engine level.</p></li>
+<li><p><strong>print_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the actual query result should be returned.
+‘True’ meaning the result will be included in the answer.
+‘False’ only returns the metadata of the query result, like the cardinality.
+Default is ‘True’.</p></li>
+<li><p><strong>yasqe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the SPARQL query was sent from the YASGUI interface of
+DeTrusty’s Web interface. This is a workaround for YASQE not being able
+to show the query results when the validation data is included.
+Set to ‘True’ to omit the validation data. Default is ‘False’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary including the query answer and additional metadata following the SPARQL protocol.
+It returns an error message in the ‘error’ field if something went wrong. Other metadata might
+be omitted in that case.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The example calls assume that an object <code class="docutils literal notranslate"><span class="pre">config</span></code> with the source descriptions exists.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_query</span><span class="p">(</span><span class="s1">&#39;SELECT ?s WHERE { ?s a &lt;http://example.com/Person&gt; }&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_query</span><span class="p">(</span><span class="s1">&#39;./query.rq&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_query</span><span class="p">(</span><span class="s1">&#39;http://example.com/queries/query.rq&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <p>Additionally, DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">get_config</span></code> to create an object with the internal representation of the source descriptions.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_input</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Creates an object with the internal representation of the source descriptions.</p>
+<p>Based on the type of input, this function will create a <code class="docutils literal notranslate"><span class="pre">Config</span></code> object either
+from a local file, remote file, or a list of dictionaries. The source descriptions
+are later used by DeTrusty for the source selection and decomposition. The main
+usage of this function is to read stored source descriptions from a file (local or remote)
+in order to reuse them for query execution over the same federation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config_input</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>]</em>) – The source description to transform into the internal representation. Might be a string holding the path
+to a configuration file. The configuration file can be local or remote (accessible via GET request).
+The source description can also be a parsed JSON, i.e., a list of Python dictionaries. Each dictionary
+represents a so-called <em>RDF Molecule Template</em>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The object holding the internal representation of the source descriptions. The result might be <code class="docutils literal notranslate"><span class="pre">None</span></code>
+if there was an issue while reading the source descriptions that did not lead to an exception.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Config</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The example calls assume that the file <code class="docutils literal notranslate"><span class="pre">rdftms.json</span></code> is a valid source description file created by DeTrusty.
+See <a class="reference external" href="https://sdm-tib.github.io/DeTrusty/library.html#creating-source-descriptions">Creating Source Descriptions</a>
+for more information.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;./rdfmts.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;http://example.com/rdfmts.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <section id="knowledge4covid-19">
 <h3>Knowledge4COVID-19<a class="headerlink" href="#knowledge4covid-19" title="Permalink to this heading"></a></h3>
 <p>In order to gain hands-on experience with DeTrusty, we provide a couple of examples.
@@ -445,14 +540,40 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </section>
 </section>
 </section>
-<section id="creating-source-descriptions">
-<span id="id3"></span><h2>Creating Source Descriptions<a class="headerlink" href="#creating-source-descriptions" title="Permalink to this heading"></a></h2>
+<section id="id3">
+<span id="id4"></span><h2>Creating Source Descriptions<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The goal of this section is to explain how to create the source descriptions when using DeTrusty as a library.
 We refer the reader to the chapter <a class="reference internal" href="source_description.html"><span class="doc">Source Descriptions</span></a> for more information about what source descriptions are and why they are needed.</p>
 </div>
 <p>DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">create_rdfmts</span></code> for the source description creation.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_rdfmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/DeTrusty/Config/rdfmts.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interlinking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Generating rdfmts.json, which need to be supplied during query execution using run_query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The endpoints, from which informations will be collected.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Path location in which the generated configuration will be saved.</p>
+<ul>
+<li><p>In case of not supplied: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.json’</p></li>
+<li><p>In case of None is supplied: the config won’t be saved, instead JSONConfig files will be returned.</p></li>
+</ul>
+</p></li>
+<li><p><strong>interlinking</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – When supplied with True, the module will assume that there’s an interlinks between endpoints, and thus generating configuration that suits this purpose. Default value is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>only generating return value when output=None.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>JSONConfig, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p>The remainder of this section provides examples showing how to use the function in different scenarios.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#standard-case">Standard Case</a>: public SPARQL endpoints only</p></li>
