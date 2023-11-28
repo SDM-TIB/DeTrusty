@@ -415,9 +415,6 @@ def p_group_var_list_1(p):
     p[0] = []
 
 
-#
-# TODO: Adjust the orderby module & services.py (for multiple condition)
-#
 def p_order_by_0(p):
     """
     order_by : ORDER BY order_by_condition
@@ -455,16 +452,16 @@ def p_order_by_condition_2(p):
 
 def p_order_by_condition_3(p):
     """
-    order_by_condition : ASC VARIABLE order_by_list
+    order_by_condition : ASC LPAR VARIABLE RPAR order_by_list
     """
-    p[0] = [Argument(p[2], desc=False)] + p[3]
+    p[0] = [Argument(p[3], desc=False)] + p[5]
 
 
 def p_order_by_condition_4(p):
     """
-    order_by_condition : DESC VARIABLE order_by_list
+    order_by_condition : DESC LPAR VARIABLE RPAR order_by_list
     """
-    p[0] = [Argument(p[2], desc=True)] + p[3]
+    p[0] = [Argument(p[3], desc=True)] + p[5]
 
 
 def p_order_by_condition_5(p):
@@ -481,7 +478,7 @@ def p_order_by_list_0(p):
     p[0] = []
 
 
-def P_order_by_list_1(p):
+def p_order_by_list_1(p):
     """
     order_by_list : order_by_condition
     """
