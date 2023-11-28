@@ -18,6 +18,9 @@
 DeTrusty
 ********
 
+.. image:: _images/logo.png
+   :align: center
+
 DeTrusty is a federated query engine.
 At this stage, only SPARQL endpoints are supported.
 DeTrusty differs from other query engines through its focus on the explainability and trustworthiness of the query result.
@@ -34,8 +37,6 @@ This list might not be exhaustive.
 Please, let us know if we missed something.
 
 * Conditional functions, e.g., ``IF``, ``BOUND``, ``COALESCE``
-* ``HAVING`` clause
-* Complex expressions
 * Built-in functions, e.g., ``isIRI``, ``STRLEN``, ``abs``, ``floor``, ``now``, ``month``, ``MD5``
 * Specifying RDF datasets using ``FROM``, ``FROM NAMES``, or ``GRAPH``
 

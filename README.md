@@ -24,8 +24,6 @@ Currently, DeTrusty only supports ``SELECT`` queries.
 The following SPARQL 1.1 operations are not supported (yet).
 This list might not be exhaustive. Please, let us know if we missed something.
 - Conditional functions, e.g., `IF`, `BOUND`, `COALESCE`
-- `HAVING` clause
-- Complex expressions
 - Built-in functions, e.g., `isIRI`, `STRLEN`, `abs`, `floor`, `now`, `month`, `MD5`
 - Specifying RDF datasets using `FROM`, `FROM NAMED`, or `GRAPH`
 

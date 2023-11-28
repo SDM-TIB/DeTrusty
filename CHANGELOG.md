@@ -1,3 +1,22 @@
+# v0.14.0 - 28 Nov 2023
+- Add complex expressions
+- Update return format to match with the SPARQL specification, i.e., include type and datatype, not just the value
+- Fix minor issues in aggregate functions
+- Fix implicit grouping
+- Fix error of executing a query with no matched source if only rdf:type statement in query
+- Fix issue with non-grouped optional variables
+- Fix filters
+  - ... for URIs
+  - ... over optional variables
+- Fix wrong splitting of VALUES clause when using multiple variables
+- Throw error if
+  - projected variables are not grouped or aggregates
+  - projected variables are not defined in the body
+  - variables in ORDER BY are not projected
+  - variables in GROUP BY are not defined in the body
+- Add functionality for ordering by multiple variables
+- Adjust Xorderby to use datatypes
+
 # v0.13.2 - 01 Nov 2023
 - Fix argument parsing in create_rdfmts.py
 - Docker: update Python
