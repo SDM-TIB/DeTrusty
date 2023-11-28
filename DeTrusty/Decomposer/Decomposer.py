@@ -40,7 +40,16 @@ class Decomposer(object):
         if not self.query.body:
             return None
 
-        if self.query.order_by == -1: # can be deleted after merging parser
+        proj_vars = []
+        for arg in self.query.args:
+            proj_vars.extend(arg.getVars())
+        proj_vars = set(proj_vars)
+        body_vars = set(self.query.body.getVars())
+        if proj_vars - body_vars:
+            raise Exception('The following variables have been defined in the SELECT clause but not in the body: '
+                            + str(proj_vars - body_vars))
+
+        if self.query.order_by == -1:  # TODO: can be deleted after merging parser
             self.query.order_by = []
 
         logger.info('Decomposition obtained')

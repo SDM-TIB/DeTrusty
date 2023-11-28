@@ -1040,8 +1040,7 @@ class Expression(object):
             return ("(" + str(self.left)+" "+ self.op +" "+str(self.right)+ ")")
 
     def getVars(self):
-        # if (self.op=='REGEX' or self.op == 'xsd:integer' or self.op=='!' or self.op == 'BOUND' or self.op == 'ISIRI' or self.op == 'ISURI' or self.op == 'ISBLANK' or self.op == 'ISLITERAL' or self.op == 'STR' or self.op == 'LANG' or self.op == 'DATATYPE'):
-        if ((self.op.upper() in unaryFunctor) or (self.right is  None)):
+        if (self.op.upper() in unaryFunctor) or (self.right is None):
             return self.left.getVars()
         else:
             return self.left.getVars() + self.right.getVars()
@@ -1264,7 +1263,7 @@ class Argument(object):
         if self.constant:
             return []
         else:
-            return [self.name]
+            return [self.name if not self.alias else self.alias]
 
     def getConsts(self):
         if self.constant:
@@ -1304,7 +1303,7 @@ class Aggregate(object):
         self.name = name
 
     def getVars(self):
-        return self.exp.getVars() # TODO: check whether Expression.getVars() correct or not
+        return self.exp.getVars()  # TODO: check whether Expression.getVars() correct or not
     
     def getName(self):
         if self.alias:
