@@ -52,6 +52,20 @@ class Decomposer(object):
         if self.query.order_by == -1:  # TODO: can be deleted after merging parser
             self.query.order_by = []
 
+        order_by_vars = []
+        for arg in self.query.order_by:
+            order_by_vars.extend(arg.getVars())
+        if set(order_by_vars) - proj_vars:
+            raise Exception('The following variables have been defined in the ORDER BY clause but are not projected: '
+                            + str(set(order_by_vars) - proj_vars))
+
+        group_by_vars = []
+        for arg in self.query.group_by:
+            group_by_vars.extend(arg.getVars())
+        if set(group_by_vars) - proj_vars:
+            raise Exception('The following variables have been defined in the GROUP BY clause but are not projected: '
+                            + str(set(group_by_vars) - proj_vars))
+
         logger.info('Decomposition obtained')
         logger.info(self.query)
 
