@@ -1,5 +1,11 @@
 .idea/
+docs/
+example/
 venv/
+.gitignore
+.zenodo.json
 Dockerfile
 DeTrusty/Sparql/Parser/parsetab.py
 tests
+requirements-dev.txt
+requirements-doc.txt
