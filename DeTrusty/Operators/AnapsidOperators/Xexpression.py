@@ -68,9 +68,9 @@ def simplifyExp(exp, tuple):
             except:
                 if exp.gen_type == 'literal' or exp.gen_type == 'uri' or exp.name.strip("\'").strip("\"") == '':
                     return exp.name.strip('\'').strip('\"'), exp.gen_type, exp.datatype
-                return None, None, None # in case of mismatch
+                return None, None, None  # in case of mismatch
         else:
-            if exp.name != '?ALL':
+            if exp.name != '*':
                 return extractValue(tuple[exp.name[1:]])
             else:
                 for var in tuple:

@@ -227,14 +227,9 @@ class Leaf(Tree):
         if not query.args:
             projvars = vs
         else:
-            # projvars = list(set([v.name for v in query.args if not v.constant]))
             projvars = []
             for arg in query.args:
-                if '?ALL' in arg.getVars():
-                    projvars = vs               # doubtable
-                    break
-                else:
-                    projvars += arg.getVars()
+                projvars.extend(arg.getVars())
         subvars = list((query.join_vars | set(projvars)) & set(vs))
         vars_order_by = [x for v in query.order_by for x in v.getVars() if x in vs]
         vars_group_by = [x for v in query.group_by for x in v.getVars() if x in vs]

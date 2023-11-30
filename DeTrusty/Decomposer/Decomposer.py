@@ -37,7 +37,7 @@ class Decomposer(object):
         proj_vars = []
         for arg in self.query.args:
             proj_vars.extend(arg.getVars())
-        proj_vars = set(proj_vars)
+        proj_vars = set(proj_vars) - {'*'}  # remove * to allow COUNT(*)
         body_vars = set(self.query.body.getVars())
         if proj_vars - body_vars:
             raise Exception('The following variables have been defined in the SELECT clause but not in the body: '

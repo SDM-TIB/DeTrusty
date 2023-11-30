@@ -1442,7 +1442,7 @@ def p_aggregate_0(p):
     """
     aggregate : COUNT LPAR distinct ALL RPAR
     """
-    p[0] = Aggregate(Argument('?ALL', False), p[3], p[1])
+    p[0] = Aggregate(Argument('*', False), p[3], p[1])
 
 
 def p_aggregate_1(p):
