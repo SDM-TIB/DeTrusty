@@ -2,6 +2,7 @@ __author__ = "Philipp D. Rohde"
 
 import multiprocessing
 import time
+import warnings
 from multiprocessing import Queue
 
 from DeTrusty.Decomposer import Decomposer, Planner
@@ -12,7 +13,7 @@ from DeTrusty.utils import is_url, get_query_string
 
 def run_query(query: str,
               decomposition_type: str = "STAR",
-              sparql_one_dot_one: bool = False,
+              sparql_one_dot_one: bool = None,
               config: Config = get_config('./Config/rdfmts.json'),
               join_stars_locally: bool = True,
               print_result: bool = True,
@@ -35,9 +36,8 @@ def run_query(query: str,
         and 'TRIPLE' for a triple-wise decomposition, i.e., each triple pattern of the query
         produces a sub-query. Default is 'STAR'.
     sparql_one_dot_one : bool, optional
-        Indicates whether the query includes the SERVICE clause.
-        'True' meaning the SERVICE clause is present in the query, 'False' otherwise.
-        Default is 'False'.
+        .. deprecated:: 0.15.0
+            No longer needed. DeTrusty is using one parser now.
     config : DeTrusty.Molecule.MTManager.Config, optional
         The configuration holding the metadata about the federation over which the
         SPARQL query should be executed. If no value is specified, DeTrusty will
@@ -76,11 +76,16 @@ def run_query(query: str,
     >>> run_query('http://example.com/queries/query.rq', config=config)
 
     """
+    if sparql_one_dot_one is not None:
+        warnings.warn(
+            'The sparql_one_dot_one parameter is deprecated. DeTrusty is using only one parser now.',
+            DeprecationWarning, 2
+        )
+
     start_time = time.time()
     decomposer = Decomposer(get_query_string(query), config,
                             decompType=decomposition_type,
-                            joinstarslocally=join_stars_locally,
-                            sparql_one_dot_one=sparql_one_dot_one)
+                            joinstarslocally=join_stars_locally)
     decomposed_query = decomposer.decompose()
 
     if decomposed_query is None:

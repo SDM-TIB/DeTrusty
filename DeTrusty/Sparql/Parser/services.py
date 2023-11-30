@@ -165,7 +165,7 @@ class Service(object):
 class Query(object):
 
     def __init__(self, prefs, args, body, distinct, group_by=None, order_by=None, limit=-1, offset=-1, having=None,
-                 filter_nested='', extra_vars=None):
+                 filter_nested='', extra_vars=None, service=False):
         self.prefs = prefs
         self.args = args
         self.body = body
@@ -180,6 +180,7 @@ class Query(object):
         self.extra_vars = extra_vars if extra_vars is not None else []
         genPred = []  # readGeneralPredicates('ontario/common/parser/generalPredicates')
         self.body.setGeneral(getPrefs(self.prefs), genPred)
+        self.service = service
 
     def __repr__(self):
         body_str = str(self.body)

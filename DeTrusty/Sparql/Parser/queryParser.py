@@ -92,9 +92,7 @@ reserved = {
     'BNODE': 'BNODE'
 }
 
-
 tokens = [
-    # "RDFTYPE",
     "CONSTANT",
     "URI",
     "NUMBER",
@@ -105,6 +103,7 @@ tokens = [
     "SEMICOLON",
     "POINT",
     "COMA",
+    "ALL",
     "LPAR",
     "RPAR",
     "ID",
@@ -118,7 +117,6 @@ tokens = [
     "NEG",
     "AND",
     "OR",
-    "ALL",
     "PLUS",
     "MINUS",
     "DIV",
@@ -141,19 +139,16 @@ tokens = [
     "UNSIGNEDSHORT",
     "UNSIGNEDBYTE",
     "POSITIVEINT"
-    ] + list(reserved.values())
-
-# t_RDFTYPE = r"a"
+] + list(reserved.values())
 
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9\-]*'
-    # print t
-    t.type = reserved.get(t.value.upper(), 'ID')    # Check for reserved words
+    t.type = reserved.get(t.value.upper(), 'ID')  # Check for reserved words
     return t
 
 
-t_CONSTANT = r"(\"|\')[^\"\'\n\r]*(\"|\')((@[a-z][a-z]) | (\^\^[<](https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|][>]))?" # [<]http[://]+www[.]w3[.]org[/]2001[/]XMLSchema[#]\w+
+t_CONSTANT = r"(\"|\')[^\"\'\n\r]*(\"|\')((@[a-z][a-z]) | (\^\^[<](https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|][>]))?"  # [<]http[://]+www[.]w3[.]org[/]2001[/]XMLSchema[#]\w+
 t_URI = r"<\S+>"
 t_NUMBER = r"([0-9])+"
 t_VARIABLE = r"([\?]|[\$])([A-Z]|[a-z])\w*"
@@ -162,28 +157,22 @@ t_LPAR = r"\("
 t_RPAR = r"\)"
 t_COLON = r"\:"
 t_SEMICOLON = r";"
-# t_RDFTYPE = r"a"
-# t_RKEY = r"(\.)?\}"
+t_ALL = r"[*]"
 t_RKEY = r"(\.)?\s*\}"
 t_POINT = r"\."
 t_COMA = r"\,"
-
 t_EQUALS = r"="
 t_NEQUALS = r"\!="
 t_LESS = r"<"
 t_LESSEQ = r"<="
 t_GREATER = r">"
 t_GREATEREQ = r">="
-t_NEG  =  r"\!"
+t_NEG = r"\!"
 t_AND = r"\&\&"
 t_OR = r"\|\|"
-# t_NIL =
-
-t_ALL = r"[*]"
 t_PLUS = r"\+"
 t_MINUS = r"\-"
 t_DIV = r"/"
-
 t_DOUBLE = r"xsd\:double"
 t_INTEGER = r"xsd\:integer"
 t_DECIMAL = r"xsd\:decimal"
@@ -203,14 +192,15 @@ t_UNSIGNEDINT = r"xsd\:unsignedInt"
 t_UNSIGNEDSHORT = r"xsd\:unsignedShort"
 t_UNSIGNEDBYTE = r"xsd\:unsignedByte"
 t_POSITIVEINT = r"xsd\:positiveInteger"
-
 t_ignore = ' \t\n'
 
 xsd = "http://www.w3.org/2001/XMLSchema#"
 
+has_service = False
+
 
 def t_error(t):
-    raise TypeError("Unknown text '%s' in line %d " % (t.value, t.lexer.lineno, ))
+    raise TypeError("Unknown text '%s' in line %d " % (t.value, t.lexer.lineno,))
 
 
 # Define a rule so we can track line numbers
@@ -223,14 +213,12 @@ lexer = lex.lex()
 
 
 # Parser
-
-
 def p_parse_sparql_0(p):
     """
     parse_sparql : prefix_list query group_by having_clause order_by limit offset
     """
     (vs, ts, d) = p[2]
-    p[0] = Query(prefs=p[1], args=vs, body=ts, distinct=d, group_by=p[3], order_by=p[5], limit=p[6], offset=p[7], having=p[4])
+    p[0] = Query(prefs=p[1], args=vs, body=ts, distinct=d, group_by=p[3], order_by=p[5], limit=p[6], offset=p[7], having=p[4], service=has_service)
 
 
 def p_parse_sparql_1(p):
@@ -311,6 +299,7 @@ def p_uri_5(p):
     """
     p[0] = p[1] + p[2] + p[3]
 
+
 ########################################################################
 
 # REDUCED not yet implemented, necessary?
@@ -343,14 +332,14 @@ def p_distinct_1(p):
     p[0] = False
 
 
-def p_single_var_list_0(p): 
+def p_single_var_list_0(p):
     """
     var_list : VARIABLE
     """
     p[0] = [Argument(p[1], False)]
 
 
-def p_single_var_list_1(p): 
+def p_single_var_list_1(p):
     """
     var_list : LPAR expression AS VARIABLE RPAR
     """
@@ -360,14 +349,14 @@ def p_single_var_list_1(p):
 
 def p_var_list_0(p):
     """
-    var_list : VARIABLE var_list 
+    var_list : VARIABLE var_list
     """
     p[0] = [Argument(p[1], False)] + p[2]
 
 
 def p_var_list_1(p):
     """
-    var_list : LPAR expression AS VARIABLE RPAR var_list 
+    var_list : LPAR expression AS VARIABLE RPAR var_list
     """
     p[2].alias = p[4]
     p[0] = [p[2]] + p[6]
@@ -387,14 +376,14 @@ def p_group_by_1(p):
     p[0] = []
 
 
-def p_group_var_0(p):                          
+def p_group_var_0(p):
     """
     group_var : VARIABLE
     """
     p[0] = Argument(p[1], False)
 
 
-def p_group_var_1(p):                          
+def p_group_var_1(p):
     """
     group_var : LPAR VARIABLE AS VARIABLE RPAR
     """
@@ -431,7 +420,7 @@ def p_order_by_1(p):
 
 def p_order_by_condition_0(p):
     """
-    order_by_condition : ASC constraint order_by_list 
+    order_by_condition : ASC constraint order_by_list
     """
     p[0] = [Argument(p[2], desc=False)] + p[3]
 
@@ -441,7 +430,7 @@ def p_order_by_condition_1(p):
     order_by_condition : DESC constraint order_by_list
     """
     p[0] = [Argument(p[2], desc=True)] + p[3]
-    
+
 
 def p_order_by_condition_2(p):
     """
@@ -492,14 +481,14 @@ def p_order_by_list_1(p):
 
 def p_constraint_0(p):
     """
-    constraint : bracketted_expression 
+    constraint : bracketted_expression
     """
     p[0] = p[1]
 
 
 def p_constraint_1(p):
     """
-    constraint : built_in_call 
+    constraint : built_in_call
     """
     p[0] = p[1]
 
@@ -669,6 +658,8 @@ def p_service(p):
     """
     service : SERVICE uri LKEY group_graph_pattern_service RKEY
     """
+    global has_service
+    has_service = True
     p[0] = Service(p[2], p[4])
 
 
@@ -741,161 +732,6 @@ def p_rest_join_block_service_2(p):
     p[0] = [p[1]] + p[2]
 
 
-def p_bgp_0(p):
-    """
-    bgp :  LKEY bgp UNION bgp rest_union_block RKEY
-    """
-    ggp = [JoinBlock([p[2]])] + [JoinBlock([p[4]])] + p[5]
-    p[0] = UnionBlock(ggp)
-
-
-def p_bgp_01(p):
-    """
-    bgp : bgp UNION bgp rest_union_block
-    """
-    ggp = [JoinBlock([p[1]])] + [JoinBlock([p[3]])] + p[4]
-    p[0] = UnionBlock(ggp)
-
-
-def p_bgp_1(p):
-    """
-    bgp : triple
-    """
-    p[0] = p[1]
-
-# Filter ::=  'FILTER' Constraint (doesn't include FunctionCall yet)
-def p_bgp_2(p):
-    """
-    bgp : FILTER LPAR expression RPAR
-    """
-    p[0] = Filter(p[3])
-
-
-def p_bgp_3(p):
-    """
-    bgp : FILTER relational_expression
-    """
-    p[0] = Filter(p[2])
-
-
-def p_bgp_4(p):
-    """
-    bgp : OPTIONAL LKEY group_graph_pattern RKEY
-    """
-    p[0] = Optional(p[3])
-
-
-#def p_bgp_5(p):
-#    """
-#    bgp : LKEY join_block rest_union_block RKEY
-#    """
-#    bgp_arg = p[2] + p[3]
-#    p[0] = UnionBlock(JoinBlock(bgp_arg))
-
-
-def p_bgp_6(p):
-    """
-    bgp : LKEY join_block RKEY
-    """
-    if len(p[2]) == 1:
-        p[0] = p[2][0]
-    else:
-        p[0] = JoinBlock(p[2])
-
-
-#####################################################################
-# TODO: throw unmatched variable length exception like in Virtuoso 
-
-
-def p_bgp_7(p):
-    """
-    bgp : VALUES VARIABLE LKEY data_block_value RKEY
-    """
-    p[0] = Values([Argument(p[2])], p[4])
-
-
-def p_bgp_8(p):
-    """
-    bgp : VALUES LPAR value_vars RPAR LKEY data_block_multiple_value RKEY
-    """
-    p[0] = Values(p[3], p[6])
-
-
-def p_value_vars_0(p):
-    """
-    value_vars : empty
-    """
-    p[0] = []
-
-
-def p_value_vars_1(p):
-    """
-    value_vars : VARIABLE value_vars
-    """
-    p[0] = [Argument(p[1])] + p[2]
-
-
-def p_data_block_value_0(p):
-    """
-    data_block_value : empty
-    """
-    p[0] = []
-
-
-def p_data_block_value_1(p):
-    """
-    data_block_value : rdf_literal data_block_value 
-                     | numeric_literal data_block_value 
-                     | boolean_literal data_block_value 
-    """
-    p[0] = [p[1]] + p[2]
-
-
-def p_data_block_value_2(p):
-    """
-    data_block_value : UNDEF data_block_value
-                     | uri data_block_value
-    """
-    p[0] = [Argument(p[1])] + p[2]
-
-
-def p_data_block_multiple_value_0(p):
-    """
-    data_block_multiple_value : empty
-    """
-    p[0] = []
-
-
-def p_data_block_multiple_value_1(p):
-    """
-    data_block_multiple_value : LPAR data_block_value RPAR data_block_multiple_value
-    """
-    p[0] = [p[2]] + p[4]
-
-#####################################################################
-
-
-def p_bgp_9(p):
-    """
-    bgp : BIND LPAR expression AS VARIABLE RPAR
-    """
-    p[0] = Bind(p[3], p[5])
-
-
-def p_bgp_10(p):
-    """
-    bgp : service
-    """
-    p[0] = ([p[1]], [])
-
-
-def p_bgp_11(p):
-    """
-    bgp : LKEY service RKEY
-    """
-    p[0] = ([p[2]], [])
-
-
 def p_bgp_service_01(p):
     """
     bgp_service :  LKEY join_block_service UNION join_block_service rest_union_block_service RKEY
@@ -948,10 +784,165 @@ def p_bgp_service_5(p):
     p[0] = UnionBlock(JoinBlock(bgp_arg))
 
 
+def p_bgp_0(p):
+    """
+    bgp : LKEY bgp UNION bgp rest_union_block RKEY
+    """
+    ggp = [JoinBlock([p[2]])] + [JoinBlock([p[4]])] + p[5]
+    p[0] = UnionBlock(ggp)
+
+
+def p_bgp_01(p):
+    """
+    bgp : bgp UNION bgp rest_union_block
+    """
+    ggp = [JoinBlock([p[1]])] + [JoinBlock([p[3]])] + p[4]
+    p[0] = UnionBlock(ggp)
+
+
+def p_bgp_1(p):
+    """
+    bgp : triple
+    """
+    p[0] = p[1]
+
+
+# Filter ::=  'FILTER' Constraint (doesn't include FunctionCall yet)
+def p_bgp_2(p):
+    """
+    bgp : FILTER LPAR expression RPAR
+    """
+    p[0] = Filter(p[3])
+
+
+def p_bgp_3(p):
+    """
+    bgp : FILTER relational_expression
+    """
+    p[0] = Filter(p[2])
+
+
+def p_bgp_4(p):
+    """
+    bgp : OPTIONAL LKEY group_graph_pattern RKEY
+    """
+    p[0] = Optional(p[3])
+
+
+def p_bgp_6(p):
+    """
+    bgp : LKEY join_block RKEY
+    """
+    if len(p[2]) == 1:
+        p[0] = p[2][0]
+    else:
+        p[0] = JoinBlock(p[2])
+
+
+#####################################################################
+# TODO: throw unmatched variable length exception like in Virtuoso
+
+
+def p_bgp_7(p):
+    """
+    bgp : VALUES VARIABLE LKEY data_block_value RKEY
+    """
+    p[0] = Values([Argument(p[2])], p[4])
+
+
+def p_bgp_8(p):
+    """
+    bgp : VALUES LPAR value_vars RPAR LKEY data_block_multiple_value RKEY
+    """
+    p[0] = Values(p[3], p[6])
+
+
+def p_value_vars_0(p):
+    """
+    value_vars : empty
+    """
+    p[0] = []
+
+
+def p_value_vars_1(p):
+    """
+    value_vars : VARIABLE value_vars
+    """
+    p[0] = [Argument(p[1])] + p[2]
+
+
+def p_data_block_value_0(p):
+    """
+    data_block_value : empty
+    """
+    p[0] = []
+
+
+def p_data_block_value_1(p):
+    """
+    data_block_value : rdf_literal data_block_value
+                     | numeric_literal data_block_value
+                     | boolean_literal data_block_value
+    """
+    p[0] = [p[1]] + p[2]
+
+
+def p_data_block_value_2(p):
+    """
+    data_block_value : UNDEF data_block_value
+                     | uri data_block_value
+    """
+    p[0] = [Argument(p[1])] + p[2]
+
+
+def p_data_block_multiple_value_0(p):
+    """
+    data_block_multiple_value : empty
+    """
+    p[0] = []
+
+
+def p_data_block_multiple_value_1(p):
+    """
+    data_block_multiple_value : LPAR data_block_value RPAR data_block_multiple_value
+    """
+    p[0] = [p[2]] + p[4]
+
+
+#####################################################################
+
+
+def p_bgp_9(p):
+    """
+    bgp : BIND LPAR expression AS VARIABLE RPAR
+    """
+    p[0] = Bind(p[3], p[5])
+
+
+def p_bgp_10(p):
+    """
+    bgp : service
+    """
+    p[0] = p[1]
+
+
+def p_bgp_11(p):
+    """
+    bgp : LKEY service RKEY
+    """
+    p[0] = p[2]
+
+
+def p_triple_0(p):
+    """
+    triple : subject predicate object
+    """
+    p[0] = Triple(p[1], p[2], p[3])
+
+
 #############################################################################
 # TODO: Test and adjust                                                     #
 #############################################################################
-
 
 def p_expression(p):
     """
@@ -1060,7 +1051,7 @@ def p_relational_expression_6(p):
     """
     relational_expression : numeric_expression IN expression_list
     """
-    p[0] = Expression(p[2], p[1], p[3], 'relational') 
+    p[0] = Expression(p[2], p[1], p[3], 'relational')
 
 
 def p_relational_expression_7(p):
@@ -1259,7 +1250,7 @@ def p_iri_or_function_2(p):
 # TODO: supposed to be URI and not constrained to the type_casting
 def p_type_casting_0(p):
     """
-    type_casting : DOUBLE 
+    type_casting : DOUBLE
                   | INTEGER
                   | DECIMAL
                   | FLOAT
@@ -1289,9 +1280,10 @@ def p_rdf_literal(p):
     """
     c = p[1].strip()
     if "@" in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype='<' + xsd + "string" + '>', lang=c[c.rfind("@")+1:], gen_type='typed-literal')
+        p[0] = Argument(c[:c.find("^")], True, datatype='<' + xsd + "string" + '>', lang=c[c.rfind("@") + 1:],
+                        gen_type='typed-literal')
     elif xsd in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^")+1:], gen_type='typed-literal')
+        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^") + 1:], gen_type='typed-literal')
     else:
         p[0] = Argument(p[1], True)
 
@@ -1512,13 +1504,6 @@ def p_aggregate_8(p):
 ##################################################################
 
 
-def p_triple_0(p):
-    """
-    triple : subject predicate object
-    """
-    p[0] = Triple(p[1], p[2], p[3])
-
-
 def p_predicate_rdftype(p):
     """
     predicate : ID
@@ -1580,9 +1565,9 @@ def p_object_constant(p):
     c = p[1].strip()
     p[0] = Argument(p[1], True)
     if xsd in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^")+1:])
+        p[0] = Argument(c[:c.find("^")], True, datatype=c[c.rfind("^") + 1:])
     if "@" in p[1]:
-        p[0] = Argument(c[:c.find("^")], True, datatype="<" + xsd + "string>", lang=c[c.rfind("@")+1:])
+        p[0] = Argument(c[:c.find("^")], True, datatype="<" + xsd + "string>", lang=c[c.rfind("@") + 1:])
 
 
 def p_error(p):

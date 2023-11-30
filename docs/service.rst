@@ -202,11 +202,3 @@ Example result:
 * ``result`` is a list of dictionaries containing the results of the query, using the variables as keys;
   metadata about the result verification is included in the key ``__meta__``.
   The current version returns all results as verified as can be seen in the key ``is_verified`` of the metadata.
-
-.. NOTE::
-
-   When posting a SPARQL 1.1 query with the SERVICE clause, you need to set the ``sparql1_1`` flag as shown below.
-
-   .. code:: bash
-
-      curl -X POST -d "sparql1_1=True" -d "query=SELECT DISTINCT ?covidDrug WHERE { SERVICE <https://labs.tib.eu/sdm/covid19kg/sparql> { ?treatment <http://research.tib.eu/covid-19/vocab/hasCovidDrug> ?covidDrug . }} LIMIT 3" localhost:5000/sparql

@@ -6,6 +6,7 @@ from functools import partial
 
 from DeTrusty.Decomposer import Tree, utils
 from DeTrusty.Logger import get_logger
+from DeTrusty.Sparql.Parser import queryParser
 from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument
 
 logger = get_logger(__name__, '.decompositions.log')
@@ -13,15 +14,9 @@ logger = get_logger(__name__, '.decompositions.log')
 
 class Decomposer(object):
 
-    def __init__(self, query, config, decompType="STAR", joinstarslocally=True, sparql_one_dot_one=False):
+    def __init__(self, query, config, decompType="STAR", joinstarslocally=True):
         self.decomposition_type = DecompositionType[decompType]
-        self.sparql_one_dot_one = sparql_one_dot_one
-        if not self.sparql_one_dot_one:
-            from DeTrusty.Sparql.Parser import queryParser
-            self.query = queryParser.parse(query)
-        else:
-            from DeTrusty.Sparql.Parser import queryParser1_1
-            self.query = queryParser1_1.parse(query)
+        self.query = queryParser.parse(query)
         if self.query:
             self.prefixes = utils.getPrefs(self.query.prefs)
         else:
@@ -31,11 +26,10 @@ class Decomposer(object):
         self.alltriplepatterns = []
 
     def decompose(self):
-
         if not self.query:
             return None
 
-        self.query.body = self.decomposeUnionBlock(self.query.body) if not self.sparql_one_dot_one else self.query.body
+        self.query.body = self.decomposeUnionBlock(self.query.body) if not self.query.service else self.query.body
 
         if not self.query.body:
             return None
@@ -48,9 +42,6 @@ class Decomposer(object):
         if proj_vars - body_vars:
             raise Exception('The following variables have been defined in the SELECT clause but not in the body: '
                             + str(proj_vars - body_vars))
-
-        if self.query.order_by == -1:  # TODO: can be deleted after merging parser
-            self.query.order_by = []
 
         order_by_vars = []
         for arg in self.query.order_by:
