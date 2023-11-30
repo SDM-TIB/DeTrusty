@@ -1,7 +1,6 @@
 __author__ = "Philipp D. Rohde"
 
 import os
-import re
 from distutils.util import strtobool
 
 from flask import Flask, Response, request, jsonify, render_template
@@ -20,8 +19,6 @@ app.config['JSON_AS_ASCII'] = False
 app.config['CONFIG'] = ConfigFile('/DeTrusty/Config/rdfmts.json')
 app.config['JOIN_STARS_LOCALLY'] = bool(strtobool(os.environ.get('JOIN_STARS_LOCALLY', 'True')))
 
-re_service = re.compile(r".*[^:][Ss][Ee][Rr][Vv][Ii][Cc][Ee]\s*<.+>\s*{.*", flags=re.DOTALL)
-
 
 @app.route('/version', methods=['POST'])
 def version():
@@ -36,18 +33,13 @@ def sparql():
         query = request.values.get("query", None)
         if query is None:
             return jsonify({"result": [], "error": "No query passed."})
-        sparql1_1 = request.values.get("sparql1_1", False)
         decomposition_type = request.values.get("decomp", "STAR")
         yasqe = request.values.get("yasqe", False)
-
-        if yasqe and re_service.match(query):
-            sparql1_1 = True
 
         return jsonify(
             run_query(
                 query=query,
                 decomposition_type=decomposition_type,
-                sparql_one_dot_one=sparql1_1,
                 config=app.config['CONFIG'],
                 join_stars_locally=app.config['JOIN_STARS_LOCALLY'],
                 yasqe=yasqe
