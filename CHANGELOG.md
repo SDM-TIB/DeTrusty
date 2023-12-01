@@ -1,3 +1,10 @@
+# v0.15.0 - 01 Dec 2023
+- Merge parsers
+  - DeTrusty uses only one parser now, hence,
+  - Deprecate sparql_one_dot_one parameter or run_query()
+- Add support for parsing SPARQL queries with comments
+- Fix issue with COUNT(*)
+
 # v0.14.0 - 28 Nov 2023
 - Add complex expressions
 - Update return format to match with the SPARQL specification, i.e., include type and datatype, not just the value
