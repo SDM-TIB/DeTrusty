@@ -193,7 +193,6 @@ t_UNSIGNEDSHORT = r"xsd\:unsignedShort"
 t_UNSIGNEDBYTE = r"xsd\:unsignedByte"
 t_POSITIVEINT = r"xsd\:positiveInteger"
 t_ignore = ' \t\n'
-t_ignore_comment = r'[ ]*\#.*'
 
 xsd = "http://www.w3.org/2001/XMLSchema#"
 
@@ -209,6 +208,18 @@ def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
+
+def t_COMMENT(t):
+    # r'[ ]*\#.*'
+    r'(\s*\#.*)|(\.[\s\n]*\#.*\n[\s\n]*\})'
+    if (t.value[0] == '.') and (t.value[-1] == '}'):
+        # Special case when comment in last line before a '}' and the line is terminated with '.'
+        t.value = '}'
+        t.type = 'RKEY'
+        return t
+        pass
+    else:
+        pass
 
 lexer = lex.lex()
 

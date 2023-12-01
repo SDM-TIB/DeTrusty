@@ -40,9 +40,6 @@ Please, let us know if we missed something.
 * Built-in functions, e.g., ``isIRI``, ``STRLEN``, ``abs``, ``floor``, ``now``, ``month``, ``MD5``
 * Specifying RDF datasets using ``FROM``, ``FROM NAMES``, or ``GRAPH``
 
-Known issues:
-- Query parser throws an error if the last line before a ``}`` includes a comment
-
 .. toctree::
    :hidden:
 
