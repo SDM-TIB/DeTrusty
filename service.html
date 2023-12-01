@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Service &mdash; DeTrusty 0.14.0 documentation</title>
+  <title>DeTrusty as a Service &mdash; DeTrusty 0.15.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -34,7 +34,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.14.0
+                0.15.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -266,13 +266,6 @@ The base URL in this example is <a class="reference external" href="localhost:50
 metadata about the result verification is included in the key <code class="docutils literal notranslate"><span class="pre">__meta__</span></code>.
 The current version returns all results as verified as can be seen in the key <code class="docutils literal notranslate"><span class="pre">is_verified</span></code> of the metadata.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When posting a SPARQL 1.1 query with the SERVICE clause, you need to set the <code class="docutils literal notranslate"><span class="pre">sparql1_1</span></code> flag as shown below.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;sparql1_1=True&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?covidDrug WHERE { SERVICE &lt;https://labs.tib.eu/sdm/covid19kg/sparql&gt; { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . }} LIMIT 3&quot;</span><span class="w"> </span>localhost:5000/sparql
-</pre></div>
-</div>
-</div>
 </section>
 </section>
 </section>
