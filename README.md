@@ -29,6 +29,9 @@ This list might not be exhaustive. Please, let us know if we missed something.
 
 If you want to know more, check out the [documentation](https://sdm-tib.github.io/DeTrusty/).
 
+Known issues:
+- Query parser throws an error if the last line before a `}` includes a comment
+
 ## Running DeTrusty
 You can use DeTrusty as a Python3 library or a Web-based service using Docker.
 The documentation includes detailed examples and explanations for both scenarios.

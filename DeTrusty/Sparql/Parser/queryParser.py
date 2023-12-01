@@ -193,6 +193,7 @@ t_UNSIGNEDSHORT = r"xsd\:unsignedShort"
 t_UNSIGNEDBYTE = r"xsd\:unsignedByte"
 t_POSITIVEINT = r"xsd\:positiveInteger"
 t_ignore = ' \t\n'
+t_ignore_comment = r'[ ]*\#.*'
 
 xsd = "http://www.w3.org/2001/XMLSchema#"
 
