@@ -356,8 +356,9 @@ def _get_results_iter(query: str, endpoint: Endpoint, limit: int = -1, max_tries
         if card > 0:
             res = res_queue.get()
             while res != 'EOF':
-                res_list.append(res)
-                res = res_queue.get()
+                if res['type'] == 'uri':
+                    res_list.append(res['value'])
+                    res = res_queue.get()
 
         # stop if all results are retrieved or the maximum number of tries is reached
         if card < limit or (0 < max_answers <= len(res_list)) or num_requests == max_tries:
