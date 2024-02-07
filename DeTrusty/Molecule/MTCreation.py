@@ -245,8 +245,8 @@ def _get_typed_concepts(endpoint):
     else:
         query += 'a'
     query += ' ?t . }'
-    res_list, _ = _get_results_iter(query, endpoint)
-    return [r['t'] for r in res_list if True not in [m in str(r['t']) for m in metas]]
+    res_list, _ = _get_results_iter(query, endpoint, 't')
+    return [r for r in res_list if True not in [m in str(r) for m in metas]]
 
 
 def _get_predicates(endpoint, type_):
@@ -256,8 +256,7 @@ def _get_predicates(endpoint, type_):
     else:
         query += 'a'
     query += ' <' + type_ + '> . ?s ?p ?pt . }'
-    res_list, status = _get_results_iter(query, endpoint)
-    res_list = [r['p'] for r in res_list]
+    res_list, status = _get_results_iter(query, endpoint, 'p')
 
     if status == -1:  # fallback - get predicates from randomly selected instances of the type
         logger.warn('giving up on ' + query)
@@ -277,24 +276,24 @@ def _get_predicates_of_random_instances(endpoint, type_):
     else:
         query += 'a'
     query += ' <' + type_ + '> . }'
-    res_list, _ = _get_results_iter(query, endpoint, limit=100, max_tries=100, max_answers=100)
+    res_list, _ = _get_results_iter(query, endpoint, 's', limit=100, max_tries=100, max_answers=100)
     results = []
     batches = [res_list[i:i+10] for i in range(0, len(res_list), 10)]
     for batch in batches:
-        batch = ['<' + r['s'] + '>' for r in batch]
+        batch = ['<' + r + '>' for r in batch]
         query = 'SELECT DISTINCT ?p WHERE {\n' \
                 '  VALUES ?s { ' + ' '.join(batch) + ' }\n' \
                 '  ?s ?p ?pt\n}'
-        res_list_batch, _ = _get_results_iter(query, endpoint)
-        results.extend([r['p'] for r in res_list_batch])
+        res_list_batch, _ = _get_results_iter(query, endpoint, 'p')
+        results.extend([r for r in res_list_batch])
     return list(set(results))
 
 
 def _get_predicate_range(endpoint, type_, predicate):
     # first, get the range using rdfs:range
     query = 'SELECT DISTINCT ?range WHERE { <' + predicate + '> <http://www.w3.org/2000/01/rdf-schema#range> ?range . }'
-    res_list, _ = _get_results_iter(query, endpoint)
-    ranges = [r['range'] for r in res_list if True not in [m in str(r['range']) for m in metas]]
+    res_list, _ = _get_results_iter(query, endpoint, 'range')
+    ranges = [r for r in res_list if True not in [m in str(r) for m in metas]]
 
     # second, get range from instances
     query = 'SELECT DISTINCT ?range WHERE {\n' \
@@ -306,8 +305,8 @@ def _get_predicate_range(endpoint, type_, predicate):
     query += ' <' + type_ + '> .\n' \
              '  ?s <' + predicate + '> ?pt .\n' \
              '  ?pt a ?range .\n}'
-    res_list, _ = _get_results_iter(query, endpoint)
-    ranges.extend([r['range'] for r in res_list if True not in [m in str(r['range']) for m in metas]])
+    res_list, _ = _get_results_iter(query, endpoint, 'range')
+    ranges.extend([r for r in res_list if True not in [m in str(r) for m in metas]])
 
     return list(set(ranges))
 
@@ -329,7 +328,8 @@ def _accessible_endpoints(endpoints):
     return accessible_endpoints
 
 
-def _get_results_iter(query: str, endpoint: Endpoint, limit: int = -1, max_tries: int = -1, max_answers: int = -1):
+def _get_results_iter(query: str, endpoint: Endpoint, return_variable: str, limit: int = -1,
+                      max_tries: int = -1, max_answers: int = -1):
     offset = 0
     res_list = []
     status = 0
@@ -356,8 +356,8 @@ def _get_results_iter(query: str, endpoint: Endpoint, limit: int = -1, max_tries
         if card > 0:
             res = res_queue.get()
             while res != 'EOF':
-                if res['type'] == 'uri':
-                    res_list.append(res['value'])
+                if res[return_variable]['type'] == 'uri':
+                    res_list.append(res[return_variable]['value'])
                     res = res_queue.get()
 
         # stop if all results are retrieved or the maximum number of tries is reached
@@ -396,8 +396,7 @@ def _get_external_links(endpoint1, root_type, predicate, endpoint2, rdfmt2):
     else:
         query += 'a'
     query += ' <' + root_type + '> ; <' + predicate + '> ?o . FILTER (isIRI(?o)) }'
-    e1_objects, _ = _get_results_iter(query, endpoint1, max_tries=100)
-    e1_objects = [obj['o'] for obj in e1_objects]
+    e1_objects, _ = _get_results_iter(query, endpoint1, 'o', max_tries=100)
     batches = [e1_objects[i:i + 45] for i in range(0, len(e1_objects), 45)]
     linked_to = set()
     for batch in batches:
@@ -412,8 +411,8 @@ def _get_external_links(endpoint1, root_type, predicate, endpoint2, rdfmt2):
             query += 'a'
         query += ' ?c .\n' \
                  '}'
-        res_list, _ = _get_results_iter(query, endpoint2, max_tries=10)
-        [linked_to.add(r['c']) for r in res_list]
+        res_list, _ = _get_results_iter(query, endpoint2, 'c', max_tries=10)
+        [linked_to.add(r) for r in res_list]
 
         if len(linked_to) == len(rdfmt2):
             break
