@@ -1,3 +1,6 @@
+# v0.15.1 - 07 Feb 2024
+- Fix query result format issue while creating the source descriptions 
+
 # v0.15.0 - 01 Dec 2023
 - Merge parsers
   - DeTrusty uses only one parser now, hence,
