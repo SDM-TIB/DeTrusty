@@ -1,3 +1,6 @@
+# v0.15.2 - 13 Feb 2024
+- Use StreamHandler for loggers if FileHandler cannot be established
+
 # v0.15.1 - 07 Feb 2024
 - Fix query result format issue while creating the source descriptions 
 
