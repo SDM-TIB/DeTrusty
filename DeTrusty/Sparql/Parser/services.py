@@ -184,14 +184,29 @@ class Query(object):
 
     def __repr__(self):
         body_str = str(self.body)
-        args_str = " ".join(map(str, self.args))
-        if self.args == []:
-            args_str = "*"
+        args_str = ' '.join(map(str, self.args))
+        if not self.args:
+            args_str = '*'
         if self.distinct:
-            d = "DISTINCT "
+            d = 'DISTINCT '
         else:
-            d = ""
-        return self.getPrefixes() + "SELECT " + d + args_str + "\nWHERE {" + body_str + "\n" + "\n" + self.filter_nested + "\n}"
+            d = ''
+        if self.filter_nested:
+            filter_nested = '\n' + self.filter_nested
+        else:
+            filter_nested = ''
+        query = self.getPrefixes() + 'SELECT ' + d + args_str + '\nWHERE {\n' + body_str + filter_nested + '\n}'
+        if self.group_by:
+            query += '\nGROUP BY ' + ' '.join([x.name for x in self.group_by])
+        if self.having:
+            query += '\nHAVING ' + str(self.having)
+        if self.order_by:
+            query += '\nORDER BY ' + ' '.join([x.name for x in self.order_by])
+        if int(self.limit) > -1:
+            query += '\nLIMIT ' + str(self.limit)
+        if int(self.offset) > -1:
+            query += '\nOFFSET ' + str(self.offset)
+        return query
 
     def variables(self):
         if not self.args:
@@ -1332,7 +1347,19 @@ class Aggregate(object):
             return list()
 
     def __repr__(self):
-        return '?' + self.getName()
+        if self.distinct:
+            d = ' DISTINCT '
+        else:
+            d = ''
+        if self.sep is not None:
+            s = ';seperator="' + str(self.sep) + '"'
+        else:
+            s = ''
+        if self.alias:
+            a = ' AS ' + self.alias
+        else:
+            a = ''
+        return self.op + '(' + d + str(self.exp) + s + ')' + a
 
     def __eq__(self, other):
         return self.exp == other.exp and self.distinct == other.distinct and self.op == other.op and self.sep == other.sep
