@@ -1,3 +1,7 @@
+# v0.15.3 - 04 Apr 2024
+- Complete the string representation of a query to also include GROUP BY, HAVING, ORDER BY, LIMIT, and OFFSET
+- Fix variable check for GROUP BY and ORDER BY
+
 # v0.15.2 - 13 Feb 2024
 - Use StreamHandler for loggers if FileHandler cannot be established
 
