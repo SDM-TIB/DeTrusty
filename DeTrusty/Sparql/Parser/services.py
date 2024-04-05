@@ -1319,7 +1319,7 @@ class Aggregate(object):
         self.name = name
 
     def getVars(self):
-        return self.exp.getVars()  # TODO: check whether Expression.getVars() correct or not
+        return [self.alias] if self.alias is not None else self.exp.getVars()  # TODO: check whether Expression.getVars() correct or not
     
     def getName(self):
         if self.alias:

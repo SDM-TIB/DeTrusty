@@ -7,7 +7,7 @@ from functools import partial
 from DeTrusty.Decomposer import Tree, utils
 from DeTrusty.Logger import get_logger
 from DeTrusty.Sparql.Parser import queryParser
-from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument
+from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument, Aggregate
 
 logger = get_logger(__name__, '.decompositions.log')
 
@@ -34,21 +34,16 @@ class Decomposer(object):
         if not self.query.body:
             return None
 
+        # Check if the variables used in the SELECT and GROUP BY clause are defined in the query body
         proj_vars = []
         for arg in self.query.args:
-            proj_vars.extend(arg.getVars())
+            if not isinstance(arg, Aggregate):
+                proj_vars.extend(arg.getVars())
         proj_vars = set(proj_vars) - {'*'}  # remove * to allow COUNT(*)
         body_vars = set(self.query.body.getVars())
         if proj_vars - body_vars:
             raise Exception('The following variables have been defined in the SELECT clause but not in the body: '
                             + str(proj_vars - body_vars))
-
-        order_by_vars = []
-        for arg in self.query.order_by:
-            order_by_vars.extend(arg.getVars())
-        if set(order_by_vars) - proj_vars:
-            raise Exception('The following variables have been defined in the ORDER BY clause but are not projected: '
-                            + str(set(order_by_vars) - proj_vars))
 
         group_by_vars = []
         for arg in self.query.group_by:
@@ -56,6 +51,21 @@ class Decomposer(object):
         if set(group_by_vars) - body_vars:
             raise Exception('The following variables have been defined in the GROUP BY clause but not in the body: '
                             + str(set(group_by_vars) - body_vars))
+
+        # Check if the variables used in the ORDER BY clause are projected
+        proj_vars = []
+        if not self.query.args:
+            proj_vars = set(self.query.body.getVars())
+        else:
+            for arg in self.query.args:
+                proj_vars.extend(arg.getVars())
+        proj_vars = set(proj_vars)
+        order_by_vars = []
+        for arg in self.query.order_by:
+            order_by_vars.extend(arg.getVars())
+        if set(order_by_vars) - proj_vars:
+            raise Exception('The following variables have been defined in the ORDER BY clause but are not projected: '
+                            + str(set(order_by_vars) - proj_vars))
 
         logger.info('Decomposition obtained')
         logger.info(self.query)
