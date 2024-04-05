@@ -1,4 +1,4 @@
-# v0.15.3 - 04 Apr 2024
+# v0.15.3 - 05 Apr 2024
 - Complete the string representation of a query to also include GROUP BY, HAVING, ORDER BY, LIMIT, and OFFSET
 - Fix variable check for GROUP BY and ORDER BY
 
