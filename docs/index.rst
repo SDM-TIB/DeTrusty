@@ -42,15 +42,22 @@ Please, let us know if we missed something.
 
 .. toctree::
    :hidden:
+   :caption: Preliminaries
 
    source_description
    decomposition
+
+.. toctree::
+   :hidden:
+   :caption: DeTrusty
+
    library
    service
 
 .. toctree::
    :hidden:
    :titlesonly:
+   :caption: Appendix
 
    contributors
    changelog
