@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 project = 'DeTrusty'
-copyright = '2020-2023, Philipp D. Rohde, Avellino and Mazen Bechara'
+copyright = '2020-2024, Philipp D. Rohde, Avellino and Mazen Bechara'
 author = 'Philipp D. Rohde, Avellino, Mazen Bechara'
 
 
