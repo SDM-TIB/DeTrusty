@@ -52,5 +52,6 @@ Please, let us know if we missed something.
    :hidden:
    :titlesonly:
 
+   contributors
    changelog
    reference
