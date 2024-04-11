@@ -151,6 +151,26 @@ class Config(object):
                         idx[pred].add(wrapper['url'])
         return idx
 
+    def get_molecules(self):
+        return list(self.metadata.keys())
+
+    def get_molecule_predicates(self, mol):
+        return [p['predicate'] for p in self.metadata[mol]['predicates']]
+
+    def get_molecule_links(self, mol):
+        return self.metadata[mol]['linkedTo']
+
+    def get_molecule_links_of_pred(self, mol, pred):
+        return [p['range'] for p in self.metadata[mol]['predicates'] if p['predicate'] == pred]
+
+    def get_molecule_endpoints(self, mol):
+        return [w['url'] for w in self.metadata[mol]['wrappers']]
+
+    def get_molecule_endpoint_preds(self, mol, endpoint):
+        for e in self.metadata[mol]['wrappers']:
+            if e['url'] == endpoint:
+                return e['predicates']
+
     def findbypreds(self, preds):
         res = []
         for p in preds:

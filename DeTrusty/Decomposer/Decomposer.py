@@ -225,7 +225,7 @@ class Decomposer(object):
             if len(typemols) > 0:
                 selectedmolecules[s] = typemols
                 for m in typemols:
-                    properties = [p['predicate'] for p in self.config.metadata[m]['predicates']]
+                    properties = self.config.get_molecule_predicates(m)
                     pinter = set(properties).intersection(preds)
                     if len(pinter) != len(preds):
                         print("Subquery: ", stars[s], "\nCannot be executed, because it contains properties that "
@@ -284,12 +284,12 @@ class Decomposer(object):
         qpl1 = []
         for s in res:
             if len(res[s]) == 1:
-                if len(self.config.metadata[res[s][0]]['wrappers']) == 1:
-                    endpoint = self.config.metadata[res[s][0]]['wrappers'][0]['url']
+                if len(self.config.get_molecule_endpoints(res[s][0])) == 1:
+                    endpoint = self.config.get_molecule_endpoints(res[s][0])[0]
                     qpl0.append(Service("<" + endpoint + ">", list(set(stars[s]))))
                 else:
-                    sources = [w['url'] for w in self.config.metadata[res[s][0]]['wrappers']
-                               if len(starpreds[s]) == len(list(set(starpreds[s]).intersection(set(w['predicates']))))]
+                    sources = [w for w in self.config.get_molecule_endpoints(res[s][0])
+                               if len(starpreds[s]) == len(list(set(starpreds[s]).intersection(set(self.config.get_molecule_endpoint_preds(res[s][0], w)))))]
                     # joins = [JoinBlock([Service("<" + url + ">", list(set(stars[s])))]) for url in sources]
                     # qpl1.append([UnionBlock([UnionBlock(joins)])])
                     if len(sources) == 1:
@@ -304,9 +304,9 @@ class Decomposer(object):
                         wpreds = {}
 
                         ptrs = {utils.getUri(tr.predicate, self.prefixes)[1:-1]: tr for tr in stars[s] if tr.predicate.constant}
-                        for w in self.config.metadata[res[s][0]]['wrappers']:
-                            wps = [p for p in w['predicates'] if p in starpreds[s]]
-                            wpreds[w['url']] = wps
+                        for w in self.config.get_molecule_endpoints(res[s][0]):  # w is the wrapper's URL
+                            wps = [p for p in self.config.get_molecule_endpoint_preds(res[s][0], w) if p in starpreds[s]]
+                            wpreds[w] = wps
 
                         inall = []
                         difs = {}
@@ -478,37 +478,36 @@ class Decomposer(object):
                 predtrips[p] = tr
                 preds.append(p)
         for x in res:
-            wrappers = self.config.metadata[x]
-            wrappers = [w for w in wrappers['wrappers']]
+            wrappers = self.config.get_molecule_endpoints(x)
             if len(wrappers) > 1:
-                for w in wrappers:
+                for w in wrappers:  # w is the wrapper's URL
                     exitsingpreds = []
                     for p in preds:
-                        if p in w['predicates']:
+                        if p in self.config.get_molecule_endpoint_preds(x, w):
                             exitsingpreds.append(predtrips[p])
                     if len(exitsingpreds) == 0:
                         continue
-                    urlmoleculemap[w['url']] = x
-                    if w['url'] not in sourceindex:
-                        sourceindex[w['url']] = exitsingpreds
+                    urlmoleculemap[w] = x
+                    if w not in sourceindex:
+                        sourceindex[w] = exitsingpreds
                     else:
-                        sourceindex[w['url']].extend(exitsingpreds)
-                        sourceindex[w['url']] = list(set(sourceindex[w['url']]))
+                        sourceindex[w].extend(exitsingpreds)
+                        sourceindex[w] = list(set(sourceindex[w]))
             else:
                 exitsingpreds = []
-                w = wrappers[0]
+                w = wrappers[0]  # w is the wrapper's URL
                 for p in preds:
-                    if p in w['predicates']:
+                    if p in self.config.get_molecule_endpoint_preds(x, w):
                         exitsingpreds.append(predtrips[p])
                 if len(exitsingpreds) == 0:
                     continue
 
-                urlmoleculemap[w['url']] = x
-                if w['url'] not in sourceindex:
-                    sourceindex[w['url']] = exitsingpreds
+                urlmoleculemap[w] = x
+                if w not in sourceindex:
+                    sourceindex[w] = exitsingpreds
                 else:
-                    sourceindex[w['url']].extend(exitsingpreds)
-                    sourceindex[w['url']] = list(set(sourceindex[w['url']]))
+                    sourceindex[w].extend(exitsingpreds)
+                    sourceindex[w] = list(set(sourceindex[w]))
 
         if len(sourceindex) == 1:
             return Service('<' + list(sourceindex.keys())[0] + '>', list(set(triplepatterns)))
@@ -569,7 +568,7 @@ class Decomposer(object):
         for s in selectedmolecules:
             mols = selectedmolecules[s]
             for m in mols:
-                mcons[m] = [n for n in self.config.metadata[m]['linkedTo'] if n in smolecules]
+                mcons[m] = [n for n in self.config.get_molecule_links(m) if n in smolecules]
         return mcons
 
     def pruneMTs(self, conn, molConn, selectedmolecules, stars):
@@ -603,8 +602,8 @@ class Decomposer(object):
                 connectingtp = list(set(connectingtp))
                 sm = selectedmolecules[s]
                 for m in sm:
-                    srange = [p for r in self.config.metadata[m]['predicates'] for p in r['range'] if
-                              r['predicate'] in connectingtp]
+                    srange = [p for r in self.config.get_molecule_predicates(m) for
+                              p in self.config.get_molecule_links_of_pred(m, r) if r in connectingtp]
                     filteredmols = [r for r in res[s] if r in srange]
                     if len(filteredmols) > 0:
                         if s in newfilteredonly:
@@ -627,7 +626,7 @@ class Decomposer(object):
         error = False
         for t in types:
             tt = utils.getUri(t.theobject, self.prefixes)[1:-1]
-            if tt in self.config.metadata:
+            if tt in self.config.get_molecules():
                 typemols.append(tt)
             else:
                 error = True
