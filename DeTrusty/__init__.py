@@ -9,6 +9,7 @@ from DeTrusty.Decomposer import Decomposer, Planner
 from DeTrusty.Molecule.MTManager import Config, get_config
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 from DeTrusty.utils import is_url, get_query_string
+from .__version__ import __version__
 
 
 def run_query(query: str,

@@ -1,8 +1,6 @@
 FROM python:3.11.6-slim-bullseye
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
-ENV VERSION="0.15.3"
-
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
 RUN python -m pip install --upgrade --no-cache-dir pip==23.1.* setuptools==67.8.* gunicorn==20.1.* && \

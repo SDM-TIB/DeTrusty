@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import setuptools
 
-with open("VERSION", "r", encoding="utf-8") as ver:
+with open("DeTrusty/__version__.py", "r", encoding="utf-8") as ver:
     version = ver.read()
+    version = version[version.find("'")+1:version.rfind("'")]
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
