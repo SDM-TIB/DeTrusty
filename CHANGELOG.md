@@ -1,3 +1,8 @@
+# v0.15.4 - 12 Apr 2024
+- Add more functions to the Config class in order to avoid direct access of its attributes
+- Move version information inside the package
+- Add favicon to pages served when running DeTrusty as a service
+
 # v0.15.3 - 05 Apr 2024
 - Complete the string representation of a query to also include GROUP BY, HAVING, ORDER BY, LIMIT, and OFFSET
 - Fix variable check for GROUP BY and ORDER BY
