@@ -6,6 +6,8 @@
 }
 .wy-menu-vertical p.caption {
     color: #228B22;
+    text-transform: unset !important;
+    font-size: 90% !important;
 }
 .sphx-glr-thumbcontainer {
     min-height: 250px !important;
