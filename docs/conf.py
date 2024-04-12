@@ -7,6 +7,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
+from DeTrusty import __version__
 
 
 # -- Project information -----------------------------------------------------
@@ -14,16 +15,8 @@ project = 'DeTrusty'
 copyright = '2020-2024, Philipp D. Rohde, Avellino and Mazen Bechara'
 author = 'Philipp D. Rohde, Avellino, Mazen Bechara'
 
-
-# The full version, including alpha/beta/rc tags
-def _get_version():
-    with open('../VERSION', 'r', encoding='utf8') as version_file:
-        version = version_file.read()
-    return version
-
-
-version = _get_version()
-release = version
+version = __version__
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
