@@ -8,7 +8,8 @@ RUN python -m pip install --upgrade --no-cache-dir pip==23.1.* setuptools==67.8.
 
 # copy the source code into the container
 COPY . /DeTrusty
-RUN cd /DeTrusty && python -m pip install -e . && mkdir -p Config
+RUN cd /DeTrusty && python -m pip install -e . && mkdir -p Config && \
+    ln -s /DeTrusty/images/icon.png /DeTrusty/DeTrusty/App/static/favicon.png
 WORKDIR /DeTrusty/DeTrusty
 
 # start the Flask app
