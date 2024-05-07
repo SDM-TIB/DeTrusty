@@ -1,3 +1,6 @@
+# v0.15.5 - 07 May 2024
+- Fix variables included in projected variables for aggregates with alias
+
 # v0.15.4 - 12 Apr 2024
 - Add more functions to the Config class in order to avoid direct access of its attributes
 - Move version information inside the package
