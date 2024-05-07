@@ -1,5 +1,7 @@
 import abc
 
+from DeTrusty.Sparql.Parser.services import Aggregate
+
 
 class Tree(object):
     __metaclass__ = abc.ABCMeta
@@ -229,7 +231,10 @@ class Leaf(Tree):
         else:
             projvars = []
             for arg in query.args:
-                projvars.extend(arg.getVars())
+                if isinstance(arg, Aggregate):
+                    projvars.extend(arg.exp.getVars())
+                else:
+                    projvars.extend(arg.getVars())
         subvars = list((query.join_vars | set(projvars)) & set(vs))
         vars_order_by = [x for v in query.order_by for x in v.getVars() if x in vs]
         vars_group_by = [x for v in query.group_by for x in v.getVars() if x in vs]
