@@ -212,7 +212,12 @@ class Query(object):
         if not self.args:
             return [var.replace('?', '') for var in set(self.body.getVars())]
         else:
-            return [str(arg).replace('?', '') for arg in self.args]
+            vars_ = []
+            for arg in self.args:
+                arg_vars = arg.getVars()
+                for arg_var in arg_vars:
+                    vars_.append(str(arg_var).replace('?', ''))
+            return vars_
 
     def instantiate(self, d):
         new_args = []
