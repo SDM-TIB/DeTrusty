@@ -55,7 +55,7 @@ def get_config(config_input: str | list[dict]):
             config = JSONConfig(read_file_from_internet(config_input, json_response=True))
             config.orig_file = config_input
             return config
-    return None
+    return Config()
 
 
 class Config(object):
