@@ -1,3 +1,6 @@
+# v0.15.6 - 08 May 2024
+- Fix variables in response header for queries with aggregates with alias
+
 # v0.15.5 - 07 May 2024
 - Fix variables included in projected variables for aggregates with alias
 
