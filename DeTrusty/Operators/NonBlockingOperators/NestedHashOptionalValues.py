@@ -40,7 +40,7 @@ class NestedHashOptionalValues(Optional):
         return NestedHashOptionalValues(newvars_left, newvars_right)
 
     def execute(self, left_queue, right_operator, out, processqueue=Queue()):
-        # print("execute NestedHashOptionalFilter")
+        # print("execute NestedHashOptionalValues")
         self.left_queue = left_queue
         self.right_operator = right_operator
         self.qresults = out
@@ -157,9 +157,9 @@ class NestedHashOptionalValues(Optional):
                     if record['type'] == 'uri':
                         combination.append('<' + record['value'] + '>')
                     elif record['type'] == 'typed-literal':
-                        combination.append(record['value'] + '^^<' + record['datatype'] + '>')
+                        combination.append('"' + record['value'] + '"^^<' + record['datatype'] + '>')
                     else:
-                        combination.append(record['value'])
+                        combination.append('"' + record['value'] + '"')
                 combinations.append('(' + ' '.join(combination) + ')')
             filter_str += values_str.replace('__expr__', ' '.join(combinations))
         new_operator = operator.instantiateFilter(set(new_vars), filter_str)

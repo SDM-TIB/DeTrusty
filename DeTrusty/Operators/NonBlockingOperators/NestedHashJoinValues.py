@@ -30,7 +30,6 @@ class NestedHashJoinValues(Join):
         self.qresults = Queue()
 
     def execute(self, left_queue, right_operator, out, processqueue=Queue()):
-        print('In NHJF')
         self.left_queue = left_queue
         self.right_operator = right_operator
         self.qresults = out
@@ -138,9 +137,9 @@ class NestedHashJoinValues(Join):
                     if record['type'] == 'uri':
                         combination.append('<' + record['value'] + '>')
                     elif record['type'] == 'typed-literal':
-                        combination.append(record['value'] + '^^<' + record['datatype'] + '>')
+                        combination.append('"' + record['value'] + '"^^<' + record['datatype'] + '>')
                     else:
-                        combination.append(record['value'])
+                        combination.append('"' + record['value'] + '"')
                 combinations.append('(' + ' '.join(combination) + ')')
             filter_str += values_str.replace('__expr__', ' '.join(combinations))
         new_operator = operators.instantiateFilter(set(new_vars), filter_str)
