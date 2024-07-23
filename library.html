@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Library &mdash; DeTrusty 0.15.6 documentation</title>
+  <title>DeTrusty as a Library &mdash; DeTrusty 0.16.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
@@ -34,7 +34,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.15.6
+                0.16.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -164,7 +164,7 @@ Additionally, we refer to <a class="reference internal" href="decomposition.html
 <p>DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">run_query</span></code> for executing SPARQL queries.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'STAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparql_one_dot_one</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_stars_locally</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yasqe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_type='STAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparql_one_dot_one=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config=&lt;DeTrusty.Molecule.MTManager.Config</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_stars_locally=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yasqe=False</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Executes a SPARQL query over a federation of SPARQL endpoints.</p>
 <p>The SPARQL query is decomposed based on the specified decomposition type.
 DeTrusty identifies the possible sources for each sub-query using the
