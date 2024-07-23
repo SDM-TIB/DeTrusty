@@ -1,3 +1,8 @@
+# v0.16.0 - 23 Jul 2024
+- Add physical operator NestedHashJoinValues (NHJV)
+- Add physical operator NestedHashOptionalValues (NHOV)
+- Use NHJV and NHOV for nested hash join and nested hash optional instead of their FILTER variants
+
 # v0.15.6 - 08 May 2024
 - Fix variables in response header for queries with aggregates with alias
 
