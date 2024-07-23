@@ -15,7 +15,7 @@ from DeTrusty.Operators.Join import Join
 from .OperatorStructures import Record
 from ...Sparql.Parser.services import Bind
 
-WINDOW_SIZE = 20
+WINDOW_SIZE = 1000
 
 
 class NestedHashJoinValues(Join):

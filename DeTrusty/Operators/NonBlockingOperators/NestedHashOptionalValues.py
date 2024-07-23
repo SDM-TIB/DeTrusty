@@ -15,7 +15,7 @@ from DeTrusty.Operators.Optional import Optional
 from .OperatorStructures import Record
 from ...Sparql.Parser.services import Bind
 
-WINDOW_SIZE = 10
+WINDOW_SIZE = 1000
 
 
 class NestedHashOptionalValues(Optional):
