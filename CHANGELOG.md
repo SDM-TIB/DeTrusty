@@ -1,3 +1,8 @@
+# v0.16.1 - 25 Jul 2024
+- Update dependencies
+  - Flask
+  - requests
+
 # v0.16.0 - 23 Jul 2024
 - Add physical operator NestedHashJoinValues (NHJV)
 - Add physical operator NestedHashOptionalValues (NHOV)
