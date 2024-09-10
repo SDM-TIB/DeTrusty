@@ -1,4 +1,4 @@
-FROM python:3.11.6-slim-bullseye
+FROM python:3.12.6-slim-bullseye
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
 # install dependencies
