@@ -1,3 +1,7 @@
+# v0.17.0 - 07 Oct 2024
+- Add query timeout feature
+- Docker: update Python
+
 # v0.16.1 - 25 Jul 2024
 - Update dependencies
   - Flask
