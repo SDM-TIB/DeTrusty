@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Service &mdash; DeTrusty 0.16.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <title>DeTrusty as a Service &mdash; DeTrusty 0.17.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=1aa419d7"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,15 +31,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -96,8 +101,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>DeTrusty as a Service</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">DeTrusty as a Service</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -108,12 +113,12 @@
              
   <p><a class="reference external" href="https://hub.docker.com/r/sdmtib/detrusty"><img alt="docker" src="https://img.shields.io/badge/Docker%20Image-sdmtib/detrusty-blue?logo=Docker" /></a></p>
 <section id="detrusty-as-a-service">
-<h1>DeTrusty as a Service<a class="headerlink" href="#detrusty-as-a-service" title="Permalink to this heading"></a></h1>
+<h1>DeTrusty as a Service<a class="headerlink" href="#detrusty-as-a-service" title="Link to this heading"></a></h1>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>If you want to run DeTrusty as a service, you can build the Docker image from its source code or download the Docker image from DockerHub.</p>
 <section id="requirements">
-<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h3>
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h3>
 <p>DeTrusty is implemented in Python3. The current version of DeTrusty supports <img alt="python" src="https://img.shields.io/pypi/pyversions/DeTrusty" />.
 DeTrusty uses the <code class="docutils literal notranslate"><span class="pre">requests</span></code> library for managing the HTTP(S) requests to the SPARQL endpoints.
 The SPARQL parser uses <code class="docutils literal notranslate"><span class="pre">ply</span></code>.
@@ -123,7 +128,7 @@ DeTrusty uses <code class="docutils literal notranslate"><span class="pre">gunic
 In order to run DeTrusty as a service, you need to have <a class="reference external" href="https://docs.docker.com/engine/install/">Docker</a> installed.</p>
 </section>
 <section id="local-source-code">
-<h3>Local Source Code<a class="headerlink" href="#local-source-code" title="Permalink to this heading"></a></h3>
+<h3>Local Source Code<a class="headerlink" href="#local-source-code" title="Link to this heading"></a></h3>
 <p>You can install DeTrusty from your local source code by performing the following steps.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:SDM-TIB/DeTrusty.git
 <span class="nb">cd</span><span class="w"> </span>DeTrusty
@@ -132,7 +137,7 @@ docker<span class="w"> </span>build<span class="w"> </span>.<span class="w"> </s
 </div>
 </section>
 <section id="dockerhub">
-<h3>DockerHub<a class="headerlink" href="#dockerhub" title="Permalink to this heading"></a></h3>
+<h3>DockerHub<a class="headerlink" href="#dockerhub" title="Link to this heading"></a></h3>
 <p>The easiest way to install DeTrusty is to download the package from PyPI:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>sdmtib/detrusty:latest
 </pre></div>
@@ -144,14 +149,14 @@ docker<span class="w"> </span>build<span class="w"> </span>.<span class="w"> </s
 </section>
 </section>
 <section id="setting-up-detrusty">
-<h2>Setting up DeTrusty<a class="headerlink" href="#setting-up-detrusty" title="Permalink to this heading"></a></h2>
+<h2>Setting up DeTrusty<a class="headerlink" href="#setting-up-detrusty" title="Link to this heading"></a></h2>
 <p>As stated in the note above, this example assumes that you cloned the repository of DeTrusty, the current working directory is the root directory of the repository, and Docker is installed.
 If all that is true, you can start your own instance of DeTrusty by executing the following command.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>-f<span class="w"> </span>example/docker-compose.yml<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
 <section id="creating-updating-source-descriptions">
-<h3>Creating/Updating Source Descriptions<a class="headerlink" href="#creating-updating-source-descriptions" title="Permalink to this heading"></a></h3>
+<h3>Creating/Updating Source Descriptions<a class="headerlink" href="#creating-updating-source-descriptions" title="Link to this heading"></a></h3>
 <p>The example loaded the source descriptions for the K4COVID federation.
 If you want to update the source descriptions, create a file <code class="docutils literal notranslate"><span class="pre">/DeTrusty/Config/endpoints.txt</span></code> inside your Docker container.
 This file should contain the URLs to the SPARQL endpoints you want to be included in your federation.
@@ -175,7 +180,7 @@ Additionally, the <code class="docutils literal notranslate"><span class="pre">-
 </section>
 </section>
 <section id="web-interface">
-<h2>Web Interface<a class="headerlink" href="#web-interface" title="Permalink to this heading"></a></h2>
+<h2>Web Interface<a class="headerlink" href="#web-interface" title="Link to this heading"></a></h2>
 <p>After setting up DeTrusty as described above, you can start using DeTrusty’s Web interface.
 In this example, the interface is accessible with the base URL <a class="reference external" href="localhost:5000">localhost:5000</a>.</p>
 <div class="admonition note">
@@ -183,12 +188,12 @@ In this example, the interface is accessible with the base URL <a class="referen
 <p>Note that the Web interface returns a <em>“404 - File not found”</em> if you try to access a route which is not specified.</p>
 </div>
 <section id="web-interface-executing-queries">
-<h3>Web Interface: Executing Queries<a class="headerlink" href="#web-interface-executing-queries" title="Permalink to this heading"></a></h3>
+<h3>Web Interface: Executing Queries<a class="headerlink" href="#web-interface-executing-queries" title="Link to this heading"></a></h3>
 <p>Thanks to <code class="docutils literal notranslate"><span class="pre">YASGUI</span></code>, you can post your queries to DeTrusty from your favorite Web browser by navigating to <code class="docutils literal notranslate"><span class="pre">https://your_domain.tld/sparql</span></code>, i.e., in this example, use <a class="reference external" href="localhost:5000/sparql">localhost:5000/sparql</a>.
 Just enter your query and hit the button.</p>
 </section>
 <section id="web-interface-plotting-query-plans">
-<h3>Web Interface: Plotting Query Plans<a class="headerlink" href="#web-interface-plotting-query-plans" title="Permalink to this heading"></a></h3>
+<h3>Web Interface: Plotting Query Plans<a class="headerlink" href="#web-interface-plotting-query-plans" title="Link to this heading"></a></h3>
 <p>When running DeTrusty as a service, you can also plot the query plan of your queries via the Web interface.
 The path is <code class="docutils literal notranslate"><span class="pre">https://your_domain.tld/query_plan</span></code>, i.e., in this example, it is <a class="reference external" href="localhost:5000/query_plan">localhost:5000/query_plan</a>.
 Simply enter your query and hit the button.
@@ -197,11 +202,11 @@ A star-shaped decomposition is assumed for the query plan generation.</p>
 </section>
 </section>
 <section id="restful-api">
-<h2>RESTful API<a class="headerlink" href="#restful-api" title="Permalink to this heading"></a></h2>
+<h2>RESTful API<a class="headerlink" href="#restful-api" title="Link to this heading"></a></h2>
 <p>DeTrusty also offers an API for executing your queries via POST requests.
 The base URL in this example is <a class="reference external" href="localhost:5000">localhost:5000</a>.</p>
 <section id="api-detrusty-version">
-<h3>API: DeTrusty Version<a class="headerlink" href="#api-detrusty-version" title="Permalink to this heading"></a></h3>
+<h3>API: DeTrusty Version<a class="headerlink" href="#api-detrusty-version" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">/version</span></code> returns the version number of DeTrusty.</p>
 <p>Example call:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:5000/version
@@ -213,7 +218,7 @@ The base URL in this example is <a class="reference external" href="localhost:50
 </div>
 </section>
 <section id="api-executing-queries">
-<h3>API: Executing Queries<a class="headerlink" href="#api-executing-queries" title="Permalink to this heading"></a></h3>
+<h3>API: Executing Queries<a class="headerlink" href="#api-executing-queries" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">/sparql</span></code> executes the posted SPARQL query and returns the result as a JSON response.</p>
 <p>Example call:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3&quot;</span><span class="w"> </span>localhost:5000/sparql

@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decomposition Types &mdash; DeTrusty 0.16.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <title>Decomposition Types &mdash; DeTrusty 0.17.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=1aa419d7"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,15 +31,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -81,8 +86,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Decomposition Types</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Decomposition Types</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -92,7 +97,7 @@
            <div itemprop="articleBody">
              
   <section id="decomposition-types">
-<h1>Decomposition Types<a class="headerlink" href="#decomposition-types" title="Permalink to this heading"></a></h1>
+<h1>Decomposition Types<a class="headerlink" href="#decomposition-types" title="Link to this heading"></a></h1>
 <p>The primary goal of query decomposition is to transform a high-level query into the internal representation.
 During query decomposition, the query is checked syntactically.
 In distributed systems, as part of query restructuring, the original query is split into sub-queries.
@@ -101,40 +106,34 @@ There are several approaches to how to build the sub-queries from the original o
 The following describes the different decomposition types implemented in DeTrusty.
 At the end, a comparison of the presented decomposition types based on an example query is provided.</p>
 <section id="triple-wise">
-<h2>Triple-wise<a class="headerlink" href="#triple-wise" title="Permalink to this heading"></a></h2>
+<h2>Triple-wise<a class="headerlink" href="#triple-wise" title="Link to this heading"></a></h2>
 <p><em>Triple-wise decomposition</em> considers each triple pattern of the query as a separate sub-query.
 The single-triple-pattern sub-queries are executed by all sources that serve the predicate.
 This decomposition type may lead to very expensive query plans.</p>
 </section>
 <section id="exclusive-groups">
-<h2>Exclusive Groups<a class="headerlink" href="#exclusive-groups" title="Permalink to this heading"></a></h2>
+<h2>Exclusive Groups<a class="headerlink" href="#exclusive-groups" title="Link to this heading"></a></h2>
 <p>When using <em>Exclusive Groups</em> <span id="id1">[<a class="reference internal" href="reference.html#id4" title="Andreas Schwarte, Peter Haase, Katja Hose, Ralf Schenkel, and Michael Schmidt. FedX: Optimization Techniques for Federated Query Processing on Linked Data. In The Semantic Web – ISWC 2011, 601–616. Berlin, Heidelberg, 2011. Springer. doi:10.1007/978-3-642-25073-6_38.">2</a>]</span>, the query is decomposed in such a way that each sub-query consists of triple patterns that can be exclusively answered by one source.
 Triple patterns with predicates occurring in several sources produce single-triple-pattern sub-queries that are executed by all sources that serve the predicate.
 Hence, queries with predicates that occur in multiple sources may be expensive following this type of decomposition.</p>
 </section>
 <section id="star-shaped-sub-queries">
-<h2>Star-shaped Sub-queries<a class="headerlink" href="#star-shaped-sub-queries" title="Permalink to this heading"></a></h2>
+<h2>Star-shaped Sub-queries<a class="headerlink" href="#star-shaped-sub-queries" title="Link to this heading"></a></h2>
 <p>Following the <em>star-shaped sub-queries</em> decomposition <span id="id2">[<a class="reference internal" href="reference.html#id5" title="Maria-Esther Vidal, Edna Ruckhaus, Tomas Lampo, Amad\'ıs Mart\'ınez, Javier Sierra, and Axel Polleres. Efficiently Joining Group Patterns in SPARQL Queries. In The Semantic Web: Research and Applications. ESWC 2010, 228–242. Berlin, Heidelberg, 2010. Springer. doi:10.1007/978-3-642-13486-9_16.">3</a>]</span>, the query is decomposed in such a way that the triple patterns with the same subject form one sub-query.
 This mitigates the previously mentioned issue of predicates occurring in several sources since the combination of all predicates belonging to the sub-query is preferred.</p>
 </section>
 <section id="combined-star-shaped-sub-queries">
-<h2>Combined Star-shaped Sub-queries<a class="headerlink" href="#combined-star-shaped-sub-queries" title="Permalink to this heading"></a></h2>
+<h2>Combined Star-shaped Sub-queries<a class="headerlink" href="#combined-star-shaped-sub-queries" title="Link to this heading"></a></h2>
 <p>When using the <em>combined star-shaped sub-queries</em> decomposition, the query is decomposed according to the star-shaped sub-query decomposition as described above.
 However, sub-queries that can be answered by the same source are merged into one sub-query if they can be joined.
 This type of decomposition exceeds if the source can perform the join efficiently and joining the sub-queries in the source reduces the size of the intermediate result significantly.</p>
 </section>
 <section id="comparison-using-an-example">
-<h2>Comparison using an Example<a class="headerlink" href="#comparison-using-an-example" title="Permalink to this heading"></a></h2>
+<h2>Comparison using an Example<a class="headerlink" href="#comparison-using-an-example" title="Link to this heading"></a></h2>
 <p>This example serves to visualize the differences of the above-mentioned decomposition types.
 Consider a federation of knowledge graphs with the following characteristics as used in the project <a class="reference external" href="https://coypu.org">CoyPu</a>.
 The statistics and execution times were collected on 2023-10-10 and are subject to change.</p>
 <table class="docutils align-center">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Knowledge Graph</p></th>
 <th class="head"><p>Triples</p></th>
@@ -202,12 +201,12 @@ The statistics and execution times were collected on 2023-10-10 and are subject 
 </pre></div>
 </div>
 <p>Click on an image of a query plan to enlarge it and view all the details.</p>
-<table class="colwidths-given borderless docutils align-center" style="width: 70%">
+<table class="borderless docutils align-center" style="width: 70%">
 <colgroup>
-<col style="width: 13%" />
-<col style="width: 7%" />
-<col style="width: 13%" />
-<col style="width: 67%" />
+<col style="width: 13.3%" />
+<col style="width: 6.7%" />
+<col style="width: 13.3%" />
+<col style="width: 66.7%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Decomposition Type</p></th>

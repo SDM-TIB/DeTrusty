@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Library &mdash; DeTrusty 0.16.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <title>DeTrusty as a Library &mdash; DeTrusty 0.17.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=1aa419d7"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,15 +31,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.16.1
+                0.17.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -106,8 +111,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>DeTrusty as a Library</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">DeTrusty as a Library</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -118,19 +123,19 @@
              
   <p><img alt="python" src="https://img.shields.io/pypi/pyversions/DeTrusty" /> <img alt="format" src="https://img.shields.io/pypi/format/DeTrusty" /> <img alt="status" src="https://img.shields.io/pypi/status/DeTrusty" /> <a class="reference external" href="https://pypi.org/project/DeTrusty"><img alt="version" src="https://img.shields.io/pypi/v/DeTrusty" /></a></p>
 <section id="detrusty-as-a-library">
-<h1>DeTrusty as a Library<a class="headerlink" href="#detrusty-as-a-library" title="Permalink to this heading"></a></h1>
+<h1>DeTrusty as a Library<a class="headerlink" href="#detrusty-as-a-library" title="Link to this heading"></a></h1>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>If you want to use DeTrusty as a library, you can install it from its source code on GitHub or download the package from PyPI.</p>
 <section id="requirements">
-<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h3>
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h3>
 <p>DeTrusty is implemented in Python3. The current version of DeTrusty supports <img alt="python" src="https://img.shields.io/pypi/pyversions/DeTrusty" />.
 DeTrusty uses the <code class="docutils literal notranslate"><span class="pre">requests</span></code> library for managing the HTTP(S) requests to the SPARQL endpoints.
 The SPARQL parser uses <code class="docutils literal notranslate"><span class="pre">ply</span></code>.
 The generation of the source descriptions from RML mappings is enabled by <code class="docutils literal notranslate"><span class="pre">rdflib</span></code>.</p>
 </section>
 <section id="local-source-code">
-<h3>Local Source Code<a class="headerlink" href="#local-source-code" title="Permalink to this heading"></a></h3>
+<h3>Local Source Code<a class="headerlink" href="#local-source-code" title="Link to this heading"></a></h3>
 <p>You can install DeTrusty from your local source code by performing the following steps.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:SDM-TIB/DeTrusty.git
 <span class="nb">cd</span><span class="w"> </span>DeTrusty
@@ -139,14 +144,14 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 </div>
 </section>
 <section id="github">
-<h3>GitHub<a class="headerlink" href="#github" title="Permalink to this heading"></a></h3>
+<h3>GitHub<a class="headerlink" href="#github" title="Link to this heading"></a></h3>
 <p>DeTrusty can also be installed from its source code in GitHub without explicitly cloning the repository:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;git+https://github.com/SDM-TIB/DeTrusty#egg=DeTrusty&#39;</span>
 </pre></div>
 </div>
 </section>
 <section id="pypi">
-<h3>PyPI<a class="headerlink" href="#pypi" title="Permalink to this heading"></a></h3>
+<h3>PyPI<a class="headerlink" href="#pypi" title="Link to this heading"></a></h3>
 <p>The easiest way to install DeTrusty is to download the package from PyPI:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>DeTrusty
 </pre></div>
@@ -154,7 +159,7 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 </section>
 </section>
 <section id="executing-queries">
-<h2>Executing Queries<a class="headerlink" href="#executing-queries" title="Permalink to this heading"></a></h2>
+<h2>Executing Queries<a class="headerlink" href="#executing-queries" title="Link to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The goal of this section is to explain how to run SPARQL queries when using DeTrusty as a library.
@@ -164,14 +169,14 @@ Additionally, we refer to <a class="reference internal" href="decomposition.html
 <p>DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">run_query</span></code> for executing SPARQL queries.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_type='STAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparql_one_dot_one=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config=&lt;DeTrusty.Molecule.MTManager.Config</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_stars_locally=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yasqe=False</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition_type='STAR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparql_one_dot_one=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config=&lt;DeTrusty.Molecule.MTManager.Config</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_stars_locally=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yasqe=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=0</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Executes a SPARQL query over a federation of SPARQL endpoints.</p>
 <p>The SPARQL query is decomposed based on the specified decomposition type.
 DeTrusty identifies the possible sources for each sub-query using the
 metadata collected previously. If the query contains the SERVICE clause,
 DeTrusty executed the sub-query at the specified endpoint instead.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The SPARQL query to be executed. Might be a string holding the SPARQL query or path to
 a query file. The query file can be local or remote (accessible via GET request).</p></li>
@@ -198,14 +203,24 @@ Default is ‘True’.</p></li>
 DeTrusty’s Web interface. This is a workaround for YASQE not being able
 to show the query results when the validation data is included.
 Set to ‘True’ to omit the validation data. Default is ‘False’.</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – <div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This feature is currently considered experimental and will not produce partial results!</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 0.17.0.</span></p>
+</div>
+<p>DeTrusty will stop the query execution once the timeout is reached.
+The timeout is specified in seconds. The default is 0 and reflects no limit.</p>
+</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary including the query answer and additional metadata following the SPARQL protocol.
 It returns an error message in the ‘error’ field if something went wrong. Other metadata might
 be omitted in that case.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
 </dd>
 </dl>
@@ -218,6 +233,9 @@ be omitted in that case.</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_query</span><span class="p">(</span><span class="s1">&#39;http://example.com/queries/query.rq&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">run_query</span><span class="p">(</span><span class="s1">&#39;./query.rq&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -233,17 +251,17 @@ are later used by DeTrusty for the source selection and decomposition. The main
 usage of this function is to read stored source descriptions from a file (local or remote)
 in order to reuse them for query execution over the same federation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config_input</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>]</em>) – The source description to transform into the internal representation. Might be a string holding the path
 to a configuration file. The configuration file can be local or remote (accessible via GET request).
 The source description can also be a parsed JSON, i.e., a list of Python dictionaries. Each dictionary
 represents a so-called <em>RDF Molecule Template</em>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The object holding the internal representation of the source descriptions. The result might be <code class="docutils literal notranslate"><span class="pre">None</span></code>
 if there was an issue while reading the source descriptions that did not lead to an exception.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Config</p>
 </dd>
 </dl>
@@ -260,7 +278,7 @@ for more information.</p>
 </dd></dl>
 
 <section id="knowledge4covid-19">
-<h3>Knowledge4COVID-19<a class="headerlink" href="#knowledge4covid-19" title="Permalink to this heading"></a></h3>
+<h3>Knowledge4COVID-19<a class="headerlink" href="#knowledge4covid-19" title="Link to this heading"></a></h3>
 <p>In order to gain hands-on experience with DeTrusty, we provide a couple of examples.
 This particular example uses the queries related to the Knowledge4COVID-19 KG <span id="id1">[<a class="reference internal" href="reference.html#id3" title="Ahmad Sakor, Samaneh Jozashoori, Emetis Niazmand, Ariam Rivas, Konstantinos Bougiatiotis, Fotis Aisopos, Enrique Iglesias, Philipp D. Rohde, Trupti Padiya, Anastasia Krithara, Georgios Paliouras, and Maria-Esther Vidal. Knowledge4COVID-19: A semantic-based approach for constructing a COVID-19 related knowledge graph from various sources and analyzing treatments’ toxicities. Journal of Web Semantics, 2023. doi:https://doi.org/10.1016/j.websem.2022.100760.">4</a>]</span>.
 Before running the examples below, please, make sure that you have DeTrusty installed.</p>
@@ -271,7 +289,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <li><p>Wikidata: <a class="reference external" href="https://query.wikidata.org/sparql">https://query.wikidata.org/sparql</a></p></li>
 </ul>
 <section id="q1-covid-19-drugs-for-patients-with-asthma">
-<h4>Q1. COVID-19 Drugs for Patients with Asthma<a class="headerlink" href="#q1-covid-19-drugs-for-patients-with-asthma" title="Permalink to this heading"></a></h4>
+<h4>Q1. COVID-19 Drugs for Patients with Asthma<a class="headerlink" href="#q1-covid-19-drugs-for-patients-with-asthma" title="Link to this heading"></a></h4>
 <p><em>“Retrieve from DBpedia the excretion rate, metabolism, and routes of administration of the COVID-19 drugs in the treatments to treat COVID-19 in patients with Asthma.”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">dbp</span><span class="p">:</span> <span class="nl">&lt;http://dbpedia.org/property/&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
@@ -304,7 +322,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </div>
 </section>
 <section id="q2-covid-19-drugs-for-patients-with-a-cardiopathy">
-<h4>Q2. COVID-19 Drugs for Patients with a Cardiopathy<a class="headerlink" href="#q2-covid-19-drugs-for-patients-with-a-cardiopathy" title="Permalink to this heading"></a></h4>
+<h4>Q2. COVID-19 Drugs for Patients with a Cardiopathy<a class="headerlink" href="#q2-covid-19-drugs-for-patients-with-a-cardiopathy" title="Link to this heading"></a></h4>
 <p><em>“Retrieve from Wikidata the CheMBL code, metabolism, and routes of administration of the COVID-19 drugs in the treatments to treat COVID-19 in patients with a cardiopathy.”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">k4covid</span><span class="p">:</span> <span class="nl">&lt;http://research.tib.eu/covid-19/vocab/&gt;</span>
@@ -337,7 +355,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </div>
 </section>
 <section id="q3-detailed-covid-19-drug-information-for-patients-with-asthma">
-<h4>Q3. Detailed COVID-19 Drug Information for Patients with Asthma<a class="headerlink" href="#q3-detailed-covid-19-drug-information-for-patients-with-asthma" title="Permalink to this heading"></a></h4>
+<h4>Q3. Detailed COVID-19 Drug Information for Patients with Asthma<a class="headerlink" href="#q3-detailed-covid-19-drug-information-for-patients-with-asthma" title="Link to this heading"></a></h4>
 <p><em>“Retrieve from DBpedia the excretion rate, metabolism, and routes of administration, CheMBL and Kegg codes, smile notation, and trade name of the COVID-19 drugs in the treatments to treat COVID-19 in patients with Asthma.”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">k4covid</span><span class="p">:</span> <span class="nl">&lt;http://research.tib.eu/covid-19/vocab/&gt;</span>
@@ -376,7 +394,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </div>
 </section>
 <section id="q4-covid-19-comorbidity-information">
-<h4>Q4. COVID-19 Comorbidity Information<a class="headerlink" href="#q4-covid-19-comorbidity-information" title="Permalink to this heading"></a></h4>
+<h4>Q4. COVID-19 Comorbidity Information<a class="headerlink" href="#q4-covid-19-comorbidity-information" title="Link to this heading"></a></h4>
 <p><em>“Retrieve from DBpedia the disease label, ICD-10 and mesh codes, and risks of the comorbidities of the COVID-19 treatments.”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">k4covid</span><span class="p">:</span> <span class="nl">&lt;http://research.tib.eu/covid-19/vocab/&gt;</span>
@@ -406,7 +424,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </div>
 </section>
 <section id="q5-covid-19-comorbidity-drugs">
-<h4>Q5. COVID-19 Comorbidity Drugs<a class="headerlink" href="#q5-covid-19-comorbidity-drugs" title="Permalink to this heading"></a></h4>
+<h4>Q5. COVID-19 Comorbidity Drugs<a class="headerlink" href="#q5-covid-19-comorbidity-drugs" title="Link to this heading"></a></h4>
 <p><em>“Retrieve the COVID-19 and comorbidity drugs on a treatment and the CheMBL code, mass, and excretion route for the comorbidity drugs.”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">dbp</span><span class="p">:</span> <span class="nl">&lt;http://dbpedia.org/property/&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
@@ -446,7 +464,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </section>
 </section>
 <section id="coypu">
-<h3>CoyPu<a class="headerlink" href="#coypu" title="Permalink to this heading"></a></h3>
+<h3>CoyPu<a class="headerlink" href="#coypu" title="Link to this heading"></a></h3>
 <p>This particular example uses queries related to the project <a class="reference external" href="https://coypu.org">CoyPu</a>.
 Before running the examples below, please, make sure that you have DeTrusty installed.</p>
 <p>The federation of knowledge graphs for this example contains the following SPARQL endpoints:</p>
@@ -455,7 +473,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <li><p>Wikidata: <a class="reference external" href="https://query.wikidata.org/sparql">https://query.wikidata.org/sparql</a></p></li>
 </ul>
 <section id="q1-life-expectancy-in-2017">
-<h4>Q1. Life Expectancy in 2017<a class="headerlink" href="#q1-life-expectancy-in-2017" title="Permalink to this heading"></a></h4>
+<h4>Q1. Life Expectancy in 2017<a class="headerlink" href="#q1-life-expectancy-in-2017" title="Link to this heading"></a></h4>
 <p><em>“Retrieve the life expectancy for all countries in 2017 as reported by World Bank and Wikidata”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">wb</span><span class="p">:</span> <span class="nl">&lt;http://worldbank.org/&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">owl</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2002/07/owl#&gt;</span>
@@ -498,7 +516,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </div>
 </section>
 <section id="q2-gdp-and-co2-emission-per-capita-in-germany">
-<h4>Q2. GDP and CO2 Emission per Capita in Germany<a class="headerlink" href="#q2-gdp-and-co2-emission-per-capita-in-germany" title="Permalink to this heading"></a></h4>
+<h4>Q2. GDP and CO2 Emission per Capita in Germany<a class="headerlink" href="#q2-gdp-and-co2-emission-per-capita-in-germany" title="Link to this heading"></a></h4>
 <p><em>“Retrieve the GDP per capita and carbon emission per capita for Germany per year.”</em></p>
 <div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">wb</span><span class="p">:</span> <span class="nl">&lt;http://worldbank.org/&gt;</span>
 <span class="k">PREFIX</span> <span class="nn">dc</span><span class="p">:</span> <span class="nl">&lt;http://purl.org/dc/elements/1.1/&gt;</span>
@@ -548,7 +566,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </section>
 </section>
 <section id="id3">
-<span id="id4"></span><h2>Creating Source Descriptions<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
+<span id="id4"></span><h2>Creating Source Descriptions<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The goal of this section is to explain how to create the source descriptions when using DeTrusty as a library.
@@ -560,7 +578,7 @@ We refer the reader to the chapter <a class="reference internal" href="source_de
 <span class="sig-name descname"><span class="pre">create_rdfmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/DeTrusty/Config/rdfmts.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interlinking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Generating rdfmts.json, which need to be supplied during query execution using run_query</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>endpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The endpoints, from which informations will be collected.</p></li>
 <li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Path location in which the generated configuration will be saved.</p>
@@ -572,10 +590,10 @@ We refer the reader to the chapter <a class="reference internal" href="source_de
 <li><p><strong>interlinking</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – When supplied with True, the module will assume that there’s an interlinks between endpoints, and thus generating configuration that suits this purpose. Default value is False.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>only generating return value when output=None.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>JSONConfig, optional</p>
 </dd>
 </dl>
@@ -589,7 +607,7 @@ We refer the reader to the chapter <a class="reference internal" href="source_de
 <li><p><a class="reference internal" href="#restricting-classes-of-an-endpoint">Restricting Classes of an Endpoint</a>: consider only specific classes of an endpoint</p></li>
 </ul>
 <section id="standard-case">
-<h3>Standard Case<a class="headerlink" href="#standard-case" title="Permalink to this heading"></a></h3>
+<h3>Standard Case<a class="headerlink" href="#standard-case" title="Link to this heading"></a></h3>
 <p>The standard case is to include only public SPARQL endpoints in the federation, collect the source description via SPARQL queries, and consider all classes in the endpoints.
 The following code snippet collects the source description of two public endpoints and saves it in the file <code class="docutils literal notranslate"><span class="pre">./Config/rdfmts.json</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
@@ -613,7 +631,7 @@ This is helpful if several queries are to be executed in order to avoid reading 
 </div>
 </section>
 <section id="private-endpoints">
-<h3>Private Endpoints<a class="headerlink" href="#private-endpoints" title="Permalink to this heading"></a></h3>
+<h3>Private Endpoints<a class="headerlink" href="#private-endpoints" title="Link to this heading"></a></h3>
 <p>Starting with version 0.6.0, DeTrusty can handle private endpoints that require authentication.
 Currently, basic authentication with Base64 encoding as well as token-based authentication via a token server are supported.
 In the case of token-based authentication, DeTrusty expects the token server to return the token in the response field <code class="docutils literal notranslate"><span class="pre">access_token</span></code>.
@@ -640,7 +658,7 @@ Each endpoint is represented as a dictionary itself; holding all parameters in t
 </div>
 </section>
 <section id="source-descriptions-from-rml-mappings">
-<h3>Source Descriptions from RML Mappings<a class="headerlink" href="#source-descriptions-from-rml-mappings" title="Permalink to this heading"></a></h3>
+<h3>Source Descriptions from RML Mappings<a class="headerlink" href="#source-descriptions-from-rml-mappings" title="Link to this heading"></a></h3>
 <p>Starting with version 0.6.0, DeTrusty can collect the metadata necessary for source selection and decomposition from RML mappings.
 Collecting metadata from RML mappings instead of the SPARQL endpoint considerably increases the performance of the metadata collection process.
 Of course, this is only feasible for endpoints that were created using RML mappings.</p>
@@ -660,7 +678,7 @@ Of course, this is only feasible for endpoints that were created using RML mappi
 <p>The key <code class="docutils literal notranslate"><span class="pre">mappings</span></code> holds a list of paths to the mapping files that were used to create the RDF data served by the SPARQL endpoint.</p>
 </section>
 <section id="restricting-classes-of-an-endpoint">
-<h3>Restricting Classes of an Endpoint<a class="headerlink" href="#restricting-classes-of-an-endpoint" title="Permalink to this heading"></a></h3>
+<h3>Restricting Classes of an Endpoint<a class="headerlink" href="#restricting-classes-of-an-endpoint" title="Link to this heading"></a></h3>
 <p>Starting with version 0.7.0, DeTrusty can restrict the collection of metadata to specific classes of an endpoint.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
