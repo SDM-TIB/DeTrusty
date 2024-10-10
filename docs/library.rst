@@ -102,7 +102,7 @@ This query collects data from the Knowledge4COVID-19 KG and DBpedia. See below h
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q1.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -121,7 +121,7 @@ This query collects data from the Knowledge4COVID-19 KG and Wikidata. See below 
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q2.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -140,7 +140,7 @@ This query collects data from the Knowledge4COVID-19 KG and DBpedia. See below h
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q3.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -159,7 +159,7 @@ This query collects data from the Knowledge4COVID-19 KG and Wikidata. See below 
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q4.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -178,7 +178,7 @@ This query collects data from the Knowledge4COVID-19 KG, DBpedia, and Wikidata. 
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q5.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -208,7 +208,7 @@ This query collects data from the World Bank KG and Wikidata. See below how to e
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/Q1.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -227,7 +227,7 @@ This query collects data from the World Bank KG and Wikidata. See below how to e
 
    from DeTrusty import get_config, run_query
 
-   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.json')
+   config = get_config('https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.ttl')
    query = 'https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/Q2.rq'
    result = run_query(query, config=config, join_stars_locally=False)
    print(result)
@@ -260,14 +260,14 @@ Standard Case
 =============
 
 The standard case is to include only public SPARQL endpoints in the federation, collect the source description via SPARQL queries, and consider all classes in the endpoints.
-The following code snippet collects the source description of two public endpoints and saves it in the file ``./Config/rdfmts.json``.
+The following code snippet collects the source description of two public endpoints and saves it in the file ``./Config/rdfmts.ttl``.
 
 .. code:: python
 
     from DeTrusty.Molecule.MTCreation import create_rdfmts
 
     endpoints = ['http://url_to_endpoint_1', 'https://url_to_endpoint_2:port/sparql']
-    create_rdfmts(endpoints, './Config/rdfmts.json')
+    create_rdfmts(endpoints, './Config/rdfmts.ttl')
 
 **Alternatively,** ``None`` can be passed instead of a path.
 In that case, ``create_rdfmts`` returns the source description in DeTrusty's internal structure.
@@ -309,7 +309,7 @@ The configuration changes slightly compared to the standard case:
         'password': 'YOUR_PASSWORD'
       }
     }
-    create_rdfmts(endpoints, './Config/rdfmts.json')
+    create_rdfmts(endpoints, './Config/rdfmts.ttl')
 
 The keys of ``endpoints`` are the URLs of the SPARQL endpoints.
 Each endpoint is represented as a dictionary itself; holding all parameters in the form of (key, value) pairs.
@@ -339,7 +339,7 @@ Of course, this is only feasible for endpoints that were created using RML mappi
         ]
       }
     }
-    create_rdfmts(endpoints, './Config/rdfmts.json')
+    create_rdfmts(endpoints, './Config/rdfmts.ttl')
 
 The key ``mappings`` holds a list of paths to the mapping files that were used to create the RDF data served by the SPARQL endpoint.
 
@@ -365,6 +365,6 @@ Starting with version 0.7.0, DeTrusty can restrict the collection of metadata to
         ]
       }
     }
-    create_rdfmts(endpoints, './Config/rdfmts.json')
+    create_rdfmts(endpoints, './Config/rdfmts.ttl')
 
 The key ``types`` holds a list of all the classes of the endpoint that should be considered for the source description creation process.

@@ -72,7 +72,7 @@ Put one URL per line and execute the following command.
 
    docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.txt'
 
-After the new source description file was generated as ``/DeTrusty/Config/rdfmts.json``, you need to restart the ``gunicorn`` workers in order for the changes to take effect.
+After the new source description file was generated as ``/DeTrusty/Config/rdfmts.ttl``, you need to restart the ``gunicorn`` workers in order for the changes to take effect.
 
 .. code:: bash
 

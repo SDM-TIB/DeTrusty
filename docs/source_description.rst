@@ -16,71 +16,45 @@ Since an RDF class can be served by more than just one dataset, this information
 For more information and a formal definition, we refer the reader to :cite:p:`Endris2018`.
 See below for an example based on FOAF.
 
-.. code:: JSON
+.. code:: turtle
 
-   [
-     {
-       "rootType": "http://xmlns.com/foaf/0.1/Person",
-       "predicates": [
-         {
-           "predicate": "http://xmlns.com/foaf/0.1/interest",
-           "range": [
-             "http://xmlns.com/foaf/0.1/Document"
-           ]
-         },
-         {
-           "predicate": "http://xmlns.com/foaf/0.1/knows",
-           "range": [
-             "http://xmlns.com/foaf/0.1/Person"
-           ]
-         },
-         {
-           "predicate": "http://xmlns.com/foaf/0.1/name",
-           "range": []
-         }
-       ],
-       "linkedTo": [
-         "http://xmlns.com/foaf/0.1/Document",
-         "http://xmlns.com/foaf/0.1/Person"
-       ],
-       "wrappers": [
-         {
-           "url": "http://example.com/sparql",
-           "predicates": [
-             "http://xmlns.com/foaf/0.1/interest"
-           ],
-           "urlparam": ""
-         },
-         {
-           "url": "http://private.example.com/sparql",
-           "predicates": [
-             "http://xmlns.com/foaf/0.1/knows",
-             "http://xmlns.com/foaf/0.1/name"
-           ],
-           "urlparam": {
-             "username": "example_user",
-             "password": "1234"
-           }
-         }
-       ]
-     },
-     {
-       "rootType": "http://xmlns.com/foaf/0.1/Document",
-       "predicates": [
-         {
-           "predicate": "http://xmlns.com/foaf/0.1/topic",
-           "range": []
-         }
-       ],
-       "linkedTo": [],
-       "wrappers": [
-         {
-           "url": "http://example.com/sparql",
-           "predicates": [
-             "http://xmlns.com/foaf/0.1/topic"
-           ],
-           "urlparam": ""
-         }
-       ]
-     }
-   ]
+   @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+   @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+   @prefix semsd: <https://research.tib.eu/semantic-source-description#> .
+   @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+   foaf:Document a rdfs:Class ;
+       semsd:hasProperty foaf:topic ;
+       semsd:hasSource <http://example.com/sparql> .
+
+   foaf:Person a rdfs:Class ;
+       semsd:hasProperty foaf:interest,
+           foaf:knows,
+           foaf:name ;
+       semsd:hasSource <http://example.com/sparql>,
+           <http://private.example.com/sparql> .
+
+   foaf:interest a rdf:Property ;
+       semsd:hasSource <http://example.com/sparql> ;
+       semsd:propertyRange [ a semsd:PropertyRange ;
+               rdfs:domain foaf:Person ;
+               rdfs:range foaf:Document ] .
+
+   foaf:knows a rdf:Property ;
+       semsd:hasSource <http://private.example.com/sparql> ;
+       semsd:propertyRange [ a semsd:PropertyRange ;
+               rdfs:domain foaf:Person ;
+               rdfs:range foaf:Person ] .
+
+   foaf:name a rdf:Property ;
+       semsd:hasSource <http://private.example.com/sparql> .
+
+   foaf:topic a rdf:Property ;
+       semsd:hasSource <http://example.com/sparql> .
+
+   <http://private.example.com/sparql> a semsd:DataSource ;
+       semsd:hasURL "http://private.example.com/sparql"^^xsd:anyURI .
+
+   <http://example.com/sparql> a semsd:DataSource ;
+       semsd:hasURL "http://example.com/sparql"^^xsd:anyURI .
