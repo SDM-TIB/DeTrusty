@@ -16,7 +16,7 @@ except ImportError:
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, 'hs:o:ji')
+        opts, args = getopt.getopt(argv, 'hs:o:j')
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -24,7 +24,6 @@ def get_options(argv):
     endpoints_file = None
     output = DEFAULT_OUTPUT_PATH
     is_json = False
-    interlinking = False
     for opt, arg in opts:
         if opt == '-h':
             usage()
@@ -35,8 +34,6 @@ def get_options(argv):
             output = arg
         elif opt == '-j':
             is_json = True
-        elif opt == '-i':
-            interlinking = True
 
     if not endpoints_file:
         usage()
@@ -55,7 +52,7 @@ def get_options(argv):
 
     if '.json' not in output:
         output += '.json'
-    return endpoints, output, interlinking
+    return endpoints, output
 
 
 def usage():
@@ -65,12 +62,11 @@ def usage():
         '    <path/to/endpoints.txt> - path to a text file containing a list of SPARQL endpoint URLs\n'
         '    <path/to/output.json> - name of output file\n'
         'parameters\n'
-        '    -j\tif set, the endpoints file will be handled as JSON instead of plain text\n'
-        '    -i\tif set, interlinks between the endpoints will be searched (computationally expensive)'
+        '    -j\tif set, the endpoints file will be handled as JSON instead of plain text'
     )
     print(usage_str.format(program=sys.argv[0]),)
 
 
 if __name__ == '__main__':
-    endpoints, output, interlinking = get_options(sys.argv[1:])
-    create_rdfmts(endpoints, output, interlinking)
+    endpoints, output = get_options(sys.argv[1:])
+    create_rdfmts(endpoints, output)
