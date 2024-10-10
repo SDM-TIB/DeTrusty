@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Source Descriptions &mdash; DeTrusty 0.17.0 documentation</title>
+  <title>Source Descriptions &mdash; DeTrusty 0.18.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=1aa419d7"></script>
+        <script src="_static/documentation_options.js?v=f0c74d41"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -103,72 +103,46 @@ While this inherently records the domain of the property, the range of the prope
 Since an RDF class can be served by more than just one dataset, this information is also encoded in the RDF Molecule Template.
 For more information and a formal definition, we refer the reader to <span id="id2">[<a class="reference internal" href="reference.html#id2" title="Kemele M. Endris, Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. Querying Interlinked Data by Bridging RDF Molecule Templates. In Transactions on Large-Scale Data- and Knowledge-Centered Systems XXXIX, volume 11310, pages 1–42. Springer, Berlin, Heidelberg, 11 2018. doi:10.1007/978-3-662-58415-6_1.">1</a>]</span>.
 See below for an example based on FOAF.</p>
-<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
-<span class="w">  </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;rootType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/Person&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;predicates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;predicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/interest&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/Document&quot;</span>
-<span class="w">        </span><span class="p">]</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;predicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/knows&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/Person&quot;</span>
-<span class="w">        </span><span class="p">]</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;predicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/name&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;linkedTo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/Document&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/Person&quot;</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;wrappers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://example.com/sparql&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;predicates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/interest&quot;</span>
-<span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;urlparam&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://private.example.com/sparql&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;predicates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/knows&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/name&quot;</span>
-<span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;urlparam&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example_user&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1234&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;rootType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/Document&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;predicates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;predicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/topic&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;linkedTo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">    </span><span class="nt">&quot;wrappers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://example.com/sparql&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;predicates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;http://xmlns.com/foaf/0.1/topic&quot;</span>
-<span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;urlparam&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">]</span>
+<div class="highlight-turtle notranslate"><div class="highlight"><pre><span></span><span class="k">@prefix</span><span class="w"> </span><span class="nn">foaf:</span><span class="w"> </span><span class="nv">&lt;http://xmlns.com/foaf/0.1/&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdf:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">semsd:</span><span class="w"> </span><span class="nv">&lt;https://research.tib.eu/semantic-source-description#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xsd:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="nn">foaf</span><span class="p">:</span><span class="nt">Document</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Class</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasProperty</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">topic</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasSource</span> <span class="nv">&lt;http://example.com/sparql&gt;</span> <span class="p">.</span>
+
+<span class="nn">foaf</span><span class="p">:</span><span class="nt">Person</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Class</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasProperty</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">interest</span><span class="p">,</span>
+        <span class="nn">foaf</span><span class="p">:</span><span class="nt">knows</span><span class="p">,</span>
+        <span class="nn">foaf</span><span class="p">:</span><span class="nt">name</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasSource</span> <span class="nv">&lt;http://example.com/sparql&gt;</span><span class="p">,</span>
+        <span class="nv">&lt;http://private.example.com/sparql&gt;</span> <span class="p">.</span>
+
+<span class="nn">foaf</span><span class="p">:</span><span class="nt">interest</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasSource</span> <span class="nv">&lt;http://example.com/sparql&gt;</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">propertyRange</span> <span class="p">[</span> <span class="kt">a</span> <span class="nn">semsd</span><span class="p">:</span><span class="nt">PropertyRange</span> <span class="p">;</span>
+            <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+            <span class="nn">rdfs</span><span class="p">:</span><span class="nt">range</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">Document</span> <span class="p">]</span> <span class="p">.</span>
+
+<span class="nn">foaf</span><span class="p">:</span><span class="nt">knows</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasSource</span> <span class="nv">&lt;http://private.example.com/sparql&gt;</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">propertyRange</span> <span class="p">[</span> <span class="kt">a</span> <span class="nn">semsd</span><span class="p">:</span><span class="nt">PropertyRange</span> <span class="p">;</span>
+            <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+            <span class="nn">rdfs</span><span class="p">:</span><span class="nt">range</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">Person</span> <span class="p">]</span> <span class="p">.</span>
+
+<span class="nn">foaf</span><span class="p">:</span><span class="nt">name</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasSource</span> <span class="nv">&lt;http://private.example.com/sparql&gt;</span> <span class="p">.</span>
+
+<span class="nn">foaf</span><span class="p">:</span><span class="nt">topic</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasSource</span> <span class="nv">&lt;http://example.com/sparql&gt;</span> <span class="p">.</span>
+
+<span class="nv">&lt;http://private.example.com/sparql&gt;</span> <span class="kt">a</span> <span class="nn">semsd</span><span class="p">:</span><span class="nt">DataSource</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasURL</span> <span class="s">&quot;http://private.example.com/sparql&quot;</span><span class="p">^^</span><span class="nn">xsd</span><span class="p">:</span><span class="nt">anyURI</span> <span class="p">.</span>
+
+<span class="nv">&lt;http://example.com/sparql&gt;</span> <span class="kt">a</span> <span class="nn">semsd</span><span class="p">:</span><span class="nt">DataSource</span> <span class="p">;</span>
+    <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasURL</span> <span class="s">&quot;http://example.com/sparql&quot;</span><span class="p">^^</span><span class="nn">xsd</span><span class="p">:</span><span class="nt">anyURI</span> <span class="p">.</span>
 </pre></div>
 </div>
 </section>

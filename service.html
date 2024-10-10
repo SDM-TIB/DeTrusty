@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Service &mdash; DeTrusty 0.17.0 documentation</title>
+  <title>DeTrusty as a Service &mdash; DeTrusty 0.18.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=1aa419d7"></script>
+        <script src="_static/documentation_options.js?v=f0c74d41"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -164,7 +164,7 @@ Put one URL per line and execute the following command.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>DeTrusty<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;create_rdfmts.py -s /DeTrusty/Config/endpoints.txt&#39;</span>
 </pre></div>
 </div>
-<p>After the new source description file was generated as <code class="docutils literal notranslate"><span class="pre">/DeTrusty/Config/rdfmts.json</span></code>, you need to restart the <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code> workers in order for the changes to take effect.</p>
+<p>After the new source description file was generated as <code class="docutils literal notranslate"><span class="pre">/DeTrusty/Config/rdfmts.ttl</span></code>, you need to restart the <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code> workers in order for the changes to take effect.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>DeTrusty<span class="w"> </span>restart_workers.sh
 </pre></div>
 </div>

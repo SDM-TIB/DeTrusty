@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Library &mdash; DeTrusty 0.17.0 documentation</title>
+  <title>DeTrusty as a Library &mdash; DeTrusty 0.18.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=1aa419d7"></script>
+        <script src="_static/documentation_options.js?v=f0c74d41"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.17.0
+                0.18.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -178,32 +178,32 @@ DeTrusty executed the sub-query at the specified endpoint instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The SPARQL query to be executed. Might be a string holding the SPARQL query or path to
+<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The SPARQL query to be executed. Might be a string holding the SPARQL query or path to
 a query file. The query file can be local or remote (accessible via GET request).</p></li>
-<li><p><strong>decomposition_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The decomposition type to be used for decomposing the query. Possible values
+<li><p><strong>decomposition_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The decomposition type to be used for decomposing the query. Possible values
 are ‘STAR’ for a star-shaped decomposition, ‘EG’ for exclusive groups decomposition,
 and ‘TRIPLE’ for a triple-wise decomposition, i.e., each triple pattern of the query
 produces a sub-query. Default is ‘STAR’.</p></li>
-<li><p><strong>sparql_one_dot_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – <div class="deprecated">
+<li><p><strong>sparql_one_dot_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 0.15.0: </span>No longer needed. DeTrusty is using one parser now.</p>
 </div>
 </p></li>
 <li><p><strong>config</strong> (<em>DeTrusty.Molecule.MTManager.Config</em><em>, </em><em>optional</em>) – The configuration holding the metadata about the federation over which the
 SPARQL query should be executed. If no value is specified, DeTrusty will
 attempt to load the configuration from <cite>./Config/rdfmts.json</cite>.</p></li>
-<li><p><strong>join_stars_locally</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether joins should be performed at the query engine.
+<li><p><strong>join_stars_locally</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether joins should be performed at the query engine.
 ‘True’ meaning joins will be performed in DeTrusty, ‘False’ leads to joins
 being executed in the sources if possible. Default behavior is join execution
 at the query engine level.</p></li>
-<li><p><strong>print_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the actual query result should be returned.
+<li><p><strong>print_result</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the actual query result should be returned.
 ‘True’ meaning the result will be included in the answer.
 ‘False’ only returns the metadata of the query result, like the cardinality.
 Default is ‘True’.</p></li>
-<li><p><strong>yasqe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the SPARQL query was sent from the YASGUI interface of
+<li><p><strong>yasqe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the SPARQL query was sent from the YASGUI interface of
 DeTrusty’s Web interface. This is a workaround for YASQE not being able
 to show the query results when the validation data is included.
 Set to ‘True’ to omit the validation data. Default is ‘False’.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – <div class="admonition warning">
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This feature is currently considered experimental and will not produce partial results!</p>
 </div>
@@ -221,7 +221,7 @@ It returns an error message in the ‘error’ field if something went wrong. Ot
 be omitted in that case.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -252,7 +252,7 @@ usage of this function is to read stored source descriptions from a file (local 
 in order to reuse them for query execution over the same federation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config_input</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>]</em>) – The source description to transform into the internal representation. Might be a string holding the path
+<dd class="field-odd"><p><strong>config_input</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>]</em>) – The source description to transform into the internal representation. Might be a string holding the path
 to a configuration file. The configuration file can be local or remote (accessible via GET request).
 The source description can also be a parsed JSON, i.e., a list of Python dictionaries. Each dictionary
 represents a so-called <em>RDF Molecule Template</em>.</p>
@@ -266,13 +266,19 @@ if there was an issue while reading the source descriptions that did not lead to
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>The example calls assume that the file <code class="docutils literal notranslate"><span class="pre">rdftms.json</span></code> is a valid source description file created by DeTrusty.
+<p>The example calls assume that the files <code class="docutils literal notranslate"><span class="pre">rdftms.json</span></code> and <code class="docutils literal notranslate"><span class="pre">rdfmts.ttl</span></code> are valid source description files created by DeTrusty.
 See <a class="reference external" href="https://sdm-tib.github.io/DeTrusty/library.html#creating-source-descriptions">Creating Source Descriptions</a>
 for more information.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;./rdfmts.json&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;./rdfmts.ttl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;http://example.com/rdfmts.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;http://example.com/rdfmts.ttl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -314,7 +320,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the Knowledge4COVID-19 KG and DBpedia. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q1.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -347,7 +353,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the Knowledge4COVID-19 KG and Wikidata. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q2.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -386,7 +392,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the Knowledge4COVID-19 KG and DBpedia. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q3.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -416,7 +422,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the Knowledge4COVID-19 KG and Wikidata. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q4.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -455,7 +461,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the Knowledge4COVID-19 KG, DBpedia, and Wikidata. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q5.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -508,7 +514,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the World Bank KG and Wikidata. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/Q1.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -556,7 +562,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 <p>This query collects data from the World Bank KG and Wikidata. See below how to execute the query with DeTrusty.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/Q2.rq&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">join_stars_locally</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -575,26 +581,26 @@ We refer the reader to the chapter <a class="reference internal" href="source_de
 <p>DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">create_rdfmts</span></code> for the source description creation.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_rdfmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/DeTrusty/Config/rdfmts.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interlinking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Generating rdfmts.json, which need to be supplied during query execution using run_query</p>
+<span class="sig-name descname"><span class="pre">create_rdfmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/DeTrusty/Config/rdfmts.ttl'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Generating rdfmts.ttl, which need to be supplied during query execution using run_query</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>endpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The endpoints, from which informations will be collected.</p></li>
-<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Path location in which the generated configuration will be saved.</p>
+<li><p><strong>endpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – The endpoints from which information will be collected.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Path for the generated configuration to be saved at.</p>
 <ul>
-<li><p>In case of not supplied: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.json’</p></li>
-<li><p>In case of None is supplied: the config won’t be saved, instead JSONConfig files will be returned.</p></li>
+<li><p>If not provided: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.ttl’</p></li>
+<li><p>In case of None: the config will not be saved, instead a TTLConfig object is returned.</p></li>
 </ul>
 </p></li>
-<li><p><strong>interlinking</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – When supplied with True, the module will assume that there’s an interlinks between endpoints, and thus generating configuration that suits this purpose. Default value is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>only generating return value when output=None.</p>
+<dd class="field-even"><p>Only generating return value when output=None, else a file with the configuration is saved
+at the location provided with the parameter output.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>JSONConfig, optional</p>
+<dd class="field-odd"><p>TTLConfig, optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -609,11 +615,11 @@ We refer the reader to the chapter <a class="reference internal" href="source_de
 <section id="standard-case">
 <h3>Standard Case<a class="headerlink" href="#standard-case" title="Link to this heading"></a></h3>
 <p>The standard case is to include only public SPARQL endpoints in the federation, collect the source description via SPARQL queries, and consider all classes in the endpoints.
-The following code snippet collects the source description of two public endpoints and saves it in the file <code class="docutils literal notranslate"><span class="pre">./Config/rdfmts.json</span></code>.</p>
+The following code snippet collects the source description of two public endpoints and saves it in the file <code class="docutils literal notranslate"><span class="pre">./Config/rdfmts.ttl</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
 
 <span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;http://url_to_endpoint_1&#39;</span><span class="p">,</span> <span class="s1">&#39;https://url_to_endpoint_2:port/sparql&#39;</span><span class="p">]</span>
-<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Alternatively,</strong> <code class="docutils literal notranslate"><span class="pre">None</span></code> can be passed instead of a path.
@@ -646,7 +652,7 @@ The configuration changes slightly compared to the standard case:</p>
 </span><span class="hll">    <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;YOUR_PASSWORD&#39;</span>
 </span><span class="hll">  <span class="p">}</span>
 </span><span class="p">}</span>
-<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The keys of <code class="docutils literal notranslate"><span class="pre">endpoints</span></code> are the URLs of the SPARQL endpoints.
@@ -672,7 +678,7 @@ Of course, this is only feasible for endpoints that were created using RML mappi
 </span><span class="hll">    <span class="p">]</span>
 </span><span class="hll">  <span class="p">}</span>
 </span><span class="p">}</span>
-<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The key <code class="docutils literal notranslate"><span class="pre">mappings</span></code> holds a list of paths to the mapping files that were used to create the RDF data served by the SPARQL endpoint.</p>
@@ -694,7 +700,7 @@ Of course, this is only feasible for endpoints that were created using RML mappi
 </span><span class="hll">    <span class="p">]</span>
 </span><span class="hll">  <span class="p">}</span>
 </span><span class="p">}</span>
-<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.json&#39;</span><span class="p">)</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The key <code class="docutils literal notranslate"><span class="pre">types</span></code> holds a list of all the classes of the endpoint that should be considered for the source description creation process.</p>
