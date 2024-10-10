@@ -2,7 +2,6 @@ from __future__ import annotations
 
 __author__ = 'Philipp D. Rohde and Kemele M. Endris'
 
-import json
 import logging
 import multiprocessing
 import sys
@@ -10,16 +9,17 @@ from queue import Queue
 from time import time
 from typing import Optional
 
-from rdflib import Graph
+from rdflib import Graph, URIRef, BNode, Literal, RDF, RDFS, XSD
 
 from DeTrusty.Logger import get_logger
-from DeTrusty.Molecule.MTManager import JSONConfig, MTCreationConfig
+from DeTrusty.Molecule import SEMSD
+from DeTrusty.Molecule.MTManager import MTCreationConfig, TTLConfig
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger('rdfmts', '.rdfmts.log', file_and_console=True)
 
 CONFIG = MTCreationConfig()
-DEFAULT_OUTPUT_PATH = '/DeTrusty/Config/rdfmts.json'
+DEFAULT_OUTPUT_PATH = '/DeTrusty/Config/rdfmts.ttl'
 TYPING_WIKIDATA = '<http://www.wikidata.org/prop/direct/P31>'
 
 metas = [
@@ -44,40 +44,40 @@ class Endpoint:
     def types(self):
         return self.params.get('types', [])
 
-    def get_params(self):
-        if self.params is None or len(self.params.keys()) == 0:
-            return ''
-        params_public = self.params.copy()
-        params_public.pop('token', None)
-        params_public.pop('valid_until', None)
-        params_public.pop('mappings', None)
-        params_public.pop('types', None)
-        return params_public
+    @property
+    def triples(self):
+        triples = set()
+        triples.add((URIRef(self.url), RDF.type, SEMSD.DataSource))
+        triples.add((URIRef(self.url), SEMSD.hasURL, Literal(self.url, datatype=XSD.anyURI)))
+        if 'username' in self.params.keys():
+            triples.add((URIRef(self.url), SEMSD.username, Literal(self.params['username'])))
+        if 'password' in self.params.keys():
+            triples.add((URIRef(self.url), SEMSD.password, Literal(self.params['password'])))
+        if 'keycloak' in self.params.keys():
+            triples.add((URIRef(self.url), SEMSD.tokenServer, Literal(self.params['keycloak'])))
+        return triples
 
 
 def create_rdfmts(endpoints: list | dict,
-                  output: Optional[str] = DEFAULT_OUTPUT_PATH,
-                  interlinking: bool = False) -> Optional[JSONConfig]:
+                  output: Optional[str] = DEFAULT_OUTPUT_PATH) -> Optional[TTLConfig]:
 
-    """Generating rdfmts.json, which need to be supplied during query execution using run_query
+    """Generating rdfmts.ttl, which need to be supplied during query execution using run_query
 
     Parameters
     ----------
     endpoints : list or dict
-        The endpoints, from which informations will be collected.
+        The endpoints from which information will be collected.
     output : str, optional
-        Path location in which the generated configuration will be saved. 
+        Path for the generated configuration to be saved at.
 
-        * In case of not supplied: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.json'
-        * In case of None is supplied: the config won't be saved, instead JSONConfig files will be returned.
-
-    interlinking : bool, optional
-        When supplied with True, the module will assume that there's an interlinks between endpoints, and thus generating configuration that suits this purpose. Default value is False.
+        * If not provided: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.ttl'
+        * In case of None: the config will not be saved, instead a TTLConfig object is returned.
 
     Return
     ------
-    JSONConfig, optional
-        only generating return value when output=None.
+    TTLConfig, optional
+        Only generating return value when output=None, else a file with the configuration is saved
+        at the location provided with the parameter output.
 
     """
     logger_wrapper = get_logger('DeTrusty.Wrapper.RDFWrapper')
@@ -96,8 +96,8 @@ def create_rdfmts(endpoints: list | dict,
                             '\tPlease, check your permissions!')
             raise e
 
-    dsrdfmts = {}
-    sparqlendps = {}
+    graph = Graph()
+    graph.bind('mt', SEMSD)
     eoffs = {}
     epros = []
     start = time()
@@ -110,6 +110,7 @@ def create_rdfmts(endpoints: list | dict,
         logger.critical('None of the endpoints can be accessed. Please check if you write URLs properly!')
         sys.exit(1)
     for e in endpoints:
+        [graph.add(triple) for triple in e.triples]
         tq = multiprocessing.Queue()
         eoffs[e.url] = tq
         p1 = multiprocessing.Process(target=_collect_rdfmts_from_source, args=(e, tq,))
@@ -118,121 +119,63 @@ def create_rdfmts(endpoints: list | dict,
 
     while len(eoffs) > 0:
         for url in eoffs:
-            q = eoffs[url]
-            rdfmts = q.get()
-            sparqlendps[url] = rdfmts
+            result_queue = eoffs[url]
+            triples = result_queue.get()
+            [graph.add(triple) for triple in triples]
             del eoffs[url]
             break
     for p in epros:
         if p.is_alive():
             p.terminate()
 
-    # now the interlinking
-    if interlinking:
-        eofflags = []
-        epros = []
-        for e1 in endpoints:
-            for e2 in endpoints:
-                if e1 == e2:
-                    continue
-                q = multiprocessing.Queue()
-                eofflags.append(q)
-                logger.info('Finding inter-links between: ' + e1.url + ' and ' + e2.url)
-                logger.info('==============================//=========//===============================')
-                p = multiprocessing.Process(target=_get_links, args=(e1, sparqlendps[e1.url], e2, sparqlendps[e2.url], q,))
-                epros.append(p)
-                p.start()
-
-        while len(eofflags) > 0:
-            for q in eofflags:
-                rdfmts = q.get()
-                for rdfmt in rdfmts:
-                    rootType = rdfmt['rootType']
-                    if rootType not in dsrdfmts:
-                        dsrdfmts[rootType] = rdfmt
-                    else:
-                        _merge_mts(rdfmt, rootType, dsrdfmts)
-                eofflags.remove(q)
-                break
-
-        for p in epros:
-            if p.is_alive():
-                p.terminate()
-
-    for e in sparqlendps:
-        rdfmts = sparqlendps[e]
-        for rdfmt in rdfmts:
-            rootType = rdfmt['rootType']
-            if rootType not in dsrdfmts:
-                dsrdfmts[rootType] = rdfmt
-            else:
-                _merge_mts(rdfmt, rootType, dsrdfmts)
-
-    templates = list(dsrdfmts.values())
     duration = time() - start
     logger.info('----- DONE in ' + str(duration) + ' seconds!-----')
     logger_wrapper.setLevel(logging.INFO)  # reset the logger
     if output is not None:
-        json.dump(templates, open(output, 'w'), indent=2)
+        graph.serialize(output, format='turtle', encoding='utf8')
     else:
-        return JSONConfig(templates)
+        return TTLConfig(graph.serialize(None, format='turtle', encoding='utf8'))
 
 
 def _collect_rdfmts_from_source(endpoint: Endpoint, tq):
     # get the typed concepts, predicates, etc. for one source
     if 'mappings' in endpoint.params:
-        molecules, template_classes = get_rdfmts_from_mapping(endpoint)
+        triples, classes, template_classes = get_rdfmts_from_mapping(endpoint)
         if template_classes:
             # get metadata for classes that use a template from the endpoint
-            classes = [mol['rootType'] for mol in molecules]
-            molecules.extend(get_rdfmts_from_endpoint(endpoint, set(classes)))
+            triples = triples.union(get_rdfmts_from_endpoint(endpoint, ignore_classes=classes))
     else:
-        molecules = get_rdfmts_from_endpoint(endpoint)
-    tq.put(molecules)
+        triples = get_rdfmts_from_endpoint(endpoint)
+    tq.put(triples)
     tq.put('EOF')
-    return molecules
+    return triples
 
 
 def get_rdfmts_from_endpoint(endpoint: Endpoint, ignore_classes=None):
     concepts = _get_typed_concepts(endpoint)
-    logger.info(endpoint.url + ': ' + str(concepts))
+    source = endpoint.url
+    logger.info(source + ': ' + str(concepts))
     if ignore_classes is not None:
-        logger.info(endpoint.url + ' ignoring classes: ' + str(ignore_classes))
+        logger.info(source + ' ignoring classes: ' + str(ignore_classes))
         concepts = [c for c in concepts if c not in ignore_classes]
-        logger.info(endpoint.url + ' considering only: ' + str(concepts))
-    molecules = []
+        logger.info(source + ' considering only: ' + str(concepts))
+    triples = set()
     for c in concepts:
         if '^^' in c:
             continue
         logger.info(c)
-        class_properties = []
-        linked_to = set()
+        triples = triples.union(_triples_class(c, source))
         predicates = _get_predicates(endpoint, c)
         for p in predicates:
             if 'wikiPageWikiLink' in p:
                 continue
-            range_ = _get_predicate_range(endpoint, c, p)
-            if len(range_) > 0:
-                [linked_to.add(r) for r in range_]
-            class_properties.append({
-                'predicate': p,
-                'range': range_,
-                'policies': [{'dataset': endpoint.url, 'operator': 'PR'}]
-            })
-        molecules.append({
-            'rootType': c,
-            'predicates': class_properties,
-            'linkedTo': list(linked_to),
-            'wrappers': [{
-                'url': endpoint.url,
-                'predicates': predicates,
-                'urlparam': endpoint.get_params(),
-                'wrapperType': 'SPARQLEndpoint'
-            }]
-        })
+            triples = triples.union(_triples_predicate(p, c, source))
+            ranges_ = _get_predicate_range(endpoint, c, p)
+            for range_ in ranges_:
+                triples = triples.union(_triples_predicate_range(p, c, range_, source))
 
     logger.info('=================================')
-    return molecules
+    return triples
 
 
 def _get_typed_concepts(endpoint):
@@ -368,90 +311,8 @@ def _get_results_iter(query: str, endpoint: Endpoint, return_variable: str, limi
 
     return res_list, status
 
-
-def _get_links(endpoint1, rdfmt1, endpoint2, rdfmt2, q):
-    found = False
-    for c in rdfmt1:
-        for p in c['predicates']:
-            if p['predicate'] == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
-                continue
-            ext_links = _get_external_links(endpoint1, c['rootType'], p['predicate'], endpoint2, rdfmt2)
-            if len(ext_links) > 0:
-                found = True
-                c['linkedTo'].extend(ext_links)
-                c['linkedTo'] = list(set(c['linkedTo']))
-                p['range'].extend(ext_links)
-                p['range'] = list(set(p['range']))
-    if found:
-        q.put(rdfmt1)
-    else:
-        q.put([])
-    q.put('EOF')
-
-
-def _get_external_links(endpoint1, root_type, predicate, endpoint2, rdfmt2):
-    query = 'SELECT DISTINCT ?o WHERE { ?s '
-    if 'wikidata' in endpoint1.url:
-        query += TYPING_WIKIDATA
-    else:
-        query += 'a'
-    query += ' <' + root_type + '> ; <' + predicate + '> ?o . FILTER (isIRI(?o)) }'
-    e1_objects, _ = _get_results_iter(query, endpoint1, 'o', max_tries=100)
-    batches = [e1_objects[i:i + 45] for i in range(0, len(e1_objects), 45)]
-    linked_to = set()
-    for batch in batches:
-        batch = ['<' + r + '>' for r in batch]
-        query = 'SELECT DISTINCT ?c WHERE {\n' \
-                '  VALUES ?o { ' + ' '.join(batch) + ' }\n' \
-                '  ?s ?p ?o .\n' \
-                '  ?s '
-        if 'wikidata' in endpoint2.url:
-            query += TYPING_WIKIDATA
-        else:
-            query += 'a'
-        query += ' ?c .\n' \
-                 '}'
-        res_list, _ = _get_results_iter(query, endpoint2, 'c', max_tries=10)
-        [linked_to.add(r) for r in res_list]
-
-        if len(linked_to) == len(rdfmt2):
-            break
-    if len(linked_to) > 0:
-        logger.info(root_type + ', ' + predicate + ' --> ' + str(linked_to))
-    return list(linked_to)
-
-
-def _merge_mts(rdfmt, root_type, dsrdfmts):
-    otherrdfmt = dsrdfmts[root_type]
-
-    dss = {d['url']: d for d in otherrdfmt['wrappers']}
-
-    if rdfmt['wrappers'][0]['url'] not in dss:
-        otherrdfmt['wrappers'].extend(rdfmt['wrappers'])
-    else:
-        pps = rdfmt['wrappers'][0]['predicates']
-        dss[rdfmt['wrappers'][0]['url']]['predicates'].extend(pps)
-        dss[rdfmt['wrappers'][0]['url']]['predicates'] = list(set(dss[rdfmt['wrappers'][0]['url']]['predicates']))
-        otherrdfmt['wrappers'] = list(dss.values())
-
-    predicates_other = {p['predicate']: p for p in otherrdfmt['predicates']}
-    predicates_this = {p['predicate']: p for p in rdfmt['predicates']}
-    predicates_same = set(predicates_other.keys()).intersection(predicates_this.keys())
-    for p in predicates_same:
-        if len(predicates_this[p]['range']) > 0:
-            predicates_other[p]['range'].extend(predicates_this[p]['range'])
-            predicates_other[p]['range'] = list(set(predicates_other[p]['range']))
-    preds = [predicates_other[p] for p in predicates_other]
-    otherrdfmt['predicates'] = preds
-    newpreds = set(list(predicates_this.keys())).difference(list(predicates_other.keys()))
-    otherrdfmt['predicates'].extend([predicates_this[p] for p in newpreds])
-    otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
-
-
 def get_rdfmts_from_mapping(endpoint: Endpoint):
-    rdf_type = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-    policies = [{'dataset': endpoint.url, 'operator': 'PR'}]
-
+    source = endpoint.url
     mapping_graph = Graph()
     for mapping_file in endpoint.params['mappings']:
         mapping_graph.parse(mapping_file, format='n3')
@@ -501,46 +362,41 @@ def get_rdfmts_from_mapping(endpoint: Endpoint):
             '} ORDER BY ?t ?p ?r'
 
     res = mapping_graph.query(query)
-    metadata = {}
+    classes = set()
+    triples = set()
     for r in res:
         class_ = str(r['t'])
-        if class_ not in metadata:
-            metadata[class_] = {
-                'predicates': {},
-                'linkedTo': set()
-            }
-            metadata[class_]['predicates'][rdf_type] = {
-                'predicate': rdf_type,
-                'range': [],
-                'policies': policies
-            }
+        classes.add(class_)
+        triples = triples.union(_triples_class(class_, source))
+        triples = triples.union(_triples_predicate(RDF.type.toPython(), class_, source))
 
         predicate = str(r['p'])
+        triples = triples.union(_triples_predicate(predicate, class_, source))
         range_ = str(r['r']) if r['r'] is not None else None
-        if predicate not in metadata[class_]['predicates']:
-            metadata[class_]['predicates'][predicate] = {
-                'predicate': predicate,
-                'range': [] if range_ is None else [range_],
-                'policies': policies
-            }
-        else:
-            if range_ is not None:
-                metadata[class_]['predicates'][predicate]['range'].append(range_)
-
         if range_ is not None:
-            metadata[class_]['linkedTo'].add(range_)
+            triples.union(_triples_predicate_range(predicate, class_, range_, source))
 
-    molecules = []
-    for mol in metadata:
-        molecules.append({
-            'rootType': mol,
-            'predicates': list(metadata[mol]['predicates'].values()),
-            'linkedTo': list(metadata[mol]['linkedTo']),
-            'wrappers': [{
-                'url': endpoint.url,
-                'predicates': list(metadata[mol]['predicates'].keys()),
-                'urlparam': endpoint.get_params() or '',
-                'wrapperType': 'SPARQLEndpoint'
-            }]
-        })
-    return molecules, template_classes
+    return triples, classes, template_classes
+
+def _triples_class(class_, source):
+    c = set()
+    c.add((URIRef(class_), RDF.type, RDFS.Class))
+    c.add((URIRef(class_), SEMSD.hasSource, URIRef(source)))
+    return c
+
+def _triples_predicate(predicate, class_, source):
+    pred = set()
+    pred.add((URIRef(predicate), RDF.type, RDF.Property))
+    pred.add((URIRef(predicate), SEMSD.hasSource, URIRef(source)))
+    pred.add((URIRef(class_), SEMSD.hasProperty, URIRef(predicate)))
+    return pred
+
+def _triples_predicate_range(predicate, domain, range_, source):
+    predicate_range = set()
+    range_info = BNode()
+    predicate_range.add((URIRef(predicate), SEMSD.propertyRange, range_info))
+    predicate_range.add((range_info, RDF.type, SEMSD.PropertyRange))
+    predicate_range.add((range_info, RDFS.domain, URIRef(domain)))
+    predicate_range.add((range_info, RDFS.range, URIRef(range_)))
+    predicate_range.add((range_info, SEMSD.hasSource, URIRef(source)))
+    return predicate_range

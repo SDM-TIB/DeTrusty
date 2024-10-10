@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__author__ = 'Kemele M. Endris and Philipp D. Rohde'
+__author__ = 'Philipp D. Rohde and Kemele M. Endris'
 
 import abc
 import json
@@ -9,6 +9,10 @@ import time
 from base64 import b64encode
 
 import requests
+from pyoxigraph import Store
+from rdflib.namespace import RDFS, XSD
+
+from DeTrusty.Molecule import SEMSD
 from DeTrusty.utils import is_url, read_file_from_internet
 
 
@@ -37,22 +41,33 @@ def get_config(config_input: str | list[dict]):
 
     Examples
     --------
-    The example calls assume that the file ``rdftms.json`` is a valid source description file created by DeTrusty.
+    The example calls assume that the files ``rdftms.json`` and ``rdfmts.ttl`` are valid source description files created by DeTrusty.
     See `Creating Source Descriptions <https://sdm-tib.github.io/DeTrusty/library.html#creating-source-descriptions>`_
     for more information.
 
     >>> get_config('./rdfmts.json')
 
+   >>> get_config('./rdfmts.ttl')
+
     >>> get_config('http://example.com/rdfmts.json')
+
+    >>> get_config('http://example.com/rdfmts.ttl')
 
     """
     if isinstance(config_input, list):
         return JSONConfig(config_input)
     else:
         if os.path.isfile(config_input):
-            return ConfigFile(config_input)
+            extension = os.path.splitext(config_input)[1]
+            if extension.lower() == '.json':
+                return ConfigFile(config_input)
+            else:
+                return TTLConfig(config_input)
         elif is_url(config_input):
-            config = JSONConfig(read_file_from_internet(config_input, json_response=True))
+            if config_input.endswith('.json'):
+                config = JSONConfig(read_file_from_internet(config_input, json_response=True))
+            else:
+                config = TTLConfig(read_file_from_internet(config_input, json_response=False))
             config.orig_file = config_input
             return config
     return Config()
@@ -312,3 +327,131 @@ class JSONConfig(Config):
         for m in self.metadata:
             meta[m['rootType']] = m
         return meta
+
+
+class TTLConfig(Config):
+    def __init__(self, ttl):
+        super().__init__()
+        self.ttl = Store()
+        self.ttl.load(ttl, 'text/turtle')
+        self.ttl.optimize()
+        self.endpoints = self.getEndpoints()
+
+    def getAll(self):
+        return None
+
+    def get_molecules(self):
+        mts = []
+        query = "SELECT DISTINCT ?mt WHERE { ?mt a " + RDFS.Class.n3() + " }"
+        result = self.ttl.query(query)
+        for res in result:
+            mts.append(res['mt'].value)
+        return mts
+
+    def get_molecule_predicates(self, mol):
+        preds = []
+        query = "SELECT DISTINCT ?pred WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
+        query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " ?pred .\n}"
+        result = self.ttl.query(query)
+        for res in result:
+            preds.append(res['pred'].value)
+        return preds
+
+    def get_molecule_links(self, mol):
+        links = []
+        query = "SELECT DISTINCT ?link WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
+        query += "  <" + mol + "> " + SEMSD.linkedTo.n3() + " ?link .\n}"
+        result = self.ttl.query(query)
+        for res in result:
+            links.append(res['link'].value)
+        return links
+
+    def get_molecule_links_of_pred(self, mol, pred):
+        links = []
+        query = "SELECT DISTINCT ?link WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
+        query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " <" + pred + "> .\n"
+        query += "  <" + pred + "> " + SEMSD.propertyRange.n3() + " ?prange .\n"
+        query += "  ?prange " + RDFS.domain.n3() + " <" + mol + "> .\n"
+        query += "  ?prange " + RDFS.range.n3() + " ?link .\n"
+        query += "}"
+        result = self.ttl.query(query)
+        for res in result:
+            links.append(res['link'].value)
+        return links
+
+    def get_molecule_endpoints(self, mol):
+        endpoints = []
+        query = "SELECT DISTINCT ?url WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
+        query += "  <" + mol + "> " + SEMSD.hasSource.n3() + " ?source .\n"
+        query += "  ?source " + SEMSD.hasURL.n3() + " ?url .\n}"
+        result = self.ttl.query(query)
+        for res in result:
+            endpoints.append(res['url'].value)
+        return endpoints
+
+    def get_molecule_endpoint_preds(self, mol, endpoint):  # endpoint is the URL of the endpoint
+        predicates = []
+        query = "SELECT DISTINCT ?pred WHERE {\n"
+        query += "  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
+        query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " ?pred .\n"
+        query += "  ?pred " + SEMSD.hasSource.n3() + " ?source .\n"
+        query += "  ?source " + SEMSD.hasURL.n3() + ' "' + endpoint + '"^^' + XSD.anyURI.n3() + ' .\n'
+        query += "}"
+        result = self.ttl.query(query)
+        for res in result:
+            predicates.append(res['pred'].value)
+        return predicates
+
+    def getEndpoints(self):
+        endpoints = {}
+        query = "SELECT DISTINCT ?url ?username ?password ?tokenServer WHERE {\n  ?endpoint a " + SEMSD.DataSource.n3() + " .\n"
+        query += "  ?endpoint " + SEMSD.hasURL.n3() + " ?url .\n"
+        query += "  OPTIONAL { ?endpoint " + SEMSD.username.n3() + " ?username }\n"
+        query += "  OPTIONAL { ?endpoint " + SEMSD.password.n3() + " ?password }\n"
+        query += "  OPTIONAL { ?endpoint " + SEMSD.tokenServer.n3() + " ?tokenServer }\n}"
+        result = self.ttl.query(query)
+        for res in result:
+            endpoints[res['url'].value] = {}
+            if res['username'] is not None:
+                endpoints[res['url'].value]['username'] = res['username'].value
+            if res['password'] is not None:
+                endpoints[res['url'].value]['password'] = res['password'].value
+            if res['tokenServer'] is not None:
+                endpoints[res['url'].value]['keycloak'] = res['tokenServer'].value
+        return endpoints
+
+    def findbypreds(self, preds):
+        mts = []
+        query = "SELECT DISTINCT ?mt WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
+        for p in preds:
+            query += "  ?mt " + SEMSD.hasProperty.n3() + " <" + p + "> .\n"
+        query += "}"
+        result = self.ttl.query(query)
+        for res in result:
+            mts.append(res['mt'].value)
+        return mts
+
+    def find_preds_per_mt(self, preds):
+        mts = {}
+        query = "SELECT DISTINCT ?mt ?pred WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
+        query += "  ?mt " + SEMSD.hasProperty.n3() + " ?pred .\n"
+        if len(preds) > 0:
+            query += "  VALUES ?pred { " + ' '.join(['<' + p + '>' for p in preds]) + " }\n"
+        query += "}"
+        result = self.ttl.query(query)
+        for res in result:
+            if not res['mt'].value in mts.keys():
+                mts[res['mt'].value] = [res['pred'].value]
+            else:
+                mts[res['mt'].value].append(res['pred'].value)
+        return mts
+
+    def findbypred(self, pred):
+        mts = []
+        query = "SELECT DISTINCT ?mt WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
+        query += "  ?mt " + SEMSD.hasProperty.n3() + " <" + pred + "> .\n"
+        query += "}"
+        result = self.ttl.query(query)
+        for res in result:
+            mts.append(res['mt'].value)
+        return mts
