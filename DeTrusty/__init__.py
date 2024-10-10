@@ -65,6 +65,7 @@ def run_query(query: str,
         .. warning::
             This feature is currently considered experimental and will not produce partial results!
         .. versionadded:: 0.17.0
+
         DeTrusty will stop the query execution once the timeout is reached.
         The timeout is specified in seconds. The default is 0 and reflects no limit.
 

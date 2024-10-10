@@ -48,7 +48,7 @@ def get_config(config_input: str | list[dict]):
 
     >>> get_config('./rdfmts.json')
 
-   >>> get_config('./rdfmts.ttl')
+    >>> get_config('./rdfmts.ttl')
 
     >>> get_config('http://example.com/rdfmts.json')
 
