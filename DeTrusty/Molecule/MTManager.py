@@ -63,7 +63,9 @@ def get_config(config_input: str | list[dict]):
             if extension.lower() == '.json':
                 return ConfigFile(config_input)
             else:
-                return TTLConfig(config_input)
+                with open(config_input, 'r', encoding='utf8') as f:
+                    config_ttl = f.read()
+                return TTLConfig(config_ttl)
         elif is_url(config_input):
             if config_input.endswith('.json'):
                 config = JSONConfig(read_file_from_internet(config_input, json_response=True))
