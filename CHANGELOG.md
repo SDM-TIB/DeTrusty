@@ -1,3 +1,10 @@
+# v0.18.0 - 10 Oct 2024
+- Add feature for defining the source descriptions in RDF
+  - Create source descriptions in RDF
+  - Read source descriptions from RDF
+- Deprecate JSON-based source descriptions
+- Update documentation
+
 # v0.17.0 - 07 Oct 2024
 - Add query timeout feature
 - Docker: update Python
