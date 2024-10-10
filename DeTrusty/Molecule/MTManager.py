@@ -6,6 +6,7 @@ import abc
 import json
 import os
 import time
+import warnings
 from base64 import b64encode
 
 import requests
@@ -235,6 +236,10 @@ class Config(object):
 
 class ConfigFile(Config):
     def __init__(self, configfile):
+        warnings.warn(
+            'ConfigFile is deprecated and will be removed in a future release.',
+            DeprecationWarning, 2
+        )
         self.orig_file = configfile
         if os.path.isfile(configfile):
             super().__init__(configfile=configfile)
@@ -320,6 +325,10 @@ class MTCreationConfig(Config):
 
 class JSONConfig(Config):
     def __init__(self, json_data):
+        warnings.warn(
+            'JSONFile is deprecated and will be removed in a future release.',
+            DeprecationWarning, 2
+        )
         super().__init__(json_data=json_data)
 
     def getAll(self):
