@@ -97,7 +97,7 @@ def create_rdfmts(endpoints: list | dict,
             raise e
 
     graph = Graph()
-    graph.bind('mt', SEMSD)
+    graph.bind('semsd', SEMSD)
     eoffs = {}
     epros = []
     start = time()
