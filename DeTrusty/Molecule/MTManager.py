@@ -10,7 +10,7 @@ import warnings
 from base64 import b64encode
 
 import requests
-from pyoxigraph import Store
+from pyoxigraph import Store, RdfFormat
 from rdflib.namespace import RDFS, XSD
 
 from DeTrusty.Molecule import SEMSD
@@ -342,7 +342,7 @@ class TTLConfig(Config):
     def __init__(self, ttl):
         super().__init__()
         self.ttl = Store()
-        self.ttl.load(ttl, 'text/turtle')
+        self.ttl.load(ttl, RdfFormat.TURTLE)
         self.ttl.optimize()
         self.endpoints = self.getEndpoints()
 
