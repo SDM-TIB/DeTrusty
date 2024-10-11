@@ -1,3 +1,7 @@
+# v0.18.1 - 11 Oct 2024
+- Fix reading RDF-based configuration
+- Update dependencies in Dockerfile
+
 # v0.18.0 - 10 Oct 2024
 - Add feature for defining the source descriptions in RDF
   - Create source descriptions in RDF
