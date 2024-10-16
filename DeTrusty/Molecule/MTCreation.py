@@ -105,7 +105,7 @@ def create_rdfmts(endpoints: list | dict,
     CONFIG.setEndpoints(endpoints)
 
     endpoints = [Endpoint(key, value) for key, value in CONFIG.endpoints.items()]
-    endpoints = _accessible_endpoints(endpoints)
+    endpoints = _accessible_endpoints(endpoints, exit_on_error=True)
     if len(endpoints) == 0:
         logger.critical('None of the endpoints can be accessed. Please check if you write URLs properly!')
         sys.exit(1)
@@ -254,7 +254,7 @@ def _get_predicate_range(endpoint, type_, predicate):
     return list(set(ranges))
 
 
-def _accessible_endpoints(endpoints):
+def _accessible_endpoints(endpoints, exit_on_error=False):
     ask = 'ASK { ?s ?p ?o }'
     accessible_endpoints = []
     for e in endpoints:
@@ -262,7 +262,8 @@ def _accessible_endpoints(endpoints):
         val, c = contact_source(url, ask, Queue(), CONFIG)
         if c == -2:
             logger.error(url + ' --> is not accessible. Please check if this endpoint properly started!')
-            sys.exit(1)
+            if exit_on_error:
+                sys.exit(1)
         if val:
             accessible_endpoints.append(e)
         else:
