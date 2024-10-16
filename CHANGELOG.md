@@ -1,3 +1,6 @@
+# v0.18.2 - 16 Oct 2024
+- Add switch for exiting when checking endpoint accessibility
+
 # v0.18.1 - 11 Oct 2024
 - Fix reading RDF-based configuration
 - Update dependencies in Dockerfile
