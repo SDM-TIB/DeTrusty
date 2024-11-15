@@ -3,7 +3,7 @@ MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
-RUN python -m pip install --upgrade --no-cache-dir pip==24.2.* setuptools==75.1.* gunicorn==23.0.* && \
+RUN python -m pip install --upgrade --no-cache-dir pip==24.3.* setuptools==75.1.* gunicorn==23.0.* && \
     python -m pip install --no-cache-dir -r /DeTrusty/requirements.txt
 
 # copy the source code into the container
