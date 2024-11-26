@@ -7,13 +7,13 @@ The system needs to decide which source or sources contribute to which part of t
 Throughout this text the information the distributed system has about the different sources is called *source descriptions*.
 There are several approaches when it comes to source descriptions in federations of knowledge graphs.
 Some of these approaches are as simple as an index tracking which source is serving which RDF properties.
-DeTrusty follows the *RDF Molecule Template* :cite:p:`Endris2018` approach as proposed by Endris et al.
+DeTrusty follows a similar approach as the *RDF Molecule Template* :cite:p:`Endris2018` proposed by Endris et al.
+However, DeTrusty uses *semantic source descriptions*, i.e., they are described in RDF themselves.
 
-RDF Molecule Templates are a fine-grained description of an RDF dataset as well as its connections with other datasets.
-An RDF Molecule corresponds to an RDF class and keeps track which RDF properties are related to the instances of said RDF class.
+The semantic source descriptions are a fine-grained description of an RDF dataset as well as its connections with other datasets.
+An RDF class keeps track which RDF properties are related to the instances of said RDF class.
 While this inherently records the domain of the property, the range of the properties is also recorded.
-Since an RDF class can be served by more than just one dataset, this information is also encoded in the RDF Molecule Template.
-For more information and a formal definition, we refer the reader to :cite:p:`Endris2018`.
+Since an RDF class can be served by more than just one dataset, this information is also encoded.
 See below for an example based on FOAF.
 
 .. code:: turtle
@@ -37,15 +37,21 @@ See below for an example based on FOAF.
 
    foaf:interest a rdf:Property ;
        semsd:hasSource <http://example.com/sparql> ;
-       semsd:propertyRange [ a semsd:PropertyRange ;
-               rdfs:domain foaf:Person ;
-               rdfs:range foaf:Document ] .
+       semsd:propertyRange [
+           a semsd:PropertyRange ;
+           semsd:hasSource <http://example.com/sparql> ;
+           rdfs:domain foaf:Person ;
+           rdfs:range foaf:Document
+       ] .
 
    foaf:knows a rdf:Property ;
        semsd:hasSource <http://private.example.com/sparql> ;
-       semsd:propertyRange [ a semsd:PropertyRange ;
-               rdfs:domain foaf:Person ;
-               rdfs:range foaf:Person ] .
+       semsd:propertyRange [
+           a semsd:PropertyRange ;
+           semsd:hasSource <http://example.com/sparql> ;
+           rdfs:domain foaf:Person ;
+           rdfs:range foaf:Person
+       ] .
 
    foaf:name a rdf:Property ;
        semsd:hasSource <http://private.example.com/sparql> .
@@ -54,7 +60,9 @@ See below for an example based on FOAF.
        semsd:hasSource <http://example.com/sparql> .
 
    <http://private.example.com/sparql> a semsd:DataSource ;
-       semsd:hasURL "http://private.example.com/sparql"^^xsd:anyURI .
+      semsd:hasURL "http://private.example.com/sparql"^^xsd:anyURI ;
+      semsd:username "privateuser" ;
+      semsd:password "password" .
 
    <http://example.com/sparql> a semsd:DataSource ;
        semsd:hasURL "http://example.com/sparql"^^xsd:anyURI .
