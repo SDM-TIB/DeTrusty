@@ -1,3 +1,7 @@
+# v0.18.3 - 26 Nov 2024
+- Update dependencies
+- Update documentation
+
 # v0.18.2 - 16 Oct 2024
 - Add switch for exiting when checking endpoint accessibility
 
