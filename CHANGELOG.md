@@ -1,3 +1,8 @@
+# v0.19.0 - 10 Dec 2024
+- Push all operations to the source if there is only one sub-query
+- Fix rare decomposition error
+- Docker: update Python and dependencies
+
 # v0.18.3 - 26 Nov 2024
 - Update dependencies
 - Update documentation
