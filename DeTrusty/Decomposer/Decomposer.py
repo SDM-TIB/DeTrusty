@@ -197,10 +197,10 @@ class Decomposer(object):
             views1 = views1 + [ub]
 
         if views0 and views1:
-            views1.insert(0, views0)
-            return views1
+            views0.extend(views1)
+            return views0
         elif views0:
-            return [views0]
+            return views0
         elif views1:
             return views1
         else:
@@ -447,8 +447,8 @@ class Decomposer(object):
                 qpl0.append(Service('<' + endp + '>', joins[e], is_single_service=is_single_service))
 
         if qpl0 and qpl1:
-            qpl1.insert(0, qpl0)
-            return qpl1
+            qpl0.extend(qpl1)
+            return qpl0
         elif qpl0 and not qpl1:
             return qpl0
         else:
