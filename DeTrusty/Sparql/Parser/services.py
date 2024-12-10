@@ -5,13 +5,14 @@ xsd = "http://www.w3.org/2001/XMLSchema#"
 
 class Service(object):
 
-    def __init__(self, endpoint, triples, limit=-1, filter_nested=None):
+    def __init__(self, endpoint, triples, limit=-1, filter_nested=None, is_single_service=False):
         self.endpoint = endpoint[1:-1] if endpoint[0] == "<" else endpoint
         self.triples = triples
         self.filters = []
         self.filter_nested = filter_nested if filter_nested is not None else []  # TODO: this is used to store the filters from NestedLoop operators
         self.limit = limit  # TODO: This arg was added in order to integrate contactSource with incremental calls (16/12/2013)
         # self.filters_vars = set(filter_vars)
+        self.is_single_service = is_single_service
 
     def include_filter(self, f):
         self.filters.append(f)
@@ -29,7 +30,12 @@ class Service(object):
         else:
             triples_str = str(self.triples)
         filters_str = " . ".join(map(str, self.filters)) + " \n".join(map(str, self.filter_nested))
-        return " { SERVICE <" + self.endpoint + "> { " + triples_str + filters_str + " }   \n }"
+        triples_str = triples_str + filters_str
+
+        if self.is_single_service:
+            return triples_str
+        else:
+            return " { SERVICE <" + self.endpoint + "> { " + triples_str + " }   \n }"
 
     def allTriplesGeneral(self):
         a = True
@@ -87,7 +93,10 @@ class Service(object):
             triples_str = self.triples.show(x+"    ")
         filters_str = " . \n".join(map(pp, self.filters)) + "  \n".join(map(pp, self.filter_nested))
 
-        return x + "SERVICE <" + self.endpoint + "> { \n" + triples_str + filters_str + "\n" + x + "}"
+        if self.is_single_service:
+            return x + str(self)
+        else:
+            return x + "SERVICE <" + self.endpoint + "> { \n" + triples_str + filters_str + "\n" + x + "}"
 
     def show2(self, x):
         def pp(t):
@@ -429,7 +438,6 @@ class UnionBlock(object):
         return self.show(" ")
 
     def show(self, w):
-
         n = nest(self.triples)
 
         if n:

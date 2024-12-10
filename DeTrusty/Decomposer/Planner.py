@@ -44,6 +44,11 @@ class Planner(object):
         operatorTree = self.includePhysicalOperatorsQuery()
         over_all_triples = False
 
+        if isinstance(operatorTree, IndependentOperator):
+            # there is only one sub-query, so we can directly send it to the endpoint
+            operatorTree.query_str = str(self.query)
+            return operatorTree
+
         if not query.group_by:
             over_all_triples, implicit_group_by = utils.collect_vars(query.args)
             if implicit_group_by:

@@ -438,10 +438,13 @@ class Decomposer(object):
                 joins[s.endpoint] = list(set(joins[s.endpoint]))
 
             qpl0 = []
+            is_single_service = False
+            if (not qpl1) and (len(joins) == 1):
+                is_single_service = True
             for e in joins:
                 endp = e.split('|')[0]
 
-                qpl0.append(Service('<' + endp + '>', joins[e]))
+                qpl0.append(Service('<' + endp + '>', joins[e], is_single_service=is_single_service))
 
         if qpl0 and qpl1:
             qpl1.insert(0, qpl0)
