@@ -43,7 +43,7 @@ setuptools.setup(
     install_requires=['requests>=2.32.0',
                       'ply==3.11',
                       'rdflib>=6.0.0',
-                      'python-dateutil>=2.9.0',
+                      'python-dateutil>=2.8.0',
                       'pyoxigraph>=0.4.0'],
     include_package_data=True,
     python_requires='>=3.8',
