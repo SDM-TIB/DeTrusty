@@ -1,3 +1,8 @@
+# v0.19.1 - 04 Feb 2025
+- Relax version requirement for python-dateutil
+- Update dependencies
+- Docker: update dependencies
+
 # v0.19.0 - 10 Dec 2024
 - Push all operations to the source if there is only one sub-query
 - Fix rare decomposition error
