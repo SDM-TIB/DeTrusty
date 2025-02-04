@@ -4,8 +4,8 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Library &mdash; DeTrusty 0.19.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+  <title>DeTrusty as a Library &mdash; DeTrusty 0.19.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
 
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=e201715b"></script>
+        <script src="_static/documentation_options.js?v=86cea11f"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.19.0
+                0.19.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -318,7 +318,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the Knowledge4COVID-19 KG and DBpedia. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q1.rq&#39;</span>
@@ -351,7 +351,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the Knowledge4COVID-19 KG and Wikidata. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q2.rq&#39;</span>
@@ -390,7 +390,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the Knowledge4COVID-19 KG and DBpedia. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q3.rq&#39;</span>
@@ -420,7 +420,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the Knowledge4COVID-19 KG and Wikidata. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q4.rq&#39;</span>
@@ -459,7 +459,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the Knowledge4COVID-19 KG, DBpedia, and Wikidata. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/K4COVID/Q5.rq&#39;</span>
@@ -512,7 +512,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the World Bank KG and Wikidata. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/Q1.rq&#39;</span>
@@ -560,7 +560,7 @@ Before running the examples below, please, make sure that you have DeTrusty inst
 </pre></div>
 </div>
 <p>This query collects data from the World Bank KG and Wikidata. See below how to execute the query with DeTrusty.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/rdfmts.ttl&#39;</span><span class="p">)</span>
 <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/SDM-TIB/DeTrusty/master/example/CoyPu/Q2.rq&#39;</span>
@@ -616,7 +616,7 @@ at the location provided with the parameter output.</p>
 <h3>Standard Case<a class="headerlink" href="#standard-case" title="Link to this heading"></a></h3>
 <p>The standard case is to include only public SPARQL endpoints in the federation, collect the source description via SPARQL queries, and consider all classes in the endpoints.
 The following code snippet collects the source description of two public endpoints and saves it in the file <code class="docutils literal notranslate"><span class="pre">./Config/rdfmts.ttl</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
 
 <span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;http://url_to_endpoint_1&#39;</span><span class="p">,</span> <span class="s1">&#39;https://url_to_endpoint_2:port/sparql&#39;</span><span class="p">]</span>
 <span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
@@ -625,7 +625,7 @@ The following code snippet collects the source description of two public endpoin
 <p><strong>Alternatively,</strong> <code class="docutils literal notranslate"><span class="pre">None</span></code> can be passed instead of a path.
 In that case, <code class="docutils literal notranslate"><span class="pre">create_rdfmts</span></code> returns the source description in DeTrusty’s internal structure.
 This is helpful if several queries are to be executed in order to avoid reading the source description from a file prior to executing each query.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
 
 <span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;http://url_to_endpoint_1&#39;</span><span class="p">,</span> <span class="s1">&#39;https://url_to_endpoint_2:port/sparql&#39;</span><span class="p">]</span>
 <span class="hll"><span class="n">config</span> <span class="o">=</span> <span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># returns the configuration instead of writing it to a file</span>
@@ -643,7 +643,7 @@ Currently, basic authentication with Base64 encoding as well as token-based auth
 In the case of token-based authentication, DeTrusty expects the token server to return the token in the response field <code class="docutils literal notranslate"><span class="pre">access_token</span></code>.
 Additionally, DeTrusty expects the lifespan of the token in seconds to be returned in the field <code class="docutils literal notranslate"><span class="pre">expires_in</span></code>.
 The configuration changes slightly compared to the standard case:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
 
 <span class="n">endpoints</span> <span class="o">=</span> <span class="p">{</span>
 <span class="hll">  <span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -668,7 +668,7 @@ Each endpoint is represented as a dictionary itself; holding all parameters in t
 <p>Starting with version 0.6.0, DeTrusty can collect the metadata necessary for source selection and decomposition from RML mappings.
 Collecting metadata from RML mappings instead of the SPARQL endpoint considerably increases the performance of the metadata collection process.
 Of course, this is only feasible for endpoints that were created using RML mappings.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
 
 <span class="n">endpoints</span> <span class="o">=</span> <span class="p">{</span>
 <span class="hll">  <span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -690,7 +690,7 @@ Of course, this is only feasible for endpoints that were created using RML mappi
 <p class="admonition-title">Warning</p>
 <p>The classes that are to be included in the source description creation process need to be specified using their <strong>full URIs</strong>.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">DeTrusty.Molecule.MTCreation</span> <span class="kn">import</span> <span class="n">create_rdfmts</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
 
 <span class="n">endpoints</span> <span class="o">=</span> <span class="p">{</span>
 <span class="hll">  <span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">:</span> <span class="p">{</span>
