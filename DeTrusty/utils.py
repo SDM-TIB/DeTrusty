@@ -11,6 +11,17 @@ re_https = re.compile("https?://")
 def is_url(url):
     return re_https.match(url)
 
+def is_sparql_endpoint(url):
+    try:
+        headers = {'Accept': 'application/sparql-results+json'}
+        params = {'query': 'ASK { ?s ?p ?o }'}
+        response = requests.post(url, headers=headers, params=params)
+        if response.status_code == 200 and response.json()['boolean']:
+            return True
+    except requests.exceptions.RequestException:
+        pass
+
+    return False
 
 def read_file_from_internet(url_file: str, json_response: bool = False):
     r = requests.get(url_file)
