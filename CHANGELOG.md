@@ -1,3 +1,10 @@
+# v0.20.0 - 23 Jul 2025
+- Add feature to read the source description from a SPARQL endpoint
+- Fix checking authentication for query endpoint only when configuration is present
+- Change log level to `logging.DEBUG` for some messages
+- Update dependencies
+- Docker: update dependencies
+
 # v0.19.1 - 04 Feb 2025
 - Relax version requirement for python-dateutil
 - Update dependencies
