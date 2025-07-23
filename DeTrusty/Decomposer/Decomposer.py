@@ -67,8 +67,8 @@ class Decomposer(object):
             raise Exception('The following variables have been defined in the ORDER BY clause but are not projected: '
                             + str(set(order_by_vars) - proj_vars))
 
-        logger.info('Decomposition obtained')
-        logger.info(self.query)
+        logger.dedug('Decomposition obtained')
+        logger.debug(self.query)
 
         self.query.body = self.makePlanQuery(self.query)
 

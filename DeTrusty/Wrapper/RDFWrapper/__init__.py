@@ -11,7 +11,7 @@ def contact_source(server, query, queue, config, limit=-1):
     # Contacts the datasource (i.e. real endpoint).
     # Every tuple in the answer is represented as Python dictionaries
     # and is stored in a queue.
-    logger.info("Contacting endpoint: " + server)
+    logger.debug("Contacting endpoint: " + server)
     b = None
     cardinality = 0
 
