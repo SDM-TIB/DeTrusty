@@ -46,9 +46,10 @@ class Planner(object):
 
         if isinstance(operatorTree, IndependentOperator):
             # there is only one sub-query, so we can directly send it to the endpoint
-            operatorTree.query_str = str(self.query)
+            operatorTree.tree.service.is_single_service = True
             if self.query.limit != 1:
                 operatorTree.tree.service.limit = int(self.query.limit)
+            operatorTree.query_str = str(self.query)
             return operatorTree
 
         if not query.group_by:
