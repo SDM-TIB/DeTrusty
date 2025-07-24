@@ -47,6 +47,8 @@ class Planner(object):
         if isinstance(operatorTree, IndependentOperator):
             # there is only one sub-query, so we can directly send it to the endpoint
             operatorTree.query_str = str(self.query)
+            if self.query.limit != 1:
+                operatorTree.tree.service.limit = int(self.query.limit)
             return operatorTree
 
         if not query.group_by:
@@ -805,15 +807,15 @@ class IndependentOperator(object):
         return self.tree.aux(n)
 
     def execute(self, outputqueue, processqueue=Queue()):
-
         if self.tree.service.limit == -1:
-            self.tree.service.limit = 10000  # TODO: Fixed value, this can be learnt in the future
+            limit = 10000  # TODO: Fixed value, this can be learnt in the future
+        else:
+            limit = -1  # The query itself contains a limit so disable paging through contact_source
 
         # Evaluate the independent operator.
 
         # self.q = Queue()
-
-        p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit))
+        p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, limit))
         p.start()
         # processqueue.put(p.pid)
 
