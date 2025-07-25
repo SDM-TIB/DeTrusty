@@ -471,9 +471,14 @@ class RDFConfig(Config):
         return mts
 
 class TTLConfig(RDFConfig):
+    src_desc: PyOxigraphEndpoint
+
     def __init__(self, ttl):
         self.src_desc = PyOxigraphEndpoint(ttl)
         super().__init__()
+
+    def saveToFile(self, path):
+        self.src_desc.serialize(path)
 
 class SPARQLConfig(RDFConfig):
     def __init__(self, url):

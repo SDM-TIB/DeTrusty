@@ -1,10 +1,14 @@
 __author__ = 'Philipp D. Rohde'
 
 import abc
-from DeTrusty.Wrapper.RDFWrapper import contact_source
 from queue import Queue
-from pyoxigraph import Store, RdfFormat
+
 from pyoxigraph import QuerySolutions as oxi_query_solution
+from pyoxigraph import Store, RdfFormat
+from pyoxigraph import serialize as oxi_serialize
+
+from DeTrusty.Molecule import SEMSD
+from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 
 class QuerySolution(object):
@@ -62,3 +66,8 @@ class PyOxigraphEndpoint(MTEndpoint):
 
     def query(self, query_str):
         return QuerySolution(self.ttl.query(query_str))
+
+    def serialize(self, path):
+        oxi_serialize(self.ttl, path,
+                      format=RdfFormat.TURTLE,
+                      prefixes={'semsd': SEMSD})
