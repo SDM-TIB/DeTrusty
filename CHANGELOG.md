@@ -1,3 +1,6 @@
+# v0.20.2 - 25 Jul 2025
+- Fix issue with single source queries when not pushing operators to the source
+
 # v0.20.1 - 24 Jul 2025
 - Fix typo in logger causing DeTrusty to not execute queries
 - Fix issue with single SSQ queries including `LIMIT`
