@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __author__ = 'Philipp D. Rohde and Kemele M. Endris'
 
+import abc
 import json
 import os
 import time
@@ -12,7 +13,7 @@ import requests
 from rdflib.namespace import RDFS, XSD
 
 from DeTrusty.Molecule import SEMSD
-from DeTrusty.Molecule.MTEndpoint import *
+from DeTrusty.Molecule.MTEndpoint import MTEndpoint, PyOxigraphEndpoint, SPARQLEndpoint
 from DeTrusty.utils import is_url, is_sparql_endpoint, read_file_from_internet
 
 
@@ -479,6 +480,14 @@ class TTLConfig(RDFConfig):
 
     def saveToFile(self, path):
         self.src_desc.serialize(path)
+
+    def add_endpoint(self, endpoint: str):
+        self.src_desc.add_endpoint(endpoint)
+        self.endpoints = self.getEndpoints()
+
+    def delete_endpoint(self, endpoint: str):
+        self.src_desc.delete_endpoint(endpoint)
+        self.endpoints = self.getEndpoints()
 
 class SPARQLConfig(RDFConfig):
     def __init__(self, url):

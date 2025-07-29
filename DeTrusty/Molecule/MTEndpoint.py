@@ -7,8 +7,12 @@ from pyoxigraph import QuerySolutions as oxi_query_solution
 from pyoxigraph import Store, RdfFormat
 from pyoxigraph import serialize as oxi_serialize
 
-from DeTrusty.Molecule import SEMSD
+from DeTrusty.Logger import get_logger
+from DeTrusty.Molecule import SEMSD, QUERY_DELETE_PROPERTY_RANGE, QUERY_DELETE_SOURCE_FROM_PROPERTY, \
+    QUERY_DELETE_PROPERTY_NO_SOURCE, QUERY_DELETE_SOURCE_FROM_CLASS, QUERY_DELETE_CLASS_NO_SOURCE, QUERY_DELETE_SOURCE
 from DeTrusty.Wrapper.RDFWrapper import contact_source
+
+logger = get_logger(__name__)
 
 
 class QuerySolution(object):
@@ -71,3 +75,24 @@ class PyOxigraphEndpoint(MTEndpoint):
         oxi_serialize(self.ttl, path,
                       format=RdfFormat.TURTLE,
                       prefixes={'semsd': SEMSD})
+
+    def delete_endpoint(self, endpoint: str):
+        self.ttl.update(QUERY_DELETE_PROPERTY_RANGE.format(url=endpoint))
+        self.ttl.update(QUERY_DELETE_SOURCE_FROM_PROPERTY.format(url=endpoint))
+        self.ttl.update(QUERY_DELETE_PROPERTY_NO_SOURCE)
+        self.ttl.update(QUERY_DELETE_SOURCE_FROM_CLASS.format(url=endpoint))
+        self.ttl.update(QUERY_DELETE_CLASS_NO_SOURCE)
+        self.ttl.update(QUERY_DELETE_SOURCE.format(url=endpoint))
+        self.ttl.optimize()
+
+    def add_endpoint(self, endpoint: str):
+        from DeTrusty.Molecule.MTCreation import Endpoint, get_rdfmts_from_endpoint, _accessible_endpoints
+        endpoint = Endpoint(endpoint, is_pyoxigraph=True)
+        accessible = endpoint in _accessible_endpoints([endpoint])
+        if accessible:
+            endpoint_desc = get_rdfmts_from_endpoint(endpoint)
+            [self.ttl.add(triple) for triple in endpoint.triples]
+            [self.ttl.add(triple) for triple in endpoint_desc]     # TODO: See how I can add the triples: https://pyoxigraph.readthedocs.io/en/stable/model.html#pyoxigraph.Quad
+            self.ttl.optimize()
+        else:
+            logger.warning('{kg} is not accessible and, hence, cannot be added to the federation.'.format(kg=endpoint.url))
