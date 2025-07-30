@@ -92,7 +92,7 @@ class PyOxigraphEndpoint(MTEndpoint):
         if accessible:
             endpoint_desc = get_rdfmts_from_endpoint(endpoint)
             [self.ttl.add(triple) for triple in endpoint.triples]
-            [self.ttl.add(triple) for triple in endpoint_desc]     # TODO: See how I can add the triples: https://pyoxigraph.readthedocs.io/en/stable/model.html#pyoxigraph.Quad
+            [self.ttl.add(triple) for triple in endpoint_desc]
             self.ttl.optimize()
         else:
             logger.warning('{kg} is not accessible and, hence, cannot be added to the federation.'.format(kg=endpoint.url))
