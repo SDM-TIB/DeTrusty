@@ -8,8 +8,9 @@ from pyoxigraph import Store, RdfFormat
 from pyoxigraph import serialize as oxi_serialize
 
 from DeTrusty.Logger import get_logger
-from DeTrusty.Molecule import SEMSD, QUERY_DELETE_PROPERTY_RANGE, QUERY_DELETE_SOURCE_FROM_PROPERTY, \
-    QUERY_DELETE_PROPERTY_NO_SOURCE, QUERY_DELETE_SOURCE_FROM_CLASS, QUERY_DELETE_CLASS_NO_SOURCE, QUERY_DELETE_SOURCE
+from DeTrusty.Molecule import SEMSD, get_query_delete_property_range, get_query_delete_source_from_property, \
+    get_query_delete_property_no_source, get_query_delete_source_from_class, get_query_delete_class_no_source, \
+    get_query_delete_source
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger(__name__)
@@ -77,12 +78,12 @@ class PyOxigraphEndpoint(MTEndpoint):
                       prefixes={'semsd': SEMSD})
 
     def delete_endpoint(self, endpoint: str):
-        self.ttl.update(QUERY_DELETE_PROPERTY_RANGE.format(url=endpoint))
-        self.ttl.update(QUERY_DELETE_SOURCE_FROM_PROPERTY.format(url=endpoint))
-        self.ttl.update(QUERY_DELETE_PROPERTY_NO_SOURCE)
-        self.ttl.update(QUERY_DELETE_SOURCE_FROM_CLASS.format(url=endpoint))
-        self.ttl.update(QUERY_DELETE_CLASS_NO_SOURCE)
-        self.ttl.update(QUERY_DELETE_SOURCE.format(url=endpoint))
+        self.ttl.update(get_query_delete_property_range(endpoint))
+        self.ttl.update(get_query_delete_source_from_property(endpoint))
+        self.ttl.update(get_query_delete_property_no_source())
+        self.ttl.update(get_query_delete_source_from_class(endpoint))
+        self.ttl.update(get_query_delete_class_no_source())
+        self.ttl.update(get_query_delete_source(endpoint))
         self.ttl.optimize()
 
     def add_endpoint(self, endpoint: str):
