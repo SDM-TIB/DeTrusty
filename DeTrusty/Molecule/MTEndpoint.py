@@ -5,7 +5,7 @@ from http import HTTPStatus
 from queue import Queue
 
 import requests
-from pyoxigraph import QuerySolutions as oxi_query_solution
+from pyoxigraph import QuerySolutions as OxiQuerySolution
 from pyoxigraph import Store, RdfFormat
 from pyoxigraph import serialize as oxi_serialize
 from requests.auth import HTTPDigestAuth
@@ -23,7 +23,7 @@ class QuerySolution(object):
     def __init__(self, solution_set, cardinality: int = None):
         self.solution_set = solution_set
         self.cardinality = cardinality
-        if isinstance(self.solution_set, oxi_query_solution):
+        if isinstance(self.solution_set, OxiQuerySolution):
             self.is_pyoxigraph = True
         else:
             self.is_pyoxigraph = False
