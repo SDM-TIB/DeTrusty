@@ -352,8 +352,8 @@ class RDFConfig(Config):
         super().__init__()
         self.endpoints = self.getEndpoints()
 
-    def add_endpoint(self, endpoint: str):
-        self.src_desc.add_endpoint(endpoint)
+    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+        self.src_desc.add_endpoint(endpoint, username, password, keycloak)
         self.endpoints = self.getEndpoints()
 
     def delete_endpoint(self, endpoint: str):

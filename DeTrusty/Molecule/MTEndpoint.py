@@ -53,8 +53,19 @@ class MTEndpoint(object):
     def query(self, query_str):
         pass
 
+    @staticmethod
+    def _credentials2dict(username: str = None, password: str = None, keycloak: str = None):
+        credentials = {}
+        if username is not None:
+            credentials['username'] = username
+        if password is not None:
+            credentials['password'] = password
+        if keycloak is not None:
+            credentials['keycloak'] = keycloak
+        return credentials
+
     @abc.abstractmethod
-    def add_endpoint(self, endpoint: str):
+    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
         pass
 
     @abc.abstractmethod
@@ -244,9 +255,9 @@ class SPARQLEndpoint(MTEndpoint):
             update_query = 'INSERT DATA { ' + ' . \n'.join(triples2str(triples[i:])) + '}'
             self._update(update_query)
 
-    def add_endpoint(self, endpoint: str):
+    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
         from DeTrusty.Molecule.MTCreation import Endpoint, get_rdfmts_from_endpoint, _accessible_endpoints
-        endpoint = Endpoint(endpoint)
+        endpoint = Endpoint(endpoint, params=self._credentials2dict(username, password, keycloak))
         accessible = endpoint in _accessible_endpoints([endpoint])
         if accessible:
             endpoint_desc = get_rdfmts_from_endpoint(endpoint)
@@ -287,9 +298,9 @@ class PyOxigraphEndpoint(MTEndpoint):
         self.ttl.update(self.get_query_delete_source(endpoint))
         self.ttl.optimize()
 
-    def add_endpoint(self, endpoint: str):
+    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
         from DeTrusty.Molecule.MTCreation import Endpoint, get_rdfmts_from_endpoint, _accessible_endpoints
-        endpoint = Endpoint(endpoint, is_pyoxigraph=True)
+        endpoint = Endpoint(endpoint, params=self._credentials2dict(username, password, keycloak), is_pyoxigraph=True)
         accessible = endpoint in _accessible_endpoints([endpoint])
         if accessible:
             endpoint_desc = get_rdfmts_from_endpoint(endpoint)
