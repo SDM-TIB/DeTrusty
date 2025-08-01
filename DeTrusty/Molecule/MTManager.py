@@ -352,6 +352,14 @@ class RDFConfig(Config):
         super().__init__()
         self.endpoints = self.getEndpoints()
 
+    def add_endpoint(self, endpoint: str):
+        self.src_desc.add_endpoint(endpoint)
+        self.endpoints = self.getEndpoints()
+
+    def delete_endpoint(self, endpoint: str):
+        self.src_desc.delete_endpoint(endpoint)
+        self.endpoints = self.getEndpoints()
+
     def getAll(self):
         return None
 
@@ -481,15 +489,12 @@ class TTLConfig(RDFConfig):
     def saveToFile(self, path):
         self.src_desc.serialize(path)
 
-    def add_endpoint(self, endpoint: str):
-        self.src_desc.add_endpoint(endpoint)
-        self.endpoints = self.getEndpoints()
-
-    def delete_endpoint(self, endpoint: str):
-        self.src_desc.delete_endpoint(endpoint)
-        self.endpoints = self.getEndpoints()
-
 class SPARQLConfig(RDFConfig):
+    src_desc: SPARQLEndpoint
+
     def __init__(self, url):
         self.src_desc = SPARQLEndpoint(url)
         super().__init__()
+
+    def set_update_credentials(self, update_endpoint, username, password):
+        self.src_desc.set_update_credentials(update_endpoint, username, password)
