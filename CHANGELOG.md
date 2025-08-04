@@ -1,3 +1,9 @@
+# v0.21.0 - 04 Aug 2025
+- Add feature to save `TTLConfig` to file
+- Add feature to add and delete endpoints from `TTLConfig`
+- Add feature to add and delete endpoints from `SPARQLConfig`
+- Add feature to add private endpoints to `TTLConfig` and `SPARQLConfig`
+
 # v0.20.2 - 25 Jul 2025
 - Fix issue with single source queries when not pushing operators to the source
 
