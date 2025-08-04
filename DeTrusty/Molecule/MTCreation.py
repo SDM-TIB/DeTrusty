@@ -9,7 +9,8 @@ from queue import Queue
 from time import time
 from typing import Optional
 
-from pyoxigraph import Quad, NamedNode, BlankNode, Literal
+from pyoxigraph import Literal as oxiLiteral
+from pyoxigraph import Quad, NamedNode, BlankNode
 from rdflib import Graph, URIRef, BNode, Literal, RDF, RDFS, XSD
 
 from DeTrusty.Logger import get_logger
@@ -51,23 +52,23 @@ class Endpoint:
         triples = set()
         if self.is_pyoxigraph:
             triples.add(Quad(NamedNode(self.url), NamedNode(RDF.type), NamedNode(SEMSD.DataSource), None))
-            triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.hasURL), Literal(self.url, datatype=NamedNode(XSD.anyURI)), None))
+            triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.hasURL), oxiLiteral(self.url, datatype=NamedNode(XSD.anyURI)), None))
         else:
             triples.add((URIRef(self.url), RDF.type, SEMSD.DataSource))
             triples.add((URIRef(self.url), SEMSD.hasURL, Literal(self.url, datatype=XSD.anyURI)))
         if 'username' in self.params.keys():
             if self.is_pyoxigraph:
-                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.username), Literal(self.params['username']), None))
+                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.username), oxiLiteral(self.params['username']), None))
             else:
                 triples.add((URIRef(self.url), SEMSD.username, Literal(self.params['username'])))
         if 'password' in self.params.keys():
             if self.is_pyoxigraph:
-                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.password), Literal(self.params['password']), None))
+                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.password), oxiLiteral(self.params['password']), None))
             else:
                 triples.add((URIRef(self.url), SEMSD.password, Literal(self.params['password'])))
         if 'keycloak' in self.params.keys():
             if self.is_pyoxigraph:
-                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.tokenServer), Literal(self.params['keycloak']), None))
+                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.tokenServer), oxiLiteral(self.params['keycloak']), None))
             else:
                 triples.add((URIRef(self.url), SEMSD.tokenServer, Literal(self.params['keycloak'])))
         return triples
