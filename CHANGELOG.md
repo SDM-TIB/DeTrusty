@@ -1,3 +1,6 @@
+# v0.21.1 - 04 Aug 2025
+- Fix issue with importing `Literal` from `pyoxigraph` and `rdflib`
+
 # v0.21.0 - 04 Aug 2025
 - Add feature to save `TTLConfig` to file
 - Add feature to add and delete endpoints from `TTLConfig`
