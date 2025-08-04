@@ -346,17 +346,43 @@ class JSONConfig(Config):
 
 
 class RDFConfig(Config):
+    """The base class for all configurations based on the source descriptions described in RDF."""
+
     src_desc: MTEndpoint
+    """The endpoint object wrapping the actual RDF graph containing the source descriptions."""
 
     def __init__(self):
+        """Initializes the RDFConfig object."""
         super().__init__()
         self.endpoints = self.getEndpoints()
 
     def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+        """Adds an endpoint to the federation.
+
+        Parameters
+        ----------
+        endpoint : str
+            The URL of the SPARQL endpoint to add to the federation.
+        username : str, optional
+            The username required to access the endpoint, the default is None.
+        password : str, optional
+            The password required to access the endpoint, the default is None.
+        keycloak : str, optional
+            The URL of the token server providing access tokens, the default is None.
+
+        """
         self.src_desc.add_endpoint(endpoint, username, password, keycloak)
         self.endpoints = self.getEndpoints()
 
     def delete_endpoint(self, endpoint: str):
+        """Deletes an endpoint from the federation.
+
+        Parameters
+        ----------
+        endpoint : str
+            The URL of the SPARQL endpoint to be removed from the federation.
+
+        """
         self.src_desc.delete_endpoint(endpoint)
         self.endpoints = self.getEndpoints()
 
@@ -364,6 +390,16 @@ class RDFConfig(Config):
         return None
 
     def get_molecules(self):
+        """Gets all RDF Molecules of the federation.
+
+        The list of molecules is extracted from the source description RDF graph via a SPARQL query.
+
+        Returns
+        -------
+        list
+            A list of all the RDF Molecules in the federation.
+
+        """
         mts = []
         query = "SELECT DISTINCT ?mt WHERE { ?mt a " + RDFS.Class.n3() + " }"
         result = self.src_desc.query(query)
@@ -372,6 +408,21 @@ class RDFConfig(Config):
         return mts
 
     def get_molecule_predicates(self, mol):
+        """Gets the predicates for a given RDF Molecule.
+
+        The list of predicates is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the predicates.
+
+        Returns
+        -------
+        list
+            The list of predicates for the given RDF Molecule.
+
+        """
         preds = []
         query = "SELECT DISTINCT ?pred WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
         query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " ?pred .\n}"
@@ -381,6 +432,21 @@ class RDFConfig(Config):
         return preds
 
     def get_molecule_links(self, mol):
+        """Gets the links for a given RDF Molecule.
+
+        The links are extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the links.
+
+        Returns
+        -------
+        list
+            The list of links for the given RDF Molecule.
+
+        """
         links = []
         query = "SELECT DISTINCT ?link WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
         query += "  <" + mol + "> " + SEMSD.linkedTo.n3() + " ?link .\n}"
@@ -390,6 +456,23 @@ class RDFConfig(Config):
         return links
 
     def get_molecule_links_of_pred(self, mol, pred):
+        """Gets the links for a given RDF Molecule and predicate.
+
+        The links are extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the links.
+        pred : str
+            The full URI of the predicate for which to retrieve the links.
+
+        Returns
+        -------
+        list
+            The list of links for the given RDF Molecule and predicate.
+
+        """
         links = []
         query = "SELECT DISTINCT ?link WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
         query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " <" + pred + "> .\n"
@@ -403,6 +486,21 @@ class RDFConfig(Config):
         return links
 
     def get_molecule_endpoints(self, mol):
+        """Get the endpoints for the given RDF Molecule.
+
+        The list of endpoints is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the endpoints.
+
+        Returns
+        -------
+        list
+            The list of endpoints (URLs) for the given RDF Molecule.
+
+        """
         endpoints = []
         query = "SELECT DISTINCT ?url WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
         query += "  <" + mol + "> " + SEMSD.hasSource.n3() + " ?source .\n"
@@ -412,7 +510,24 @@ class RDFConfig(Config):
             endpoints.append(res['url'])
         return endpoints
 
-    def get_molecule_endpoint_preds(self, mol, endpoint):  # endpoint is the URL of the endpoint
+    def get_molecule_endpoint_preds(self, mol, endpoint):
+        """Get the predicates for the given RDF Molecule and endpoint of the federation.
+
+        The list of predicates is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the predicates.
+        endpoint : str
+            The URL of the endpoints for which to retrieve the predicates.
+
+        Returns
+        -------
+        list
+            The list of predicates for the given RDF Molecule and endpoint.
+
+        """
         predicates = []
         query = "SELECT DISTINCT ?pred WHERE {\n"
         query += "  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
@@ -426,6 +541,17 @@ class RDFConfig(Config):
         return predicates
 
     def getEndpoints(self):
+        """Get all endpoints and their information of the federation.
+
+        The information of an endpoint includes the access information like username, password and token server URL.
+        All information are extracted from the source description RDF graph via a SPARQL query.
+
+        Returns
+        -------
+        dict
+            A dictionary containing all endpoints of the federation including their information.
+
+        """
         endpoints = {}
         query = "SELECT DISTINCT ?url ?username ?password ?tokenServer WHERE {\n  ?endpoint a " + SEMSD.DataSource.n3() + " .\n"
         query += "  ?endpoint " + SEMSD.hasURL.n3() + " ?url .\n"
@@ -444,6 +570,21 @@ class RDFConfig(Config):
         return endpoints
 
     def findbypreds(self, preds):
+        """Get all RDF Molecules that contain the given list of predicates.
+
+        The list of RDF Molecules is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        preds : list
+            The list of predicates the RDF Molecules need to contain.
+
+        Returns
+        -------
+        list
+            The list of RDF Molecules that contain the given predicates.
+
+        """
         mts = []
         query = "SELECT DISTINCT ?mt WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
         for p in preds:
@@ -455,6 +596,21 @@ class RDFConfig(Config):
         return mts
 
     def find_preds_per_mt(self, preds):
+        """Get all RDF Molecules and matching predicates that contain at least one of the given predicates.
+
+        The information is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        preds : list
+            The list of predicates from which the RDF Molecules need to contain at least one.
+
+        Returns
+        -------
+        dict
+            A dictionary mapping the RDF Molecules to the predicates found from the given list.
+
+        """
         mts = {}
         query = "SELECT DISTINCT ?mt ?pred WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
         query += "  ?mt " + SEMSD.hasProperty.n3() + " ?pred .\n"
@@ -470,6 +626,21 @@ class RDFConfig(Config):
         return mts
 
     def findbypred(self, pred):
+        """Get all RDF Molecules that contain the given predicate.
+
+        The list of RDF Molecules is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        pred : str
+            The full URI of the predicate the RDF Molecules need to contain.
+
+        Returns
+        -------
+        list
+            The list of RDF Molecules that contain the given predicates.
+
+        """
         mts = []
         query = "SELECT DISTINCT ?mt WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
         query += "  ?mt " + SEMSD.hasProperty.n3() + " <" + pred + "> .\n"
@@ -480,21 +651,63 @@ class RDFConfig(Config):
         return mts
 
 class TTLConfig(RDFConfig):
+    """This class uses Pyoxigraph as backend for the RDF graph containing the source descriptions."""
+
     src_desc: PyOxigraphEndpoint
 
     def __init__(self, ttl):
+        """Initializes the TTLConfig class.
+
+        Parameters
+        ----------
+        ttl : str
+            The source descriptions in RDF as a string.
+
+        """
         self.src_desc = PyOxigraphEndpoint(ttl)
         super().__init__()
 
     def saveToFile(self, path):
+        """Saves the source descriptions to a file.
+
+        This method makes use of the serialization method provided by Pyoxigraph.
+
+        Parameters
+        ----------
+        path : str
+            The path where to save the source descriptions.
+
+        """
         self.src_desc.serialize(path)
 
 class SPARQLConfig(RDFConfig):
+    """This class uses Virtuoso as backend for the RDF graph containing the source descriptions."""
+
     src_desc: SPARQLEndpoint
 
     def __init__(self, url):
+        """Initializes the SPARQLConfig class.
+
+        Parameters
+        ----------
+        url : str
+            The URL of the Virtuoso endpoint containing the source descriptions.
+
+        """
         self.src_desc = SPARQLEndpoint(url)
         super().__init__()
 
     def set_update_credentials(self, update_endpoint, username, password):
+        """Sets the credentials for updating the source descriptions in Virtuoso.
+
+        Parameters
+        ----------
+        update_endpoint : str
+            The URL of the Virtuoso endpoint for UPDATE queries.
+        username : str
+            The username required to authenticate for UPDATE queries.
+        password : str
+            The password required to authenticate for UPDATE queries.
+
+        """
         self.src_desc.set_update_credentials(update_endpoint, username, password)
