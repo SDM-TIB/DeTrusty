@@ -1,3 +1,6 @@
+# v0.21.2 - 13 Aug 2025
+- Make typing backwards compatible
+
 # v0.21.1 - 04 Aug 2025
 - Fix issue with importing `Literal` from `pyoxigraph` and `rdflib`
 
