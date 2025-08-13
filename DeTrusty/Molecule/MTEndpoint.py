@@ -412,7 +412,7 @@ class SPARQLEndpoint(MTEndpoint):
 
         return False
 
-    def _add_triples(self, triples: list[tuple]):
+    def _add_triples(self, triples: list):
         """Adds new data of the RDF Molecule Templates into the RDF knowledge graph.
 
         This method uses INSERT queries to add new data to the RDF knowledge graph
@@ -421,21 +421,21 @@ class SPARQLEndpoint(MTEndpoint):
 
         Parameters
         ----------
-        triples : list
+        triples : list[tuple]
             A list of RDF triples to insert into the knowledge graph.
 
         """
-        def triples2str(triples_: list[tuple]) -> list[str]:
+        def triples2str(triples_: list) -> list:
             """Utility function to convert RDF triples from tuples to strings.
 
             Parameters
             ----------
-            triples_ : list
+            triples_ : list[tuple]
                 The list of RDF triples as tuples to convert.
 
             Returns
             -------
-            list
+            list[str]
                 The list of RDF triples as strings.
 
             """
