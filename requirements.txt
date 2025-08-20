@@ -1,4 +1,4 @@
-requests==2.32.4
+requests==2.32.5
 Flask==3.1.2
 ply==3.11
 rdflib==6.3.2
