@@ -1,5 +1,5 @@
 requests==2.32.4
-Flask==3.1.1
+Flask==3.1.2
 ply==3.11
 rdflib==6.3.2
 python-dateutil==2.9.0.post0
