@@ -4,6 +4,7 @@ import getopt
 import json
 import pathlib
 import sys
+import warnings
 
 try:
     from DeTrusty.Molecule.MTCreation import DEFAULT_OUTPUT_PATH, create_rdfmts, logger
@@ -68,5 +69,9 @@ def usage():
 
 
 if __name__ == '__main__':
+    warnings.warn(
+        "This script has been deprecated and does not support DeTrusty's federation feature.",
+        DeprecationWarning, 2
+    )
     endpoints, output = get_options(sys.argv[1:])
     create_rdfmts(endpoints, output)
