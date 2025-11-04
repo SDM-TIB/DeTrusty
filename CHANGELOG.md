@@ -1,3 +1,9 @@
+# v0.22.0 - 04 Nov 2025
+- Add feature to manage federations within the same file/endpoint
+- Reorganize source description documentation
+- Update dependencies
+- Docker: update Python and dependencies
+
 # v0.21.2 - 13 Aug 2025
 - Make typing backwards compatible
 
