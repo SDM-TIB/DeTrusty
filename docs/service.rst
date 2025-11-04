@@ -64,29 +64,13 @@ Creating/Updating Source Descriptions
 =====================================
 
 The example loaded the source descriptions for the K4COVID federation.
-If you want to update the source descriptions, create a file ``/DeTrusty/Config/endpoints.txt`` inside your Docker container.
-This file should contain the URLs to the SPARQL endpoints you want to be included in your federation.
-Put one URL per line and execute the following command.
-
-.. code:: bash
-
-   docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.txt'
-
+If you want to update the source descriptions, you need to update the file ``/DeTrusty/Config/rdfmts.ttl`` inside your Docker container.
+See :ref:`creating-source-descriptions` for how to create said file.
 After the new source description file was generated as ``/DeTrusty/Config/rdfmts.ttl``, you need to restart the ``gunicorn`` workers in order for the changes to take effect.
 
 .. code:: bash
 
    docker exec -it DeTrusty restart_workers.sh
-
-.. NOTE::
-
-   You can also make use of the more advanced options described in :ref:`creating-source-descriptions`.
-   In that case, your endpoints file should contain a JSON string matching with the input of the mentioned examples.
-   Additionally, the ``-j`` flag needs to be set.
-
-   .. code:: bash
-
-      docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /DeTrusty/Config/endpoints.json -j'
 
 *************
 Web Interface
