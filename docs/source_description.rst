@@ -86,6 +86,7 @@ The remainder of this section provides examples showing how to use the function 
 * `Private Endpoints`_: including private endpoints requiring authentication into the federation
 * `Source Descriptions from RML Mappings`_: use RML mappings to compute the source descriptions
 * `Restricting Classes of an Endpoint`_: consider only specific classes of an endpoint
+* `Managing Federations`_: managing multiple federations of endpoints
 
 Standard Case
 =============
@@ -199,3 +200,32 @@ Starting with version 0.7.0, DeTrusty can restrict the collection of metadata to
     create_rdfmts(endpoints, './Config/rdfmts.ttl')
 
 The key ``types`` holds a list of all the classes of the endpoint that should be considered for the source description creation process.
+
+Managing Federations
+====================
+
+Starting from version 0.22.0, DeTrusty supports the management of multiple federations within the same source description file/endpoint.
+For the creation of a queryable endpoint from a source description file, DeTrusty resorts to `Pyoxigraph`.
+`Virtuoso` SPARQL endpoints are also supported.
+
+.. code-block:: python
+
+    from DeTrusty import get_config, run_query
+    from DeTrusty.Molecule.MTManager import FederationConfig
+
+    config = get_config('federations.ttl')  # regular source description file
+    fed_config = FederationConfig(config, 'http://example.com/fed1#')  # limiting to specific federation
+
+    # Adding endpoints
+    fed_config.add_endpoint('https://url_to_endpoint_1')
+    fed_config.add_endpoint('https://url_to_endpoint_2')
+    fed_config.add_endpoint('https://url_to_endpoint_3')
+
+    # Running query over the federation
+    query = "SELECT DISTINCT ?c WHERE { ?s a ?c }"
+    result = run_query(query, config=fed_config)
+
+    # Deleting an endpoint
+    fed_config.delete_endpoint('https://url_to_endpoint_3')
+
+Naturally, you can create several _FederationConfig_ objects for all the different federations required in your application.
