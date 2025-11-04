@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Source Descriptions &mdash; DeTrusty 0.21.2 documentation</title>
+  <title>Source Descriptions &mdash; DeTrusty 0.22.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=614e7688"></script>
+        <script src="_static/documentation_options.js?v=9f9b922e"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.21.2
+                0.22.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -51,7 +51,17 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Preliminaries</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Source Descriptions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Source Descriptions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-source-descriptions">Creating Source Descriptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#standard-case">Standard Case</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#private-endpoints">Private Endpoints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#source-descriptions-from-rml-mappings">Source Descriptions from RML Mappings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restricting-classes-of-an-endpoint">Restricting Classes of an Endpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#managing-federations">Managing Federations</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="decomposition.html">Decomposition Types</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">DeTrusty</span></p>
@@ -153,6 +163,164 @@ See below for an example based on FOAF.</p>
     <span class="nn">semsd</span><span class="p">:</span><span class="nt">hasURL</span> <span class="s">&quot;http://example.com/sparql&quot;</span><span class="p">^^</span><span class="nn">xsd</span><span class="p">:</span><span class="nt">anyURI</span> <span class="p">.</span>
 </pre></div>
 </div>
+<section id="creating-source-descriptions">
+<span id="id2"></span><h2>Creating Source Descriptions<a class="headerlink" href="#creating-source-descriptions" title="Link to this heading"></a></h2>
+<p>The goal of this section is to explain how to create the source descriptions for DeTrusty.
+DeTrusty offers the function <code class="docutils literal notranslate"><span class="pre">create_rdfmts</span></code> for the source description creation.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_rdfmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/DeTrusty/Config/rdfmts.ttl'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Generating rdfmts.ttl, which need to be supplied during query execution using run_query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – The endpoints from which information will be collected.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Path for the generated configuration to be saved at.</p>
+<ul>
+<li><p>If not provided: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.ttl’</p></li>
+<li><p>In case of None: the config will not be saved, instead a TTLConfig object is returned.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Only generating return value when output=None, else a file with the configuration is saved
+at the location provided with the parameter output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>TTLConfig, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The remainder of this section provides examples showing how to use the function in different scenarios.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#standard-case">Standard Case</a>: public SPARQL endpoints only</p></li>
+<li><p><a class="reference internal" href="#private-endpoints">Private Endpoints</a>: including private endpoints requiring authentication into the federation</p></li>
+<li><p><a class="reference internal" href="#source-descriptions-from-rml-mappings">Source Descriptions from RML Mappings</a>: use RML mappings to compute the source descriptions</p></li>
+<li><p><a class="reference internal" href="#restricting-classes-of-an-endpoint">Restricting Classes of an Endpoint</a>: consider only specific classes of an endpoint</p></li>
+<li><p><a class="reference internal" href="#managing-federations">Managing Federations</a>: managing multiple federations of endpoints</p></li>
+</ul>
+<section id="standard-case">
+<h3>Standard Case<a class="headerlink" href="#standard-case" title="Link to this heading"></a></h3>
+<p>The standard case is to include only public SPARQL endpoints in the federation, collect the source description via SPARQL queries, and consider all classes in the endpoints.
+The following code snippet collects the source description of two public endpoints and saves it in the file <code class="docutils literal notranslate"><span class="pre">./Config/rdfmts.ttl</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
+
+<span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;http://url_to_endpoint_1&#39;</span><span class="p">,</span> <span class="s1">&#39;https://url_to_endpoint_2:port/sparql&#39;</span><span class="p">]</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Alternatively,</strong> <code class="docutils literal notranslate"><span class="pre">None</span></code> can be passed instead of a path.
+In that case, <code class="docutils literal notranslate"><span class="pre">create_rdfmts</span></code> returns the source description in DeTrusty’s internal structure.
+This is helpful if several queries are to be executed in order to avoid reading the source description from a file prior to executing each query.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
+
+<span class="n">endpoints</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;http://url_to_endpoint_1&#39;</span><span class="p">,</span> <span class="s1">&#39;https://url_to_endpoint_2:port/sparql&#39;</span><span class="p">]</span>
+<span class="hll"><span class="n">config</span> <span class="o">=</span> <span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># returns the configuration instead of writing it to a file</span>
+</span></pre></div>
+</div>
+<p><strong>Additionally,</strong> the source description object provides a method for saving it to a file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">saveToFile</span><span class="p">(</span><span class="s1">&#39;/path/for/new_mts&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="private-endpoints">
+<h3>Private Endpoints<a class="headerlink" href="#private-endpoints" title="Link to this heading"></a></h3>
+<p>Starting with version 0.6.0, DeTrusty can handle private endpoints that require authentication.
+Currently, basic authentication with Base64 encoding as well as token-based authentication via a token server are supported.
+In the case of token-based authentication, DeTrusty expects the token server to return the token in the response field <code class="docutils literal notranslate"><span class="pre">access_token</span></code>.
+Additionally, DeTrusty expects the lifespan of the token in seconds to be returned in the field <code class="docutils literal notranslate"><span class="pre">expires_in</span></code>.
+The configuration changes slightly compared to the standard case:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
+
+<span class="n">endpoints</span> <span class="o">=</span> <span class="p">{</span>
+<span class="hll">  <span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">    <span class="s1">&#39;keycloak&#39;</span><span class="p">:</span> <span class="s1">&#39;https://url_to_token_server&#39;</span><span class="p">,</span>
+</span><span class="hll">    <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;YOUR_USERNAME&#39;</span><span class="p">,</span>
+</span><span class="hll">    <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;YOUR_PASSWORD&#39;</span>
+</span><span class="hll">  <span class="p">}</span>
+</span><span class="p">}</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The keys of <code class="docutils literal notranslate"><span class="pre">endpoints</span></code> are the URLs of the SPARQL endpoints.
+Each endpoint is represented as a dictionary itself; holding all parameters in the form of (key, value) pairs.
+<code class="docutils literal notranslate"><span class="pre">keycloak</span></code> is the URL to the token server, <code class="docutils literal notranslate"><span class="pre">username</span></code> and <code class="docutils literal notranslate"><span class="pre">password</span></code> represent the credentials for the token server or SPARQL endpoint.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your SPARQL endpoint uses basic authentication with Base64 encoding instead of a token server, simply omit <code class="docutils literal notranslate"><span class="pre">keycloak</span></code>.</p>
+</div>
+</section>
+<section id="source-descriptions-from-rml-mappings">
+<h3>Source Descriptions from RML Mappings<a class="headerlink" href="#source-descriptions-from-rml-mappings" title="Link to this heading"></a></h3>
+<p>Starting with version 0.6.0, DeTrusty can collect the metadata necessary for source selection and decomposition from RML mappings.
+Collecting metadata from RML mappings instead of the SPARQL endpoint considerably increases the performance of the metadata collection process.
+Of course, this is only feasible for endpoints that were created using RML mappings.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
+
+<span class="n">endpoints</span> <span class="o">=</span> <span class="p">{</span>
+<span class="hll">  <span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">    <span class="s1">&#39;mappings&#39;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class="hll">      <span class="s1">&#39;path/to/mapping/file1&#39;</span><span class="p">,</span>
+</span><span class="hll">      <span class="s1">&#39;path/to/mapping/file2&#39;</span>
+</span><span class="hll">    <span class="p">]</span>
+</span><span class="hll">  <span class="p">}</span>
+</span><span class="p">}</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The key <code class="docutils literal notranslate"><span class="pre">mappings</span></code> holds a list of paths to the mapping files that were used to create the RDF data served by the SPARQL endpoint.</p>
+</section>
+<section id="restricting-classes-of-an-endpoint">
+<h3>Restricting Classes of an Endpoint<a class="headerlink" href="#restricting-classes-of-an-endpoint" title="Link to this heading"></a></h3>
+<p>Starting with version 0.7.0, DeTrusty can restrict the collection of metadata to specific classes of an endpoint.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The classes that are to be included in the source description creation process need to be specified using their <strong>full URIs</strong>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTCreation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_rdfmts</span>
+
+<span class="n">endpoints</span> <span class="o">=</span> <span class="p">{</span>
+<span class="hll">  <span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">    <span class="s1">&#39;types&#39;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class="hll">      <span class="s1">&#39;http://example.com/ontology/ClassA&#39;</span><span class="p">,</span>
+</span><span class="hll">      <span class="s1">&#39;http://example.com/ontology/ClassB&#39;</span>
+</span><span class="hll">    <span class="p">]</span>
+</span><span class="hll">  <span class="p">}</span>
+</span><span class="p">}</span>
+<span class="n">create_rdfmts</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="s1">&#39;./Config/rdfmts.ttl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The key <code class="docutils literal notranslate"><span class="pre">types</span></code> holds a list of all the classes of the endpoint that should be considered for the source description creation process.</p>
+</section>
+<section id="managing-federations">
+<h3>Managing Federations<a class="headerlink" href="#managing-federations" title="Link to this heading"></a></h3>
+<p>Starting from version 0.22.0, DeTrusty supports the management of multiple federations within the same source description file/endpoint.
+For the creation of a queryable endpoint from a source description file, DeTrusty resorts to <cite>Pyoxigraph</cite>.
+<cite>Virtuoso</cite> SPARQL endpoints are also supported.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">run_query</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeTrusty.Molecule.MTManager</span><span class="w"> </span><span class="kn">import</span> <span class="n">FederationConfig</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="s1">&#39;federations.ttl&#39;</span><span class="p">)</span>  <span class="c1"># regular source description file</span>
+<span class="n">fed_config</span> <span class="o">=</span> <span class="n">FederationConfig</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;http://example.com/fed1#&#39;</span><span class="p">)</span>  <span class="c1"># limiting to specific federation</span>
+
+<span class="c1"># Adding endpoints</span>
+<span class="n">fed_config</span><span class="o">.</span><span class="n">add_endpoint</span><span class="p">(</span><span class="s1">&#39;https://url_to_endpoint_1&#39;</span><span class="p">)</span>
+<span class="n">fed_config</span><span class="o">.</span><span class="n">add_endpoint</span><span class="p">(</span><span class="s1">&#39;https://url_to_endpoint_2&#39;</span><span class="p">)</span>
+<span class="n">fed_config</span><span class="o">.</span><span class="n">add_endpoint</span><span class="p">(</span><span class="s1">&#39;https://url_to_endpoint_3&#39;</span><span class="p">)</span>
+
+<span class="c1"># Running query over the federation</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT DISTINCT ?c WHERE { ?s a ?c }&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">fed_config</span><span class="p">)</span>
+
+<span class="c1"># Deleting an endpoint</span>
+<span class="n">fed_config</span><span class="o">.</span><span class="n">delete_endpoint</span><span class="p">(</span><span class="s1">&#39;https://url_to_endpoint_3&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Naturally, you can create several _FederationConfig_ objects for all the different federations required in your application.</p>
+</section>
+</section>
 </section>
 
 
