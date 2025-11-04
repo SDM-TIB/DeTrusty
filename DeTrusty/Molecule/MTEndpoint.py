@@ -6,12 +6,12 @@ from queue import Queue
 
 import requests
 from pyoxigraph import QuerySolutions as OxiQuerySolution
-from pyoxigraph import Store, RdfFormat
+from pyoxigraph import Store, RdfFormat, NamedNode
 from pyoxigraph import serialize as oxi_serialize
 from requests.auth import HTTPDigestAuth
 
 from DeTrusty.Logger import get_logger
-from DeTrusty.Molecule import SEMSD
+from DeTrusty.Molecule import SEMSD, DEFAULT_GRAPH
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger(__name__)
@@ -113,13 +113,19 @@ class MTEndpoint(object):
         return credentials
 
     @abc.abstractmethod
-    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+    def add_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH, username: str = None, password: str = None,
+                     keycloak: str = None):
         """Adds an endpoint to the federation.
 
         Parameters
         ----------
         endpoint : str
             The URL of the SPARQL endpoint to add to the federation.
+        graph : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to which the endpoint should be added.
+            If omitted, the default federation is considered.
         username : str, optional
             The username required to access the endpoint, the default is None.
         password : str, optional
@@ -131,19 +137,24 @@ class MTEndpoint(object):
         pass
 
     @abc.abstractmethod
-    def delete_endpoint(self, endpoint: str):
+    def delete_endpoint(self, endpoint: str,  graph: str = DEFAULT_GRAPH):
         """Deletes an endpoint from the federation.
 
         Parameters
         ----------
         endpoint : str
             The URL of the SPARQL endpoint to be removed from the federation.
+        graph : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) from which to remove the endpoint.
+            If omitted, the default federation is considered.
 
         """
         pass
 
     @staticmethod
-    def get_query_delete_property_range(endpoint_url: str):
+    def get_query_delete_property_range(endpoint_url: str, graph: str = DEFAULT_GRAPH):
         """Gets the query for deleting the property ranges associated with the given SPARQL endpoint.
 
         This query is then executed against the RDF graph containing the source descriptions
@@ -153,6 +164,8 @@ class MTEndpoint(object):
         ----------
         endpoint_url : str
             The URL of the SPARQL endpoint for which the information should be deleted.
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -163,6 +176,7 @@ class MTEndpoint(object):
         return '''
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX semsd: <{semsd}>
+        WITH <{graph}>
         DELETE {{
           ?pred semsd:propertyRange ?pr .
           ?pr ?p ?o .
@@ -173,10 +187,10 @@ class MTEndpoint(object):
             semsd:hasSource <{url}> ;
             ?p ?o .
         }}
-        '''.format(semsd=SEMSD, url=endpoint_url)
+        '''.format(graph=graph, semsd=SEMSD, url=endpoint_url)
 
     @staticmethod
-    def get_query_delete_source_from_property(endpoint_url: str):
+    def get_query_delete_source_from_property(endpoint_url: str, graph: str = DEFAULT_GRAPH):
         """Gets the query for deleting the given SPARQL endpoint as source for properties.
 
         This query is then executed against the RDF graph containing the source descriptions
@@ -186,6 +200,8 @@ class MTEndpoint(object):
         ----------
         endpoint_url : str
             The URL of the SPARQL endpoint for which the information should be deleted.
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -196,20 +212,26 @@ class MTEndpoint(object):
         return '''
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX semsd: <{semsd}>
+        WITH <{graph}>
         DELETE {{
           ?pred semsd:hasSource <{url}> .
         }} WHERE {{
           ?pred a rdf:Property ;
             semsd:hasSource <{url}> .
         }}
-        '''.format(semsd=SEMSD, url=endpoint_url)
+        '''.format(graph=graph, semsd=SEMSD, url=endpoint_url)
 
     @staticmethod
-    def get_query_delete_property_no_source():
+    def get_query_delete_property_no_source(graph: str = DEFAULT_GRAPH):
         """Gets the query for deleting properties with no sources.
 
         This query is then executed against the RDF graph containing the source descriptions
         as part of the deletion process of the given SPARQL endpoint.
+
+        Parameters
+        ----------
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -221,6 +243,7 @@ class MTEndpoint(object):
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX semsd: <{semsd}>
+        WITH <{graph}>
         DELETE {{
           ?c semsd:hasPredicate ?pred .
           ?pred ?p ?o .
@@ -231,10 +254,10 @@ class MTEndpoint(object):
           ?c a rdfs:Class ;
             semsd:hasProperty ?pred .
         }}
-        '''.format(semsd=SEMSD)
+        '''.format(graph=graph, semsd=SEMSD)
 
     @staticmethod
-    def get_query_delete_source_from_class(endpoint_url: str):
+    def get_query_delete_source_from_class(endpoint_url: str, graph: str = DEFAULT_GRAPH):
         """Gets the query for deleting the given SPARQL endpoint as source for classes.
 
         This query is then executed against the RDF graph containing the source descriptions
@@ -244,6 +267,8 @@ class MTEndpoint(object):
         ----------
         endpoint_url : str
             The URL of the SPARQL endpoint for which the information should be deleted.
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -254,20 +279,26 @@ class MTEndpoint(object):
         return '''
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX semsd: <{semsd}>
+        WITH <{graph}>
         DELETE {{
           ?c semsd:hasSource <{url}> .
         }} WHERE {{
           ?c a rdfs:Class ;
             semsd:hasSource <{url}> .
         }}
-        '''.format(semsd=SEMSD, url=endpoint_url)
+        '''.format(graph=graph, semsd=SEMSD, url=endpoint_url)
 
     @staticmethod
-    def get_query_delete_class_no_source():
+    def get_query_delete_class_no_source(graph: str = DEFAULT_GRAPH):
         """Gets the query for deleting classes with no sources.
 
         This query is then executed against the RDF graph containing the source descriptions
         as part of the deletion process of the given SPARQL endpoint.
+
+        Parameters
+        ----------
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -278,6 +309,7 @@ class MTEndpoint(object):
         return '''
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX semsd: <{semsd}>
+        WITH <{graph}>
         DELETE {{
           ?c ?p ?o .
         }} WHERE {{
@@ -285,10 +317,10 @@ class MTEndpoint(object):
             ?p ?o .
           FILTER NOT EXISTS {{ ?c semsd:hasSource ?source }}
         }}
-        '''.format(semsd=SEMSD)
+        '''.format(graph=graph, semsd=SEMSD)
 
     @staticmethod
-    def get_query_delete_source(endpoint_url: str):
+    def get_query_delete_source(endpoint_url: str, graph: str = DEFAULT_GRAPH):
         """Gets the query for deleting the given SPARQL endpoint.
 
         This query is then executed against the RDF graph containing the source descriptions
@@ -298,6 +330,8 @@ class MTEndpoint(object):
         ----------
         endpoint_url : str
             The URL of the SPARQL endpoint for which the information should be deleted.
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -308,6 +342,7 @@ class MTEndpoint(object):
         return '''
         PREFIX semsd: <{semsd}>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        WITH <{graph}>
         DELETE {{
           ?source ?p ?o .
         }} WHERE {{
@@ -315,7 +350,7 @@ class MTEndpoint(object):
             semsd:hasURL "{url}"^^xsd:anyURI ;
             ?p ?o .
         }}
-        '''.format(semsd=SEMSD, url=endpoint_url)
+        '''.format(graph=graph, semsd=SEMSD, url=endpoint_url)
 
 
 class SPARQLEndpoint(MTEndpoint):
@@ -341,11 +376,6 @@ class SPARQLEndpoint(MTEndpoint):
         self.username = username
         self.password = password
 
-    @property
-    def default_graph(self):
-        """The default graph URI required for adding and deleting data in Virtuoso."""
-        return SEMSD + 'defaultGraph'
-
     def set_update_credentials(self, update_endpoint_url, username, password):
         """Sets the credentials for updating the source descriptions in Virtuoso.
 
@@ -368,7 +398,7 @@ class SPARQLEndpoint(MTEndpoint):
         _, card = contact_source(self.endpoint_url, query_str, res_queue, config=None)
         return QuerySolution(res_queue, cardinality=card)
 
-    def _update(self, update_query: str):
+    def _update(self, update_query: str, graph: str = DEFAULT_GRAPH):
         """Updates the SPARQL endpoint using a SPARQL update query.
 
         The SPARQL endpoint is updated by executing the SPARQL update query.
@@ -378,6 +408,8 @@ class SPARQLEndpoint(MTEndpoint):
         ----------
         update_query : str
             The SPARQL update query that needs to be executed for the intended update.
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         Returns
         -------
@@ -395,7 +427,6 @@ class SPARQLEndpoint(MTEndpoint):
             resp = requests.post(self.update_endpoint_url,
                                  data=update_query,
                                  headers=headers,
-                                 params={'default-graph-uri': self.default_graph},
                                  auth=HTTPDigestAuth(self.username, self.password))
             if resp.status_code == HTTPStatus.OK or \
                     resp.status_code == HTTPStatus.ACCEPTED or \
@@ -412,7 +443,7 @@ class SPARQLEndpoint(MTEndpoint):
 
         return False
 
-    def _add_triples(self, triples: list):
+    def _add_triples(self, triples: list, graph: str = DEFAULT_GRAPH):
         """Adds new data of the RDF Molecule Templates into the RDF knowledge graph.
 
         This method uses INSERT queries to add new data to the RDF knowledge graph
@@ -423,6 +454,10 @@ class SPARQLEndpoint(MTEndpoint):
         ----------
         triples : list[tuple]
             A list of RDF triples to insert into the knowledge graph.
+        graph : str, optional
+            .. versionadded:: 0.22.0
+
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
 
         """
         def triples2str(triples_: list) -> list:
@@ -445,32 +480,33 @@ class SPARQLEndpoint(MTEndpoint):
         # Virtuoso supports only 49 triples at a time.
         for i in range(0, len(triples), 49):
             if i + 49 > len(triples):
-                update_query = 'INSERT DATA { ' + ' . \n'.join(triples2str(triples[i:])) + '}'
+                update_query = 'WITH <{graph}> INSERT DATA {{ '.format(graph=graph) + ' . \n'.join(triples2str(triples[i:])) + '}'
             else:
-                update_query = 'INSERT DATA { ' + ' . \n'.join(triples2str(triples[i:i + 49])) + '}'
-            self._update(update_query)
+                update_query = 'WITH <{graph}> INSERT DATA {{ '.format(graph=graph) + ' . \n'.join(triples2str(triples[i:i + 49])) + '}'
+            self._update(update_query, graph)
         if i < len(triples) + 49:
-            update_query = 'INSERT DATA { ' + ' . \n'.join(triples2str(triples[i:])) + '}'
-            self._update(update_query)
+            update_query = 'WITH <{graph}> INSERT DATA {{ '.format(graph=graph) + ' . \n'.join(triples2str(triples[i:])) + '}'
+            self._update(update_query, graph)
 
-    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+    def add_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH, username: str = None, password: str = None,
+                     keycloak: str = None):
         from DeTrusty.Molecule.MTCreation import Endpoint, get_rdfmts_from_endpoint, _accessible_endpoints
         endpoint = Endpoint(endpoint, params=self._credentials2dict(username, password, keycloak))
         accessible = endpoint in _accessible_endpoints([endpoint])
         if accessible:
             endpoint_desc = get_rdfmts_from_endpoint(endpoint)
-            self._add_triples(list(endpoint.triples))
-            self._add_triples(list(endpoint_desc))
+            self._add_triples(list(endpoint.triples), graph)
+            self._add_triples(list(endpoint_desc), graph)
         else:
             logger.warning('{kg} is not accessible and, hence, cannot be added to the federation.'.format(kg=endpoint.url))
 
-    def delete_endpoint(self, endpoint: str):
-        self._update(self.get_query_delete_property_range(endpoint))
-        self._update(self.get_query_delete_source_from_property(endpoint))
-        self._update(self.get_query_delete_property_no_source())
-        self._update(self.get_query_delete_source_from_class(endpoint))
-        self._update(self.get_query_delete_class_no_source())
-        self._update(self.get_query_delete_source(endpoint))
+    def delete_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH):
+        self._update(self.get_query_delete_property_range(endpoint, graph))
+        self._update(self.get_query_delete_source_from_property(endpoint, graph))
+        self._update(self.get_query_delete_property_no_source(graph))
+        self._update(self.get_query_delete_source_from_class(endpoint, graph))
+        self._update(self.get_query_delete_class_no_source(graph))
+        self._update(self.get_query_delete_source(endpoint, graph))
 
 
 class PyOxigraphEndpoint(MTEndpoint):
@@ -486,11 +522,11 @@ class PyOxigraphEndpoint(MTEndpoint):
 
         """
         self.ttl = Store()
-        self.ttl.load(ttl, RdfFormat.TURTLE)
+        self.ttl.load(ttl, RdfFormat.TRIG)
         self.ttl.optimize()
 
     def query(self, query_str):
-        return QuerySolution(self.ttl.query(query_str))
+        return QuerySolution(self.ttl.query(query_str, use_default_graph_as_union=True))
 
     def serialize(self, path):
         """Saves the source descriptions to a file.
@@ -504,21 +540,22 @@ class PyOxigraphEndpoint(MTEndpoint):
 
         """
         oxi_serialize(self.ttl, path,
-                      format=RdfFormat.TURTLE,
+                      format=RdfFormat.TRIG,
                       prefixes={'semsd': SEMSD})
 
-    def delete_endpoint(self, endpoint: str):
-        self.ttl.update(self.get_query_delete_property_range(endpoint))
-        self.ttl.update(self.get_query_delete_source_from_property(endpoint))
-        self.ttl.update(self.get_query_delete_property_no_source())
-        self.ttl.update(self.get_query_delete_source_from_class(endpoint))
-        self.ttl.update(self.get_query_delete_class_no_source())
-        self.ttl.update(self.get_query_delete_source(endpoint))
+    def delete_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH):
+        self.ttl.update(self.get_query_delete_property_range(endpoint, graph))
+        self.ttl.update(self.get_query_delete_source_from_property(endpoint, graph))
+        self.ttl.update(self.get_query_delete_property_no_source(graph))
+        self.ttl.update(self.get_query_delete_source_from_class(endpoint, graph))
+        self.ttl.update(self.get_query_delete_class_no_source(graph))
+        self.ttl.update(self.get_query_delete_source(endpoint, graph))
         self.ttl.optimize()
 
-    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+    def add_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH, username: str = None, password: str = None,
+                     keycloak: str = None):
         from DeTrusty.Molecule.MTCreation import Endpoint, get_rdfmts_from_endpoint, _accessible_endpoints
-        endpoint = Endpoint(endpoint, params=self._credentials2dict(username, password, keycloak), is_pyoxigraph=True)
+        endpoint = Endpoint(endpoint, params=self._credentials2dict(username, password, keycloak), pyoxigraph=graph)
         accessible = endpoint in _accessible_endpoints([endpoint])
         if accessible:
             endpoint_desc = get_rdfmts_from_endpoint(endpoint)

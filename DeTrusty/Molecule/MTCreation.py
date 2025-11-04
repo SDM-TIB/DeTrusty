@@ -38,10 +38,10 @@ metas = [
 
 class Endpoint:
     """Simple representation of an endpoint. URL is mandatory, but an endpoint might have optional parameters."""
-    def __init__(self, url: str, params: dict = None, is_pyoxigraph: bool = False):
+    def __init__(self, url: str, params: dict = None, pyoxigraph: str = None):
         self.url = url
         self.params = params if params is not None else {}
-        self.is_pyoxigraph = is_pyoxigraph
+        self.pyoxigraph = NamedNode(pyoxigraph) if pyoxigraph is not None else None
 
     @property
     def types(self):
@@ -50,25 +50,25 @@ class Endpoint:
     @property
     def triples(self):
         triples = set()
-        if self.is_pyoxigraph:
-            triples.add(Quad(NamedNode(self.url), NamedNode(RDF.type), NamedNode(SEMSD.DataSource), None))
-            triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.hasURL), oxiLiteral(self.url, datatype=NamedNode(XSD.anyURI)), None))
+        if self.pyoxigraph is not None:
+            triples.add(Quad(NamedNode(self.url), NamedNode(RDF.type), NamedNode(SEMSD.DataSource), self.pyoxigraph))
+            triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.hasURL), oxiLiteral(self.url, datatype=NamedNode(XSD.anyURI)), self.pyoxigraph))
         else:
             triples.add((URIRef(self.url), RDF.type, SEMSD.DataSource))
             triples.add((URIRef(self.url), SEMSD.hasURL, Literal(self.url, datatype=XSD.anyURI)))
         if 'username' in self.params.keys():
-            if self.is_pyoxigraph:
-                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.username), oxiLiteral(self.params['username']), None))
+            if self.pyoxigraph is not None:
+                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.username), oxiLiteral(self.params['username']), self.pyoxigraph))
             else:
                 triples.add((URIRef(self.url), SEMSD.username, Literal(self.params['username'])))
         if 'password' in self.params.keys():
-            if self.is_pyoxigraph:
-                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.password), oxiLiteral(self.params['password']), None))
+            if self.pyoxigraph is not None:
+                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.password), oxiLiteral(self.params['password']), self.pyoxigraph))
             else:
                 triples.add((URIRef(self.url), SEMSD.password, Literal(self.params['password'])))
         if 'keycloak' in self.params.keys():
-            if self.is_pyoxigraph:
-                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.tokenServer), oxiLiteral(self.params['keycloak']), None))
+            if self.pyoxigraph is not None:
+                triples.add(Quad(NamedNode(self.url), NamedNode(SEMSD.tokenServer), oxiLiteral(self.params['keycloak']), self.pyoxigraph))
             else:
                 triples.add((URIRef(self.url), SEMSD.tokenServer, Literal(self.params['keycloak'])))
         return triples
@@ -180,15 +180,15 @@ def get_rdfmts_from_endpoint(endpoint: Endpoint, ignore_classes=None):
         if '^^' in c:
             continue
         logger.info(c)
-        triples = triples.union(_triples_class(c, source, is_pyoxigraph=endpoint.is_pyoxigraph))
+        triples = triples.union(_triples_class(c, source, pyoxigraph=endpoint.pyoxigraph))
         predicates = _get_predicates(endpoint, c)
         for p in predicates:
             if 'wikiPageWikiLink' in p:
                 continue
-            triples = triples.union(_triples_predicate(p, c, source, is_pyoxigraph=endpoint.is_pyoxigraph))
+            triples = triples.union(_triples_predicate(p, c, source, pyoxigraph=endpoint.pyoxigraph))
             ranges_ = _get_predicate_range(endpoint, c, p)
             for range_ in ranges_:
-                triples = triples.union(_triples_predicate_range(p, c, range_, source, is_pyoxigraph=endpoint.is_pyoxigraph))
+                triples = triples.union(_triples_predicate_range(p, c, range_, source, pyoxigraph=endpoint.pyoxigraph))
 
     logger.info('=================================')
     return triples
@@ -395,37 +395,37 @@ def get_rdfmts_from_mapping(endpoint: Endpoint):
 
     return triples, classes, template_classes
 
-def _triples_class(class_, source, is_pyoxigraph=False):
+def _triples_class(class_, source, pyoxigraph=None):
     c = set()
-    if is_pyoxigraph:
-        c.add(Quad(NamedNode(class_), NamedNode(RDF.type), NamedNode(RDFS.Class), None))
-        c.add(Quad(NamedNode(class_), NamedNode(SEMSD.hasSource), NamedNode(source), None))
+    if pyoxigraph is not None:
+        c.add(Quad(NamedNode(class_), NamedNode(RDF.type), NamedNode(RDFS.Class), pyoxigraph))
+        c.add(Quad(NamedNode(class_), NamedNode(SEMSD.hasSource), NamedNode(source), pyoxigraph))
     else:
         c.add((URIRef(class_), RDF.type, RDFS.Class))
         c.add((URIRef(class_), SEMSD.hasSource, URIRef(source)))
     return c
 
-def _triples_predicate(predicate, class_, source, is_pyoxigraph=False):
+def _triples_predicate(predicate, class_, source, pyoxigraph=None):
     pred = set()
-    if is_pyoxigraph:
-        pred.add(Quad(NamedNode(predicate), NamedNode(RDF.type), NamedNode(RDF.Property), None))
-        pred.add(Quad(NamedNode(predicate), NamedNode(SEMSD.hasSource), NamedNode(source), None))
-        pred.add(Quad(NamedNode(class_), NamedNode(SEMSD.hasProperty), NamedNode(predicate), None))
+    if pyoxigraph is not None:
+        pred.add(Quad(NamedNode(predicate), NamedNode(RDF.type), NamedNode(RDF.Property), pyoxigraph))
+        pred.add(Quad(NamedNode(predicate), NamedNode(SEMSD.hasSource), NamedNode(source), pyoxigraph))
+        pred.add(Quad(NamedNode(class_), NamedNode(SEMSD.hasProperty), NamedNode(predicate), pyoxigraph))
     else:
         pred.add((URIRef(predicate), RDF.type, RDF.Property))
         pred.add((URIRef(predicate), SEMSD.hasSource, URIRef(source)))
         pred.add((URIRef(class_), SEMSD.hasProperty, URIRef(predicate)))
     return pred
 
-def _triples_predicate_range(predicate, domain, range_, source, is_pyoxigraph=False):
+def _triples_predicate_range(predicate, domain, range_, source, pyoxigraph=None):
     predicate_range = set()
-    if is_pyoxigraph:
+    if pyoxigraph is not None:
         range_info = BlankNode()
-        predicate_range.add(Quad(NamedNode(predicate), NamedNode(SEMSD.propertyRange), range_info, None))
-        predicate_range.add(Quad(range_info, NamedNode(RDF.type), NamedNode(SEMSD.PropertyRange), None))
-        predicate_range.add(Quad(range_info, NamedNode(RDFS.domain), NamedNode(domain), None))
-        predicate_range.add(Quad(range_info, NamedNode(RDFS.range), NamedNode(range_), None))
-        predicate_range.add(Quad(range_info, NamedNode(SEMSD.hasSource), NamedNode(source), None))
+        predicate_range.add(Quad(NamedNode(predicate), NamedNode(SEMSD.propertyRange), range_info, pyoxigraph))
+        predicate_range.add(Quad(range_info, NamedNode(RDF.type), NamedNode(SEMSD.PropertyRange), pyoxigraph))
+        predicate_range.add(Quad(range_info, NamedNode(RDFS.domain), NamedNode(domain), pyoxigraph))
+        predicate_range.add(Quad(range_info, NamedNode(RDFS.range), NamedNode(range_), pyoxigraph))
+        predicate_range.add(Quad(range_info, NamedNode(SEMSD.hasSource), NamedNode(source), pyoxigraph))
     else:
         range_info = BNode()
         predicate_range.add((URIRef(predicate), SEMSD.propertyRange, range_info))

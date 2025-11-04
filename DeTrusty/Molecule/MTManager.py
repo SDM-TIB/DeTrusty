@@ -12,7 +12,7 @@ from base64 import b64encode
 import requests
 from rdflib.namespace import RDFS, XSD
 
-from DeTrusty.Molecule import SEMSD
+from DeTrusty.Molecule import SEMSD, DEFAULT_GRAPH
 from DeTrusty.Molecule.MTEndpoint import MTEndpoint, PyOxigraphEndpoint, SPARQLEndpoint
 from DeTrusty.utils import is_url, is_sparql_endpoint, read_file_from_internet
 
@@ -356,13 +356,19 @@ class RDFConfig(Config):
         super().__init__()
         self.endpoints = self.getEndpoints()
 
-    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+    def add_endpoint(self, endpoint: str, federation: str = None, username: str = None, password: str = None,
+                     keycloak: str = None):
         """Adds an endpoint to the federation.
 
         Parameters
         ----------
         endpoint : str
             The URL of the SPARQL endpoint to add to the federation.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to which the endpoint should be added.
+            If omitted, the default federation is considered.
         username : str, optional
             The username required to access the endpoint, the default is None.
         password : str, optional
@@ -371,43 +377,61 @@ class RDFConfig(Config):
             The URL of the token server providing access tokens, the default is None.
 
         """
-        self.src_desc.add_endpoint(endpoint, username, password, keycloak)
+        self.src_desc.add_endpoint(endpoint, federation, username, password, keycloak)
         self.endpoints = self.getEndpoints()
 
-    def delete_endpoint(self, endpoint: str):
+    def delete_endpoint(self, endpoint: str, federation: str = None):
         """Deletes an endpoint from the federation.
 
         Parameters
         ----------
         endpoint : str
             The URL of the SPARQL endpoint to be removed from the federation.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) from which to remove the endpoint.
+            If omitted, the default federation is considered.
 
         """
-        self.src_desc.delete_endpoint(endpoint)
+        self.src_desc.delete_endpoint(endpoint, federation)
         self.endpoints = self.getEndpoints()
 
     def getAll(self):
         return None
 
-    def get_molecules(self):
+    def get_molecules(self, federation: str = None):
         """Gets all RDF Molecules of the federation.
 
         The list of molecules is extracted from the source description RDF graph via a SPARQL query.
 
+        Parameters
+        ----------
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
+
         Returns
         -------
         list
-            A list of all the RDF Molecules in the federation.
+            A list of all the RDF Molecules in the federation(s).
 
         """
         mts = []
-        query = "SELECT DISTINCT ?mt WHERE { ?mt a " + RDFS.Class.n3() + " }"
+        query = (
+            'SELECT DISTINCT ?mt WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'?mt a {RDFS.Class.n3()} '
+            + ('} ' if federation else '')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             mts.append(res['mt'])
         return mts
 
-    def get_molecule_predicates(self, mol):
+    def get_molecule_predicates(self, mol, federation: str = None):
         """Gets the predicates for a given RDF Molecule.
 
         The list of predicates is extracted from the source description RDF graph via a SPARQL query.
@@ -416,6 +440,10 @@ class RDFConfig(Config):
         ----------
         mol : str
             The name of the RDF Molecule for which to retrieve the predicates.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -424,14 +452,20 @@ class RDFConfig(Config):
 
         """
         preds = []
-        query = "SELECT DISTINCT ?pred WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
-        query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " ?pred .\n}"
+        query = (
+            'SELECT DISTINCT ?pred WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n <{mol}> a {RDFS.Class.n3()} .'
+            + f'\n <{mol}> {SEMSD.hasProperty.n3()} ?pred .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             preds.append(res['pred'])
         return preds
 
-    def get_molecule_links(self, mol):
+    def get_molecule_links(self, mol, federation: str = None):
         """Gets the links for a given RDF Molecule.
 
         The links are extracted from the source description RDF graph via a SPARQL query.
@@ -440,6 +474,10 @@ class RDFConfig(Config):
         ----------
         mol : str
             The name of the RDF Molecule for which to retrieve the links.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -448,14 +486,20 @@ class RDFConfig(Config):
 
         """
         links = []
-        query = "SELECT DISTINCT ?link WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
-        query += "  <" + mol + "> " + SEMSD.linkedTo.n3() + " ?link .\n}"
+        query = (
+            'SELECT DISTINCT ?link WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n <{mol}> a {RDFS.Class.n3()} .'
+            + f'\n <{mol}> {SEMSD.linkedTo.n3()} ?link .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             links.append(res['link'])
         return links
 
-    def get_molecule_links_of_pred(self, mol, pred):
+    def get_molecule_links_of_pred(self, mol, pred, federation: str = None):
         """Gets the links for a given RDF Molecule and predicate.
 
         The links are extracted from the source description RDF graph via a SPARQL query.
@@ -466,6 +510,10 @@ class RDFConfig(Config):
             The name of the RDF Molecule for which to retrieve the links.
         pred : str
             The full URI of the predicate for which to retrieve the links.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -474,18 +522,23 @@ class RDFConfig(Config):
 
         """
         links = []
-        query = "SELECT DISTINCT ?link WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
-        query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " <" + pred + "> .\n"
-        query += "  <" + pred + "> " + SEMSD.propertyRange.n3() + " ?prange .\n"
-        query += "  ?prange " + RDFS.domain.n3() + " <" + mol + "> .\n"
-        query += "  ?prange " + RDFS.range.n3() + " ?link .\n"
-        query += "}"
+        query = (
+            'SELECT DISTINCT ?link WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n <{mol}> a {RDFS.Class.n3()} .'
+            + f'\n <{mol}> {SEMSD.hasProperty.n3()} <{pred}> .'
+            + f'\n <{pred}> {SEMSD.propertyRange.n3()} ?prange .'
+            + f'\n ?prange {RDFS.domain.n3()} <{mol}> .'
+            + f'\n ?prange {RDFS.range.n3()} ?link .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             links.append(res['link'])
         return links
 
-    def get_molecule_endpoints(self, mol):
+    def get_molecule_endpoints(self, mol, federation: str = None):
         """Get the endpoints for the given RDF Molecule.
 
         The list of endpoints is extracted from the source description RDF graph via a SPARQL query.
@@ -494,6 +547,10 @@ class RDFConfig(Config):
         ----------
         mol : str
             The name of the RDF Molecule for which to retrieve the endpoints.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -502,15 +559,21 @@ class RDFConfig(Config):
 
         """
         endpoints = []
-        query = "SELECT DISTINCT ?url WHERE {\n  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
-        query += "  <" + mol + "> " + SEMSD.hasSource.n3() + " ?source .\n"
-        query += "  ?source " + SEMSD.hasURL.n3() + " ?url .\n}"
+        query = (
+            'SELECT DISTINCT ?url WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n <{mol}> a {RDFS.Class.n3()} .'
+            + f'\n <{mol}> {SEMSD.hasSource.n3()} ?source .'
+            + f'\n ?source {SEMSD.hasURL.n3()} ?url .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             endpoints.append(res['url'])
         return endpoints
 
-    def get_molecule_endpoint_preds(self, mol, endpoint):
+    def get_molecule_endpoint_preds(self, mol, endpoint, federation: str = None):
         """Get the predicates for the given RDF Molecule and endpoint of the federation.
 
         The list of predicates is extracted from the source description RDF graph via a SPARQL query.
@@ -521,6 +584,10 @@ class RDFConfig(Config):
             The name of the RDF Molecule for which to retrieve the predicates.
         endpoint : str
             The URL of the endpoints for which to retrieve the predicates.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -529,22 +596,33 @@ class RDFConfig(Config):
 
         """
         predicates = []
-        query = "SELECT DISTINCT ?pred WHERE {\n"
-        query += "  <" + mol + "> a " + RDFS.Class.n3() + " .\n"
-        query += "  <" + mol + "> " + SEMSD.hasProperty.n3() + " ?pred .\n"
-        query += "  ?pred " + SEMSD.hasSource.n3() + " ?source .\n"
-        query += "  ?source " + SEMSD.hasURL.n3() + ' "' + endpoint + '"^^' + XSD.anyURI.n3() + ' .\n'
-        query += "}"
+        query = (
+            'SELECT DISTINCT ?pred WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n <{mol}> a {RDFS.Class.n3()} .'
+            + f'\n <{mol}> {SEMSD.hasProperty.n3()} ?pred .'
+            + f'\n ?pred {SEMSD.hasSource.n3()} ?source .'
+            + f'\n ?source {SEMSD.hasURL.n3()} "{endpoint}"^^{XSD.anyURI.n3()} .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             predicates.append(res['pred'])
         return predicates
 
-    def getEndpoints(self):
+    def getEndpoints(self, federation: str = None):
         """Get all endpoints and their information of the federation.
 
         The information of an endpoint includes the access information like username, password and token server URL.
         All information are extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -553,11 +631,17 @@ class RDFConfig(Config):
 
         """
         endpoints = {}
-        query = "SELECT DISTINCT ?url ?username ?password ?tokenServer WHERE {\n  ?endpoint a " + SEMSD.DataSource.n3() + " .\n"
-        query += "  ?endpoint " + SEMSD.hasURL.n3() + " ?url .\n"
-        query += "  OPTIONAL { ?endpoint " + SEMSD.username.n3() + " ?username }\n"
-        query += "  OPTIONAL { ?endpoint " + SEMSD.password.n3() + " ?password }\n"
-        query += "  OPTIONAL { ?endpoint " + SEMSD.tokenServer.n3() + " ?tokenServer }\n}"
+        query = (
+            'SELECT DISTINCT ?url ?username ?password ?tokenServer WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n ?endpoint a {SEMSD.DataSource.n3()} .'
+            + f'\n ?endpoint {SEMSD.hasURL.n3()} ?url .'
+            + f'\n OPTIONAL {{ ?endpoint {SEMSD.username.n3()} ?username }} .'
+            + f'\n OPTIONAL {{ ?endpoint {SEMSD.password.n3()} ?password }} .'
+            + f'\n OPTIONAL {{ ?endpoint {SEMSD.tokenServer.n3()} ?tokenServer }} .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             endpoints[res['url']] = {}
@@ -569,7 +653,7 @@ class RDFConfig(Config):
                 endpoints[res['url']]['keycloak'] = res['tokenServer']
         return endpoints
 
-    def findbypreds(self, preds):
+    def findbypreds(self, preds, federation: str = None):
         """Get all RDF Molecules that contain the given list of predicates.
 
         The list of RDF Molecules is extracted from the source description RDF graph via a SPARQL query.
@@ -578,6 +662,10 @@ class RDFConfig(Config):
         ----------
         preds : list
             The list of predicates the RDF Molecules need to contain.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -586,16 +674,20 @@ class RDFConfig(Config):
 
         """
         mts = []
-        query = "SELECT DISTINCT ?mt WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
-        for p in preds:
-            query += "  ?mt " + SEMSD.hasProperty.n3() + " <" + p + "> .\n"
-        query += "}"
+        query = (
+            'SELECT DISTINCT ?mt WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n ?mt a {RDFS.Class.n3()} .'
+            + ''.join(f'\n ?mt {SEMSD.hasProperty.n3()} <{p}> .' for p in preds)
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             mts.append(res['mt'])
         return mts
 
-    def find_preds_per_mt(self, preds):
+    def find_preds_per_mt(self, preds, federation: str = None):
         """Get all RDF Molecules and matching predicates that contain at least one of the given predicates.
 
         The information is extracted from the source description RDF graph via a SPARQL query.
@@ -604,6 +696,10 @@ class RDFConfig(Config):
         ----------
         preds : list
             The list of predicates from which the RDF Molecules need to contain at least one.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -612,11 +708,15 @@ class RDFConfig(Config):
 
         """
         mts = {}
-        query = "SELECT DISTINCT ?mt ?pred WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
-        query += "  ?mt " + SEMSD.hasProperty.n3() + " ?pred .\n"
-        if len(preds) > 0:
-            query += "  VALUES ?pred { " + ' '.join(['<' + p + '>' for p in preds]) + " }\n"
-        query += "}"
+        query = (
+            'SELECT DISTINCT ?mt ?pred WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n ?mt a {RDFS.Class.n3()} .'
+            + f'\n ?mt {SEMSD.hasProperty.n3()} ?pred .'
+            + ('\n VALUES ?pred {' + ''.join(f'\n  <{p}>' for p in preds) + '\n }' if len(preds) > 0 else '')
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             if not res['mt'] in mts.keys():
@@ -625,7 +725,7 @@ class RDFConfig(Config):
                 mts[res['mt']].append(res['pred'])
         return mts
 
-    def findbypred(self, pred):
+    def findbypred(self, pred, federation: str = None):
         """Get all RDF Molecules that contain the given predicate.
 
         The list of RDF Molecules is extracted from the source description RDF graph via a SPARQL query.
@@ -634,6 +734,10 @@ class RDFConfig(Config):
         ----------
         pred : str
             The full URI of the predicate the RDF Molecules need to contain.
+        federation : str, optional
+            .. versionadded:: 0.22.0
+
+            The federation (named graph) to be considered. If omitted, all federations are considered.
 
         Returns
         -------
@@ -642,9 +746,14 @@ class RDFConfig(Config):
 
         """
         mts = []
-        query = "SELECT DISTINCT ?mt WHERE {\n  ?mt a " + RDFS.Class.n3() + " .\n"
-        query += "  ?mt " + SEMSD.hasProperty.n3() + " <" + pred + "> .\n"
-        query += "}"
+        query = (
+            'SELECT DISTINCT ?mt WHERE { '
+            + (f'GRAPH <{federation}> {{ ' if federation else '')
+            + f'\n ?mt a {RDFS.Class.n3()} .'
+            + f'\n ?mt {SEMSD.hasProperty.n3()} <{pred}> .'
+            + ('\n} ' if federation else '\n')
+            + '}'
+        )
         result = self.src_desc.query(query)
         for res in result:
             mts.append(res['mt'])
@@ -711,3 +820,228 @@ class SPARQLConfig(RDFConfig):
 
         """
         self.src_desc.set_update_credentials(update_endpoint, username, password)
+
+class FederationConfig(Config):
+    """This class limits the scope of the source descriptions to a specific federation."""
+
+    def __init__(self, config: RDFConfig, graph: str = DEFAULT_GRAPH):
+        """Initializes the TTLConfig class.
+
+        Parameters
+        ----------
+        config : RDFConfig
+            The RDFConfig object containing the source descriptions for several federations
+        graph : str, optional
+            The named graph used to query for the source descriptions. Default is semsd:defaultGraph
+
+        """
+        super().__init__()
+        self.__config = config
+        self.graph = graph
+        self.__config.endpoints = self.__config.getEndpoints()
+
+    def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
+        """Adds an endpoint to the federation.
+
+        Parameters
+        ----------
+        endpoint : str
+            The URL of the SPARQL endpoint to add to the federation.
+        username : str, optional
+            The username required to access the endpoint, the default is None.
+        password : str, optional
+            The password required to access the endpoint, the default is None.
+        keycloak : str, optional
+            The URL of the token server providing access tokens, the default is None.
+
+        """
+        self.__config.src_desc.add_endpoint(endpoint, self.graph, username, password, keycloak)
+
+    def delete_endpoint(self, endpoint: str):
+        """Deletes an endpoint from the federation.
+
+        Parameters
+        ----------
+        endpoint : str
+            The URL of the SPARQL endpoint to be removed from the federation.
+
+        """
+        self.__config.src_desc.delete_endpoint(endpoint, self.graph)
+
+    def getAll(self):
+        return self.__config.getAll()
+
+    def get_molecules(self):
+        """Gets all RDF Molecules of the federation.
+
+        The list of molecules is extracted from the source description RDF graph via a SPARQL query.
+
+        Returns
+        -------
+        list
+            A list of all the RDF Molecules in the federation(s).
+
+        """
+        return self.__config.get_molecules(self.graph)
+
+    def get_molecule_predicates(self, mol):
+        """Gets the predicates for a given RDF Molecule.
+
+        The list of predicates is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the predicates.
+
+        Returns
+        -------
+        list
+            The list of predicates for the given RDF Molecule.
+
+        """
+        return self.__config.get_molecule_predicates(mol, self.graph)
+
+    def get_molecule_links(self, mol):
+        """Gets the links for a given RDF Molecule.
+
+        The links are extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the links.
+
+        Returns
+        -------
+        list
+            The list of links for the given RDF Molecule.
+
+        """
+        return self.__config.get_molecule_links(mol, self.graph)
+
+    def get_molecule_links_of_pred(self, mol, pred):
+        """Gets the links for a given RDF Molecule and predicate.
+
+        The links are extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the links.
+        pred : str
+            The full URI of the predicate for which to retrieve the links.
+
+        Returns
+        -------
+        list
+            The list of links for the given RDF Molecule and predicate.
+
+        """
+        return self.__config.get_molecule_links_of_pred(mol, pred, self.graph)
+
+    def get_molecule_endpoints(self, mol):
+        """Get the endpoints for the given RDF Molecule.
+
+        The list of endpoints is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the endpoints.
+
+        Returns
+        -------
+        list
+            The list of endpoints (URLs) for the given RDF Molecule.
+
+        """
+        return self.__config.get_molecule_endpoints(mol, self.graph)
+
+    def get_molecule_endpoint_preds(self, mol, endpoint):
+        """Get the predicates for the given RDF Molecule and endpoint of the federation.
+
+        The list of predicates is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        mol : str
+            The name of the RDF Molecule for which to retrieve the predicates.
+        endpoint : str
+            The URL of the endpoints for which to retrieve the predicates.
+
+        Returns
+        -------
+        list
+            The list of predicates for the given RDF Molecule and endpoint.
+
+        """
+        return self.__config.get_molecule_endpoint_preds(mol, endpoint, self.graph)
+
+    def getEndpoints(self):
+        """Get all endpoints and their information of the federation.
+
+        The information of an endpoint includes the access information like username, password and token server URL.
+        All information are extracted from the source description RDF graph via a SPARQL query.
+
+        Returns
+        -------
+        dict
+            A dictionary containing all endpoints of the federation including their information.
+
+        """
+        return self.__config.getEndpoints(self.graph)
+
+    def findbypreds(self, preds):
+        """Get all RDF Molecules that contain the given list of predicates.
+
+        The list of RDF Molecules is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        preds : list
+            The list of predicates the RDF Molecules need to contain.
+
+        Returns
+        -------
+        list
+            The list of RDF Molecules that contain the given predicates.
+
+        """
+        return self.__config.findbypreds(preds, self.graph)
+
+    def find_preds_per_mt(self, preds):
+        """Get all RDF Molecules and matching predicates that contain at least one of the given predicates.
+
+        The information is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        preds : list
+            The list of predicates from which the RDF Molecules need to contain at least one.
+
+        Returns
+        -------
+        dict
+            A dictionary mapping the RDF Molecules to the predicates found from the given list.
+
+        """
+        return self.__config.find_preds_per_mt(preds, self.graph)
+
+    def findbypred(self, pred):
+        """Get all RDF Molecules that contain the given predicate.
+
+        The list of RDF Molecules is extracted from the source description RDF graph via a SPARQL query.
+
+        Parameters
+        ----------
+        pred : str
+            The full URI of the predicate the RDF Molecules need to contain.
+
+        Returns
+        -------
+        list
+            The list of RDF Molecules that contain the given predicates.
+
+        """
+        return self.__config.findbypred(pred, self.graph)
