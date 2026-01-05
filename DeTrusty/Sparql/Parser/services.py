@@ -1035,8 +1035,10 @@ class Expression(object):
         self.alias = alias
 
     def replace_prefix(self, prefixes):
-        self.left.replace_prefix(prefixes)
-        self.right.replace_prefix(prefixes)
+        if self.left is not None:
+            self.left.replace_prefix(prefixes)
+        if self.right is not None:
+            self.right.replace_prefix(prefixes)
 
     def __repr__(self):
         if self.alias:
