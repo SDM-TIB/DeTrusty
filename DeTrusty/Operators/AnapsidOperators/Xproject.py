@@ -9,7 +9,7 @@ The intermediate results are represented in a queue.
 
 from multiprocessing import Queue
 from . import Xexpression
-from DeTrusty.Sparql.Parser.services import Expression, Aggregate
+from DeTrusty.Sparql.utils import Expression, Aggregate
 
 
 class Xproject(object):

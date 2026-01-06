@@ -1,7 +1,7 @@
 import pytest
 
 from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues
-from DeTrusty.Sparql.Parser.services import Argument, Values
+from DeTrusty.Sparql.utils import Argument, Values
 
 
 @pytest.fixture

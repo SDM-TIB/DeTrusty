@@ -5,7 +5,7 @@ venv/
 .gitignore
 .zenodo.json
 Dockerfile
-DeTrusty/Sparql/Parser/parsetab.py
+DeTrusty/Sparql/parsetab.py
 tests
 requirements-dev.txt
 requirements-doc.txt

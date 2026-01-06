@@ -13,7 +13,7 @@ from time import time
 from queue import Empty
 from DeTrusty.Operators.Optional import Optional
 from .OperatorStructures import Record
-from ...Sparql.Parser.services import Bind
+from DeTrusty.Sparql.utils import Bind
 
 WINDOW_SIZE = 1000
 

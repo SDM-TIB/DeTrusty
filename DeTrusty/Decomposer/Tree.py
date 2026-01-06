@@ -1,6 +1,6 @@
 import abc
 
-from DeTrusty.Sparql.Parser.services import Aggregate
+from DeTrusty.Sparql.utils import Aggregate
 
 
 class Tree(object):

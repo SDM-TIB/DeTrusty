@@ -8,7 +8,7 @@ The intermediate results are represented in a queue.
 """
 
 from multiprocessing import Queue
-from DeTrusty.Sparql.Parser.services import Expression, Argument
+from DeTrusty.Sparql.utils import Expression, Argument
 import datetime
 import operator
 

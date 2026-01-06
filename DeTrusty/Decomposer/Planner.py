@@ -22,7 +22,7 @@ from DeTrusty.Operators.AnapsidOperators.Xvalues import Xvalues
 from DeTrusty.Operators.BlockingOperators.Union import Union
 from DeTrusty.Operators.NonBlockingOperators.NestedHashJoinValues import NestedHashJoinValues as NestedHashJoin
 from DeTrusty.Operators.NonBlockingOperators.NestedHashOptionalValues import  NestedHashOptionalValues as NestedHashOptional
-from DeTrusty.Sparql.Parser.services import Bind, Filter, Values, Service, Optional, UnionBlock, JoinBlock
+from DeTrusty.Sparql.utils import Bind, Filter, Values, Service, Optional, UnionBlock, JoinBlock
 
 
 class Planner(object):

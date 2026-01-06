@@ -15,10 +15,10 @@ from time import time
 import string, sys
 from queue import Empty
 from DeTrusty.Operators.Join import Join
-from DeTrusty.Sparql.Parser import queryParser as qp
+from DeTrusty.Sparql import parser as qp
 from .OperatorStructures import Table, Partition, Record
 # from .NestedHashJoin import NestedHashJoin
-from ...Sparql.Parser.services import Bind
+from DeTrusty.Sparql.utils import Bind
 
 WINDOW_SIZE = 20
 

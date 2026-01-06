@@ -2,7 +2,7 @@ import urllib.parse
 
 from ply import lex, yacc
 
-from .services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Service
+from DeTrusty.Sparql.utils import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression, Values, Bind, Aggregate, Service
 
 # Lexer
 reserved = {

@@ -1,7 +1,7 @@
 import datetime
 from multiprocessing import Queue
 
-from DeTrusty.Sparql.Parser.services import Argument
+from DeTrusty.Sparql.utils import Argument
 
 data_types = {
     'integer': (int, 'numerical'),

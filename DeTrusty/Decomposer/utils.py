@@ -1,4 +1,4 @@
-from DeTrusty.Sparql.Parser.services import Aggregate, Expression
+from DeTrusty.Sparql.utils import Aggregate, Expression
 
 def getVars(sg):
     s = []

@@ -7,7 +7,7 @@ The result is triple consisting of value, type, datatype.
 @author: Avellino
 """
 
-from DeTrusty.Sparql.Parser.services import Argument, Aggregate
+from DeTrusty.Sparql.utils import Argument, Aggregate
 from dateutil.parser import * 
 import operator
 

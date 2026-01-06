@@ -6,8 +6,8 @@ from functools import partial
 
 from DeTrusty.Decomposer import Tree, utils
 from DeTrusty.Logger import get_logger
-from DeTrusty.Sparql.Parser import queryParser
-from DeTrusty.Sparql.Parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument, Aggregate
+from DeTrusty.Sparql import parser
+from DeTrusty.Sparql.utils import Service, Triple, Filter, Optional, UnionBlock, JoinBlock, Values, Bind, Argument, Aggregate
 
 logger = get_logger(__name__, '.decompositions.log')
 
@@ -16,7 +16,8 @@ class Decomposer(object):
 
     def __init__(self, query, config, decompType="STAR", joinstarslocally=True):
         self.decomposition_type = DecompositionType[decompType]
-        self.query = queryParser.parse(query)
+        print(query)
+        self.query = parser.parse(query)
         if self.query:
             self.prefixes = utils.getPrefs(self.query.prefs)
         else:

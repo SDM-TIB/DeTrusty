@@ -12,7 +12,7 @@ venv/
 .idea/
 **/.DS_Store
 
-DeTrusty/Sparql/Parser/parsetab.py
+DeTrusty/Sparql/parsetab.py
 
 .decompositions.log
 .rdfmts.log
