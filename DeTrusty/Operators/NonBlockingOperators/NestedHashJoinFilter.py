@@ -10,14 +10,11 @@ Autor: Gabriela Montoya
 Date: January 29th, 2014
 """
 
-from multiprocessing import Queue, Process
+from multiprocessing import Queue
 from time import time
-import string, sys
 from queue import Empty
 from DeTrusty.Operators.Join import Join
-from DeTrusty.Sparql import parser as qp
-from .OperatorStructures import Table, Partition, Record
-# from .NestedHashJoin import NestedHashJoin
+from .OperatorStructures import Record
 from DeTrusty.Sparql.utils import Bind
 
 WINDOW_SIZE = 20
