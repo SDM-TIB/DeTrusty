@@ -1,3 +1,9 @@
+# v0.23.0 - 25 Feb 2026
+- Improve error handling
+- Replace prefixes only if `not None`
+- Refactor `SPARQL` package
+- Update dependencies
+
 # v0.22.0 - 04 Nov 2025
 - Add feature to manage federations within the same file/endpoint
 - Reorganize source description documentation

@@ -12,7 +12,7 @@ setuptools.setup(
     name='DeTrusty',
     version=version,
     description='DeTrusty - Decentralized and Trustable Query Engine',
-    license='GNU/GPLv3',
+    license='GPL-3.0-only',
     author='Philipp D. Rohde',
     author_email='philipp.rohde@tib.eu',
     url='https://github.com/SDM-TIB/DeTrusty',
@@ -36,7 +36,6 @@ setuptools.setup(
         'DeTrusty.Operators.BlockingOperators',
         'DeTrusty.Operators.NonBlockingOperators',
         'DeTrusty.Sparql',
-        'DeTrusty.Sparql.Parser',
         'DeTrusty.Wrapper',
         'DeTrusty.Wrapper.RDFWrapper'
     ],
@@ -57,7 +56,6 @@ setuptools.setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: 3.13',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Intended Audience :: Science/Research'
     ]
