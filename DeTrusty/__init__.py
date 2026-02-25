@@ -175,48 +175,56 @@ def _execute_query(query: str,
     if return_value is None:
         return_value = dict()
 
-    start_time = time.time()
-    decomposer = Decomposer(get_query_string(query), config,
-                            decompType=decomposition_type,
-                            joinstarslocally=join_stars_locally)
-    decomposed_query = decomposer.decompose()
+    try:
+        start_time = time.time()
+        decomposer = Decomposer(get_query_string(query), config,
+                                decompType=decomposition_type,
+                                joinstarslocally=join_stars_locally)
+        decomposed_query = decomposer.decompose()
 
-    if decomposed_query is None:
-        return_value['results'] = {}
-        return_value['error'] = 'The query cannot be answered by the endpoints in the federation.'
-        return return_value
+        if decomposed_query is None:
+            return_value['results'] = {}
+            return_value['error'] = 'The query cannot be answered by the endpoints in the federation.'
+            return return_value
 
-    planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
-    plan = planner.createPlan()
+        planner = Planner(decomposed_query, True, contact_source, 'RDF', config)
+        plan = planner.createPlan()
 
-    output = Queue()
-    plan.execute(output)
+        output = Queue()
+        plan.execute(output)
 
-    result = []
-    r = output.get()
-    card = 0
-    while r != 'EOF':
-        card += 1
-        if print_result:
-            res = {}
-            for key, value in r.items():
-                res[key] = value
-            if not yasqe:
-                res['__meta__'] = {"is_verified": True}
-
-            result.append(res)
+        result = []
         r = output.get()
-    end_time = time.time()
+        card = 0
+        while r != 'EOF':
+            card += 1
+            if print_result:
+                res = {}
+                for key, value in r.items():
+                    res[key] = value
+                if not yasqe:
+                    res['__meta__'] = {"is_verified": True}
 
-    # sometimes, subprocesses are still running even though they are done
-    # TODO: this is supposed to be a workaround, we should solve the issue at the source
-    active = multiprocessing.active_children()
-    for child in active:
-        child.kill()
+                result.append(res)
+            r = output.get()
+        end_time = time.time()
 
-    return_value['head'] = {'vars': decomposed_query.variables()}
-    return_value['cardinality'] = card
-    return_value['results'] = {'bindings': result}
-    return_value['execution_time'] = end_time - start_time
-    return_value['output_version'] = '2.0'
+        # sometimes, subprocesses are still running even though they are done
+        # TODO: this is supposed to be a workaround, we should solve the issue at the source
+        active = multiprocessing.active_children()
+        for child in active:
+            child.kill()
+
+        return_value['head'] = {'vars': decomposed_query.variables()}
+        return_value['cardinality'] = card
+        return_value['results'] = {'bindings': result}
+        return_value['execution_time'] = end_time - start_time
+        return_value['output_version'] = '2.0'
+    except TypeError as e:
+        return_value['results'] = {}
+        return_value['error'] = f'Syntax error in query: {e}'
+    except Exception as e:
+        return_value['results'] = {}
+        return_value['error'] = f'An error occurred during query execution: {e}'
+
     return return_value
