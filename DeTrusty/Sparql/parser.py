@@ -764,7 +764,10 @@ def p_bgp_service_1(p):
     """
     bgp_service : triple
     """
-    p[0] = p[1]
+    if len(p[1]) == 1:
+        p[0] = p[1][0]
+    else:
+        p[0] = JoinBlock(p[1])
 
 
 def p_bgp_service_2(p):
@@ -816,7 +819,10 @@ def p_bgp_1(p):
     """
     bgp : triple
     """
-    p[0] = p[1]
+    if len(p[1]) == 1:
+        p[0] = p[1][0]
+    else:
+        p[0] = JoinBlock(p[1])
 
 
 # Filter ::=  'FILTER' Constraint (doesn't include FunctionCall yet)
@@ -947,9 +953,40 @@ def p_bgp_11(p):
 
 def p_triple_0(p):
     """
-    triple : subject predicate object
+    triple : subject predicate_object_list
     """
-    p[0] = Triple(p[1], p[2], p[3])
+    p[0] = [Triple(p[1], pred, obj) for pred, obj in p[2]]
+
+def p_predicate_object_list_0(p):
+    """
+    predicate_object_list : predicate object_list
+    """
+    p[0] = [(p[1], obj) for obj in p[2]]
+
+def p_predicate_object_list_1(p):
+    """
+    predicate_object_list : predicate object_list SEMICOLON predicate_object_list
+    """
+    p[0] = [(p[1], obj) for obj in p[2]] + p[4]
+
+def p_predicate_object_list_2(p):
+    """
+    predicate_object_list : predicate object_list SEMICOLON
+    """
+    # trailing semicolon is valid SPARQL: ?s :p :o ; .
+    p[0] = [(p[1], obj) for obj in p[2]]
+
+def p_object_list_0(p):
+    """
+    object_list : object
+    """
+    p[0] = [p[1]]
+
+def p_object_list_1(p):
+    """
+    object_list : object COMA object_list
+    """
+    p[0] = [p[1]] + p[3]
 
 
 #############################################################################
