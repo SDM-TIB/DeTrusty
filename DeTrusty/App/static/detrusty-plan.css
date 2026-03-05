@@ -1,0 +1,46 @@
+#btn_query_plan {
+  background-image: url('play.png');
+  background-size: 40px 40px;
+  height: 40px;
+  width: 40px;
+}
+
+body {
+  background-color: #e3e3e3;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node text { font: 16px sans-serif; }
+
+.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 2px;
+}
+li:not(:last-child) {
+  margin-bottom: 3px;
+}
+
+#plan-container {
+  display: inline
+}
+
+#canvas {
+  float: left;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+#details {
+  float: left;
+  display: inline-block;
+}
+
+#plan-clear {
+  clear: both;
+}

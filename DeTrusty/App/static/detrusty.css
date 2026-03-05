@@ -1,0 +1,5 @@
+.yasgui .autocompleteWrapper,
+.yasgui .controlbar,
+.yasqe .yasqe_buttons .yasqe_share {
+  display: none !important;
+}
