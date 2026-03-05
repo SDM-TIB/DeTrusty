@@ -7,7 +7,7 @@ from flask import Flask, Response, request, jsonify, render_template
 
 from DeTrusty import run_query, Decomposer, Planner, __version__
 from DeTrusty.Logger import get_logger
-from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty.Molecule.MTManager import get_config
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
 logger = get_logger(__name__)
@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config['VERSION'] = __version__
 app.config['VERSION_STRING'] = 'DeTrusty v' + __version__
 app.config['JSON_AS_ASCII'] = False
-app.config['CONFIG'] = ConfigFile('/DeTrusty/Config/rdfmts.json')
+app.config['CONFIG'] = get_config('/DeTrusty/Config/rdfmts.ttl')
 app.config['JOIN_STARS_LOCALLY'] = bool(strtobool(os.environ.get('JOIN_STARS_LOCALLY', 'True')))
 
 
