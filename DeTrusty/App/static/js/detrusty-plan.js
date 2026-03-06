@@ -11,11 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
                       cm.replaceSelection(new Array(cm.getOption('indentUnit') + 1).join(' '));
                   }
               },
-              pluginButtons: function() { return btn_query_plan },
-              showQueryButton: false
+              pluginButtons: function() { return btn_query_plan }
           }),
           errorEl = document.getElementById('plan-error'),
-          endpoint = document.getElementById('yasqe').dataset.endpoint;
+          endpoint = document.getElementById('yasqe').dataset.endpoint,
+          nativeBtn = document.querySelector('.yasqe_queryButton:not(#btn_query_plan)');
+
+    btn_query_plan.innerHTML = nativeBtn.innerHTML;
+    nativeBtn.remove();
 
     function renderError(message) {
         errorEl.innerHTML = '';
@@ -40,6 +43,8 @@ document.addEventListener('DOMContentLoaded', function () {
         canvas.innerHTML = '';
         queryPlanDetails.innerHTML = '';
         clearError();
+        btn_query_plan.classList.add('busy');
+        btn_query_plan.disabled = true;
 
         const body = new URLSearchParams({ query: query });
 
@@ -63,6 +68,10 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(function(err) {
             renderError('The server returned with status code ' + err.status + '. Message: ' + err.message);
             console.log(err.status + ': ' + err.message);
+        })
+        .finally(function() {
+            btn_query_plan.classList.remove('busy');
+            btn_query_plan.disabled = false;
         });
     };
 
