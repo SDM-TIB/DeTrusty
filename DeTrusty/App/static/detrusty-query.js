@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         requestConfig: {
             // configuring the endpoint for DeTrusty
-            endpoint: window.location.href,
+            endpoint: document.getElementById('yasgui').dataset.endpoint,
             method: 'POST',
             args: [{name: "yasqe", value: true}]
         }

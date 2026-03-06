@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', function () {
               pluginButtons: function() { return btn_query_plan },
               showQueryButton: false
           }),
-          errorEl = document.getElementById('plan-error');
+          errorEl = document.getElementById('plan-error'),
+          endpoint = document.getElementById('yasqe').dataset.endpoint;
 
     function renderError(message) {
         errorEl.innerHTML = '';
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: {
                 Accept: 'application/json'
             },
-            url: window.location.href,
+            url: endpoint,
             data: jQuery.param({'query': query}),
             crossDomain: true,
             success: function(data) {

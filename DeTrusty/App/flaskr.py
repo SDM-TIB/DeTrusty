@@ -4,6 +4,7 @@ import os
 from distutils.util import strtobool
 
 from flask import Flask, Response, request, jsonify, render_template
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from DeTrusty import run_query, Decomposer, Planner, __version__
 from DeTrusty.Logger import get_logger
@@ -13,6 +14,7 @@ from DeTrusty.Wrapper.RDFWrapper import contact_source
 logger = get_logger(__name__)
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
 app.config['VERSION'] = __version__
 app.config['VERSION_STRING'] = 'DeTrusty v' + __version__
 app.config['JSON_AS_ASCII'] = False

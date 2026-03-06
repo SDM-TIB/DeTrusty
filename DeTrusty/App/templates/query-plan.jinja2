@@ -11,7 +11,7 @@
   <script src="{{ url_for('static', filename='detrusty-plan.js') }}"></script>
 </head>
 <body>
-  <div id="yasqe"></div>
+  <div id="yasqe" data-endpoint="{{ url_for('query_plan') }}"></div>
   <div id="plan-error"></div>
   <div id="plan-container" style="display: inline">
     <div id="canvas"></div>
