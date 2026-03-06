@@ -1,0 +1,21 @@
+.home-container {
+  max-width: 720px;
+  margin: 60px auto;
+  padding: 0 20px;
+  font-family: sans-serif;
+}
+
+.home-title {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.home-subtitle {
+  color: #555;
+  margin-bottom: 32px;
+}
+
+.home-description {
+  line-height: 1.6;
+  text-align: justify;
+}

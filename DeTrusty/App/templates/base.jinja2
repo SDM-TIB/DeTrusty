@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" />
+    <link href="{{ url_for('static', filename='css/detrusty.css') }}" rel="stylesheet" type="text/css" />
+    {% block head %}{% endblock %}
+</head>
+<body>
+<nav class="navbar">
+    <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active"{% endif %}>Home</a>
+    <a href="{{ url_for('query_editor') }}" {% if request.endpoint == 'query_editor' %}class="active"{% endif %}>Query Editor</a>
+    <a href="{{ url_for('query_editor_plan') }}" {% if request.endpoint == 'query_editor_plan' %}class="active"{% endif %}>Query Plan</a>
+    <span class="navbar-version">{{ version_string }}</span>
+</nav>
+{% block content %}{% endblock %}
+</body>
+</html>

@@ -6,7 +6,7 @@
 
 .yasr-has-error .yasr_results,
 .yasr-has-error .yasr_fallback_info {
-    display: none;
+  display: none;
 }
 
 .yasr-error {
@@ -24,4 +24,35 @@
   color: #a94442;
   background-color: #f2dede;
   border-color: #ebccd1;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  background-color: #222;
+  padding: 0 20px;
+  height: 48px;
+  gap: 24px;
+}
+
+.navbar a {
+  color: #ccc;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+
+.navbar a:hover,
+.navbar a.active {
+  color: #fff;
+  border-bottom-color: #9ACD32;
+}
+
+.navbar .navbar-version {
+  margin-left: auto;
+  color: #888;
+  font-family: monospace;
+  font-size: 13px;
 }

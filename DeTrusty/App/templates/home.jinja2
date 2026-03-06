@@ -1,0 +1,15 @@
+{% extends "base.jinja2" %}
+
+{% block head %}
+  <link href="{{ url_for('static', filename='css/detrusty-home.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+  <h1 class="home-title">DeTrusty</h1>
+  <p class="home-subtitle">A federated SPARQL query engine for the Semantic Web.</p>
+  <p class="home-description">DeTrusty enables querying across multiple SPARQL endpoints simultaneously.
+  It decomposes queries based on molecule templates that describe the data available at each
+  endpoint, produces an optimized execution plan, and federates the sub-queries accordingly.</p>
+</div>
+{% endblock %}

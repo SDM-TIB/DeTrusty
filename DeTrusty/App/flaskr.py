@@ -22,6 +22,16 @@ app.config['CONFIG'] = get_config('/DeTrusty/Config/rdfmts.ttl')
 app.config['JOIN_STARS_LOCALLY'] = bool(strtobool(os.environ.get('JOIN_STARS_LOCALLY', 'True')))
 
 
+@app.context_processor
+def inject_version():
+    return {'version_string': app.config['VERSION_STRING']}
+
+
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('home.jinja2', title='DeTrusty - Home')
+
+
 @app.route('/version', methods=['POST'])
 def version():
     """Returns the version of the running DeTrusty instance."""
@@ -58,12 +68,12 @@ def sparql():
 
 @app.route('/sparql', methods=['GET'])
 def query_editor():
-    return render_template('query-editor.jinja2', title=app.config['VERSION_STRING'])
+    return render_template('query-editor.jinja2', title='DeTrusty - Query Editor')
 
 
 @app.route('/query_plan', methods=['GET'])
 def query_editor_plan():
-    return render_template('query-plan.jinja2', title=app.config['VERSION_STRING'])
+    return render_template('query-plan.jinja2', title='DeTrusty - Query Plan')
 
 
 @app.route('/query_plan', methods=['POST'])
