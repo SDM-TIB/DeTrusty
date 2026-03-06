@@ -32,30 +32,38 @@ document.addEventListener('DOMContentLoaded', function () {
     btn_query_plan.id = "btn_query_plan";
     btn_query_plan.title = "Create Plan";
     btn_query_plan.classList.add("yasqe_queryButton");
-    btn_query_plan.onclick = function() {
+        btn_query_plan.onclick = function() {
         const query = yasqe.getValue(),
-              query_plan_details = $('#details');
-        $('#canvas').empty();
-        query_plan_details.empty();
+              canvas = document.getElementById('canvas'),
+              queryPlanDetails = document.getElementById('details');
+
+        canvas.innerHTML = '';
+        queryPlanDetails.innerHTML = '';
         clearError();
-        $.ajax({
-            type: 'POST',
-            headers: {
-                Accept: 'application/json'
-            },
-            url: endpoint,
-            data: jQuery.param({'query': query}),
-            crossDomain: true,
-            success: function(data) {
-                clearError();
-                query_plan_details.html('<h3>Sub-query Details:</h3><ul id="#subqueries"></ul>');
-                create_tree(data['tree'], data['details']);
-            },
-            error: function(jqXHR) {
-                renderError(jqXHR.responseText);
-                console.log(jqXHR.status + ': ' + jqXHR.responseText);
-            }
+
+        const body = new URLSearchParams({ query: query });
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: body
         })
+        .then(function(response) {
+            if (!response.ok) {
+                return response.text().then(function(text) {
+                    throw { status: response.status, message: text };
+                });
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            queryPlanDetails.innerHTML = '<h3>Sub-query Details:</h3><ul id="#subqueries"></ul>';
+            create_tree(data['tree'], data['details']);
+        })
+        .catch(function(err) {
+            renderError('The server returned with status code ' + err.status + '. Message: ' + err.message);
+            console.log(err.status + ': ' + err.message);
+        });
     };
 
     function create_tree(treeData, details) {

@@ -84,11 +84,6 @@ bundles = {
         NPM_PATH + 'd3/dist/d3.min.js',
         filters='rjsmin',
         output=JS_PATH + 'd3.min.js'
-    ),
-    'jquery_js': Bundle(
-        NPM_PATH + 'jquery/dist/jquery.min.js',
-        filters='rjsmin',
-        output=JS_PATH + 'jquery.min.js'
     )
 }
 
