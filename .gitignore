@@ -16,3 +16,5 @@ DeTrusty/Sparql/parsetab.py
 
 .decompositions.log
 .rdfmts.log
+
+DeTrusty/App/node_modules/

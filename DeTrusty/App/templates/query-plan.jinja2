@@ -2,13 +2,13 @@
 <head>
   <title>{{ title }}</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" />
-  <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js" charset="utf-8"></script>
-  <script src="https://unpkg.com/d3@7.8.2/dist/d3.min.js" charset="utf-8"></script>
-  <link href="https://unpkg.com/@triply/yasgui@4.2.28/build/yasgui.min.css" rel="stylesheet" type="text/css" />
-  <script src="https://unpkg.com/@triply/yasgui@4.2.28/build/yasgui.min.js"></script>
-  <link href="{{ url_for('static', filename='detrusty.css') }}" rel="stylesheet" type="text/css" />
-  <link href="{{ url_for('static', filename='detrusty-plan.css') }}" rel="stylesheet" type="text/css" />
-  <script src="{{ url_for('static', filename='detrusty-plan.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
+  <link href="{{ url_for('static', filename='css/yasgui.min.css') }}" rel="stylesheet" type="text/css" />
+  <script src="{{ url_for('static', filename='js/yasgui.min.js') }}"></script>
+  <link href="{{ url_for('static', filename='css/detrusty.css') }}" rel="stylesheet" type="text/css" />
+  <link href="{{ url_for('static', filename='css/detrusty-plan.css') }}" rel="stylesheet" type="text/css" />
+  <script src="{{ url_for('static', filename='js/detrusty-plan.js') }}"></script>
 </head>
 <body>
   <div id="yasqe" data-endpoint="{{ url_for('query_plan') }}"></div>

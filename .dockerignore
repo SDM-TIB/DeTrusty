@@ -9,3 +9,5 @@ DeTrusty/Sparql/parsetab.py
 tests
 requirements-dev.txt
 requirements-doc.txt
+DeTrusty/App/node_modules/
+DeTrusty/App/bundle-assets.py

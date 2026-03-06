@@ -2,10 +2,10 @@
 <head>
   <title>{{ title }}</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" />
-  <link href="https://unpkg.com/@triply/yasgui@4.2.28/build/yasgui.min.css" rel="stylesheet" type="text/css" />
-  <link href="{{ url_for('static', filename='detrusty.css') }}" rel="stylesheet" type="text/css" />
-  <script src="https://unpkg.com/@triply/yasgui@4.2.28/build/yasgui.min.js"></script>
-  <script src="{{ url_for('static', filename='detrusty-query.js') }}"></script>
+  <link href="{{ url_for('static', filename='css/yasgui.min.css') }}" rel="stylesheet" type="text/css" />
+  <link href="{{ url_for('static', filename='css/detrusty.css') }}" rel="stylesheet" type="text/css" />
+  <script src="{{ url_for('static', filename='js/yasgui.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/detrusty-query.js') }}"></script>
 </head>
 <body>
   <div id="yasgui" data-endpoint="{{ url_for('sparql') }}"></div>
