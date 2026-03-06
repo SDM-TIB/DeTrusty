@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
         node.append("text")
             .attr("dy", ".35em")
             .attr("x", d => d.children ? (node_size + 5) * -1 : node_size + 5)
-            .attr("y", d => d.children && d.depth !== 0 ? -(node_size + 5) : d)
+            .attr("y", d => d.children && d.depth !== 0 ? -(node_size + 5) : 0)
             .style("text-anchor", d => d.children ? "end" : "start")
             .text(d => d.data.name);
     }
