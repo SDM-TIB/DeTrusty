@@ -1,28 +1,42 @@
 document.addEventListener('DOMContentLoaded', function () {
     const COLORS = ['#9ACD32', '#A52A2A', '#5B9AA0', '#FFA500', '#622569',
             '#BC8F8F', '#808080', '#006400', '#191970', '#8B4513'],
-        btn_query_plan = document.createElement("button"),
-        yasqe = new Yasqe(document.getElementById('yasqe'), {
-            persistenceId: null,
-            tabSize: 2,
-            indentUnit: 2,
-            extraKeys: {
-                Tab: function(cm) {
-                    cm.replaceSelection(new Array(cm.getOption('indentUnit') + 1).join(' '));
-                }
-            },
-            pluginButtons: function() { return btn_query_plan },
-            showQueryButton: false
-        });
+          btn_query_plan = document.createElement("button"),
+          yasqe = new Yasqe(document.getElementById('yasqe'), {
+              persistenceId: null,
+              tabSize: 2,
+              indentUnit: 2,
+              extraKeys: {
+                  Tab: function(cm) {
+                      cm.replaceSelection(new Array(cm.getOption('indentUnit') + 1).join(' '));
+                  }
+              },
+              pluginButtons: function() { return btn_query_plan },
+              showQueryButton: false
+          }),
+          errorEl = document.getElementById('plan-error');
+
+    function renderError(message) {
+        errorEl.innerHTML = '';
+        const alertEl = document.createElement('div');
+        alertEl.className = 'alert alert-danger';
+        alertEl.textContent = message;
+        errorEl.appendChild(alertEl);
+    }
+
+    function clearError() {
+        errorEl.innerHTML = '';
+    }
 
     btn_query_plan.id = "btn_query_plan";
     btn_query_plan.title = "Create Plan";
     btn_query_plan.classList.add("yasqe_queryButton");
     btn_query_plan.onclick = function() {
         const query = yasqe.getValue(),
-            query_plan_details = $('#details');
+              query_plan_details = $('#details');
         $('#canvas').empty();
         query_plan_details.empty();
+        clearError();
         $.ajax({
             type: 'POST',
             headers: {
@@ -32,19 +46,20 @@ document.addEventListener('DOMContentLoaded', function () {
             data: jQuery.param({'query': query}),
             crossDomain: true,
             success: function(data) {
+                clearError();
                 query_plan_details.html('<h3>Sub-query Details:</h3><ul id="#subqueries"></ul>');
                 create_tree(data['tree'], data['details']);
             },
             error: function(jqXHR) {
-                alert('The server returned with status code ' + jqXHR.status + '.\nMessage: ' + jqXHR.responseText);
+                renderError(jqXHR.responseText);
                 console.log(jqXHR.status + ': ' + jqXHR.responseText);
             }
         })
     };
 
     function create_tree(treeData, details) {
-        const ssq_list = document.getElementById("#subqueries");
-        const endpoints = new Set();
+        const ssq_list = document.getElementById("#subqueries"),
+              endpoints = new Set();
 
         for (const ssq in details) {
             const child = document.createElement("li");
@@ -58,9 +73,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // set the dimensions and margins of the diagram
         const margin = {top: 20, right: 90, bottom: 30, left: 90},
-            width  = 800 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom,
-            node_size = 10;
+              width  = 800 - margin.left - margin.right,
+              height = 600 - margin.top - margin.bottom,
+              node_size = 10;
 
         // declares a tree layout and assigns the size
         const treemap = d3.tree().size([width, height]);
