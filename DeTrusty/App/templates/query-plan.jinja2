@@ -12,8 +12,12 @@
   <div id="yasqe" data-endpoint="{{ url_for('query_plan') }}"></div>
   <div id="plan-error"></div>
   <div id="plan-container">
-    <div id="canvas"></div>
+    <div id="canvas-wrapper">
+      <div id="canvas"></div>
+      <div id="canvas-toolbar"></div>
+    </div>
     <div id="details"></div>
     <div id="plan-clear"></div>
   </div>
+  <div id="plan-tooltip"></div>
 {% endblock %}
