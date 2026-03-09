@@ -476,16 +476,14 @@ class SPARQLEndpoint(MTEndpoint):
             """
             return [triple[0].n3() + ' ' + triple[1].n3() + ' ' + triple[2].n3() for triple in triples_]
 
-        i = 0
         # Virtuoso supports only 49 triples at a time.
         for i in range(0, len(triples), 49):
-            if i + 49 > len(triples):
-                update_query = 'WITH <{graph}> INSERT DATA {{ '.format(graph=graph) + ' . \n'.join(triples2str(triples[i:])) + '}'
-            else:
-                update_query = 'WITH <{graph}> INSERT DATA {{ '.format(graph=graph) + ' . \n'.join(triples2str(triples[i:i + 49])) + '}'
-            self._update(update_query, graph)
-        if i < len(triples) + 49:
-            update_query = 'WITH <{graph}> INSERT DATA {{ '.format(graph=graph) + ' . \n'.join(triples2str(triples[i:])) + '}'
+            batch = triples[i:i + 49]
+            update_query = (
+                'INSERT DATA {{ GRAPH <{graph}> {{ '.format(graph=graph)
+                + ' . \n'.join(triples2str(batch))
+                + ' } }'
+            )
             self._update(update_query, graph)
 
     def add_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH, username: str = None, password: str = None,
