@@ -433,15 +433,24 @@ class SPARQLEndpoint(MTEndpoint):
                     resp.status_code == HTTPStatus.NO_CONTENT:
                 return True
             else:
-                print(resp.text)
-                logger.error('Update ' + self.update_endpoint_url + ' returned: ' + str(resp.status_code) + '\nReason: ' +
-                             str(resp.reason) + '\nFailed query:\n' + update_query)
-                exit(0)
+                msg = (
+                    'Update ' + self.update_endpoint_url
+                    + ' returned: ' + str(resp.status_code)
+                    + '\nReason: ' + str(resp.reason)
+                    + '\nFailed query:\n' + update_query
+                )
+                logger.error(msg)
+                raise RuntimeError(msg)
+        except RuntimeError:
+            raise
         except Exception as e:
-            logger.exception('Update ' + self.update_endpoint_url + ' caused an exception: ' + str(e) +
-                             '\nFailed query:\n' + update_query)
-
-        return False
+            msg = (
+                'Update ' + self.update_endpoint_url
+                + ' caused an exception: ' + str(e)
+                + '\nFailed query:\n' + update_query
+            )
+            logger.exception(msg)
+            raise RuntimeError(msg) from e
 
     def _add_triples(self, triples: list, graph: str = DEFAULT_GRAPH):
         """Adds new data of the RDF Molecule Templates into the RDF knowledge graph.
@@ -520,7 +529,7 @@ class PyOxigraphEndpoint(MTEndpoint):
 
         """
         self.ttl = Store()
-        self.ttl.load(ttl, RdfFormat.TRIG)
+        self.ttl.load(ttl, RdfFormat.TRIG, to_graph=NamedNode(DEFAULT_GRAPH))
         self.ttl.optimize()
 
     def query(self, query_str):

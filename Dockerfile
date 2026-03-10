@@ -1,6 +1,11 @@
 FROM python:3.12.12-slim-bookworm
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
+# install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/
+
 # install dependencies
 COPY requirements.txt /DeTrusty/requirements.txt
 RUN python -m pip install --upgrade --no-cache-dir pip==25.3.* setuptools==80.9.* gunicorn==23.0.* && \
