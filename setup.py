@@ -26,7 +26,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     scripts=['./Scripts/create_rdfmts.py',
-             './Scripts/restart_workers.sh'],
+             './Scripts/restart_metadata_service.sh'],
     packages=[
         'DeTrusty',
         'DeTrusty.Decomposer',

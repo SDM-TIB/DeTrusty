@@ -14,6 +14,7 @@ gunicorn \
     "DeTrusty.App.metadata:app" &
 
 METADATA_PID=$!
+echo "$METADATA_PID" > /DeTrusty/DeTrusty/App/.metadata_pid
 
 PROBE='curl -sf -X POST http://127.0.0.1:9000/sparql --data-urlencode "query=ASK {}" > /dev/null'
 
