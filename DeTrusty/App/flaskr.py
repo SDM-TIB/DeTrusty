@@ -10,7 +10,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from DeTrusty import run_query, Decomposer, Planner, __version__
 from DeTrusty.Logger import get_logger
-from DeTrusty.Molecule import DEFAULT_GRAPH
 from DeTrusty.Molecule.MTManager import SPARQLConfig, FederationConfig
 from DeTrusty.Wrapper.RDFWrapper import contact_source
 
@@ -48,14 +47,17 @@ def _build_config() -> SPARQLConfig:
     return cfg
 
 
-def _federation_config(federation: str = None) -> FederationConfig:
-    """Return a FederationConfig scoped to the given named graph.
+def _federation_config(federation: str = None):
+    """Return the appropriate config for the given federation.
 
-    All query and management operations should go through this rather than
-    using the bare SPARQLConfig directly, so that source selection and
-    endpoint mutations are always scoped to the correct federation.
+    No federation (None / empty string) → the base SPARQLConfig is returned
+    directly so that source selection runs across all named graphs.
+
+    A specific federation URI → a FederationConfig scoped to that named graph.
     """
-    return FederationConfig(app.config['CONFIG'], graph=federation or DEFAULT_GRAPH)
+    if not federation:
+        return app.config['CONFIG']
+    return FederationConfig(app.config['CONFIG'], graph=federation)
 
 
 app = Flask(__name__)
@@ -104,11 +106,12 @@ def sparql():
         yasqe = request.values.get('yasqe', False)
 
         federation = request.values.get('federation', None)
+        fed_cfg = _federation_config(federation)
         return jsonify(
             run_query(
                 query=query,
                 decomposition_type=decomposition_type,
-                config=_federation_config(federation),
+                config=fed_cfg,
                 join_stars_locally=app.config['JOIN_STARS_LOCALLY'],
                 yasqe=yasqe
             )
@@ -228,6 +231,27 @@ def federation_delete_endpoint():
     try:
         fed_cfg.delete_endpoint(endpoint_url)
         return jsonify({'status': 'ok', 'endpoint': endpoint_url})
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/federations', methods=['GET'])
+def federations():
+    """Return the list of named graphs (federations) available in the metadata store.
+
+    No authentication required — this is read-only and needed by the UI to
+    populate the federation selector on the query pages.
+    """
+    try:
+        resp = http_client.get(
+            _METADATA_URL + '/sparql',
+            params={'query': 'SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }'}
+        )
+        resp.raise_for_status()
+        bindings = resp.json().get('results', {}).get('bindings', [])
+        graphs = [b['g']['value'] for b in bindings if 'g' in b]
+        return jsonify({'federations': graphs})
     except Exception as e:
         logger.exception(e)
         return jsonify({'error': str(e)}), 500

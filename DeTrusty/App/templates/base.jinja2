@@ -6,6 +6,7 @@
     <title>{% block title %}{{ title }}{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" />
     <link href="{{ url_for('static', filename='css/detrusty.css') }}" rel="stylesheet" type="text/css" />
+    <script src="{{ url_for('static', filename='js/detrusty-fedbar.js') }}"></script>
     {% block head %}{% endblock %}
 </head>
 <body>

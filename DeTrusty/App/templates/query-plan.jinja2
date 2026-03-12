@@ -9,7 +9,13 @@
 {% endblock %}
 
 {% block content %}
-  <div id="yasqe" data-endpoint="{{ url_for('query_plan') }}"></div>
+  <div id="federation-bar">
+    <label for="federation-select">Federation:</label>
+    <select id="federation-select">
+      <option value="">All federations</option>
+    </select>
+  </div>
+  <div id="yasqe" data-endpoint="{{ url_for('query_plan') }}" data-federations-endpoint="{{ url_for('federations') }}"></div>
   <div id="plan-error"></div>
   <div id="plan-container">
     <div id="canvas-wrapper">

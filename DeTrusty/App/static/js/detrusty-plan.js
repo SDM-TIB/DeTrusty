@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }),
           errorEl = document.getElementById('plan-error'),
           endpoint = document.getElementById('yasqe').dataset.endpoint,
+          federationsEndpoint = document.getElementById('yasqe').dataset.federationsEndpoint,
           nativeBtn = document.querySelector('.yasqe_queryButton:not(#btn_query_plan)');
 
     btn_query_plan.innerHTML = nativeBtn.innerHTML;
@@ -23,6 +24,24 @@ document.addEventListener('DOMContentLoaded', function () {
     btn_query_plan.id    = 'btn_query_plan';
     btn_query_plan.title = 'Create Plan';
     btn_query_plan.classList.add('yasqe_queryButton');
+
+    // Populate the federation selector.
+    const federationSelect = document.getElementById('federation-select');
+    fetch(federationsEndpoint)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            let federations = data.federations || [];
+            if (federations.length < 2) return;
+            federations.forEach(function (uri) {
+                let opt = document.createElement('option');
+                opt.value = uri;
+                opt.textContent = uri.split(/[#\/]/).filter(Boolean).pop() || uri;
+                opt.title = uri;
+                federationSelect.appendChild(opt);
+            });
+            document.getElementById('federation-bar').style.display = 'flex';
+        })
+        .catch(function (err) { console.warn('Could not load federation list:', err); });
 
     function renderError(message) {
         errorEl.innerHTML = '';
@@ -47,10 +66,15 @@ document.addEventListener('DOMContentLoaded', function () {
         btn_query_plan.classList.add('busy');
         btn_query_plan.disabled = true;
 
+        const params = { query };
+        if (federationSelect && federationSelect.value) {
+            params.federation = federationSelect.value;
+        }
+
         fetch(endpoint, {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
-            body: new URLSearchParams({ query })
+            body: new URLSearchParams(params)
         })
             .then(function (response) {
                 if (!response.ok) {

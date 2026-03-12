@@ -1,11 +1,54 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const yasgui = new Yasgui(document.getElementById("yasgui"), {
+    const yasguiEl = document.getElementById('yasgui'),
+          federationSelect = document.getElementById('federation-select'),
+          BASE_ENDPOINT = yasguiEl.dataset.endpoint;
+
+    // -------------------------------------------------------------------------
+    // Network-level federation injection
+    //
+    // YASGUI builds and fires its XHR internally, bypassing any public API we
+    // can wrap.  The only reliable injection point is XMLHttpRequest.prototype.open.
+    // We intercept every request whose URL starts with our SPARQL endpoint and
+    // append the current federation value as a query parameter if one is selected.
+    // -------------------------------------------------------------------------
+    (function () {
+        let _open = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function (method, url) {
+            if (typeof url === 'string' && url.indexOf(BASE_ENDPOINT) !== -1) {
+                let federation = federationSelect ? federationSelect.value : '';
+                if (federation) {
+                    let sep = url.indexOf('?') === -1 ? '?' : '&';
+                    url = url + sep + 'federation=' + encodeURIComponent(federation);
+                }
+            }
+            return _open.apply(this, [method, url].concat(Array.prototype.slice.call(arguments, 2)));
+        };
+    })();
+
+    // Populate the federation dropdown from the backend.
+    fetch(yasguiEl.dataset.federationsEndpoint)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            let federations = data.federations || [];
+            if (federations.length < 2) return;
+            federations.forEach(function (uri) {
+                let opt = document.createElement('option');
+                opt.value = uri;
+                opt.textContent = uri.split(/[#\/]/).filter(Boolean).pop() || uri;
+                opt.title = uri;
+                federationSelect.appendChild(opt);
+            });
+            document.getElementById('federation-bar').style.display = 'flex';
+        })
+        .catch(function (err) {
+            console.warn('Could not load federation list:', err);
+        });
+
+    const yasgui = new Yasgui(yasguiEl, {
         persistenceId: null,
         yasqe: {
-            // modify codemirror tab handling to solely use 2 spaces
             tabSize: 2,
             indentUnit: 2,
-            // set default query
             value: "SELECT DISTINCT ?concept\nWHERE {\n\t?s a ?concept\n} LIMIT 10"
         },
         extraKeys: {
@@ -15,10 +58,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         requestConfig: {
-            // configuring the endpoint for DeTrusty
-            endpoint: document.getElementById('yasgui').dataset.endpoint,
+            endpoint: BASE_ENDPOINT,
             method: 'POST',
-            args: [{name: "yasqe", value: true}]
+            args: [{name: 'yasqe', value: true}]
         }
     });
 
@@ -80,15 +122,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    let tab = yasgui.getTab();
-    attachQueryResponseHook(tab);
+    attachQueryResponseHook(yasgui.getTab());
 
     yasgui.on('tabAdd', function (yasgui, tabId) {
         setTimeout(function () {
             let newTab = yasgui.getTab(tabId);
-            if (newTab) {
-                attachQueryResponseHook(newTab);
-            }
+            if (newTab) attachQueryResponseHook(newTab);
         }, 0);
     });
+
 }); // end DOMContentLoaded

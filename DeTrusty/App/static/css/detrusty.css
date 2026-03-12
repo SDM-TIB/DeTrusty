@@ -56,3 +56,34 @@
   font-family: monospace;
   font-size: 13px;
 }
+
+#federation-bar {
+  display: none; /* shown by JS only when 2+ federations exist */
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid transparent; /* coloured at runtime */
+  box-sizing: border-box;
+}
+
+#federation-bar label {
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+#federation-bar select {
+  border-radius: 3px;
+  padding: 0.15rem 0.4rem;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 14rem;
+  max-width: 40rem;
+  border: 1px solid transparent; /* coloured at runtime */
+}
+
+#federation-bar select:focus {
+  outline: none;
+}

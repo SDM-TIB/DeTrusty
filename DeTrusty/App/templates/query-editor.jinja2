@@ -7,5 +7,11 @@
 {% endblock %}
 
 {% block content %}
-  <div id="yasgui" data-endpoint="{{ url_for('sparql') }}"></div>
+  <div id="federation-bar">
+    <label for="federation-select">Federation:</label>
+    <select id="federation-select">
+      <option value="">All federations</option>
+    </select>
+  </div>
+  <div id="yasgui" data-endpoint="{{ url_for('sparql') }}" data-federations-endpoint="{{ url_for('federations') }}"></div>
 {% endblock %}
