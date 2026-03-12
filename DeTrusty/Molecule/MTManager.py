@@ -838,7 +838,7 @@ class FederationConfig(Config):
         super().__init__()
         self.__config = config
         self.graph = graph
-        self.__config.endpoints = self.__config.getEndpoints()
+        self.endpoints = self.getEndpoints()
 
     def add_endpoint(self, endpoint: str, username: str = None, password: str = None, keycloak: str = None):
         """Adds an endpoint to the federation.
