@@ -1,3 +1,20 @@
+# v0.24.0 - 12 Mar 2026
+- Add capability to parse `;` and `,` shorthand
+- Fix endpoint list in `FederationConfig`
+- Fix default graph for adding and deleting endpoints from a federation
+- Fix insert query for `SPARQLMTEndpoint`
+- Rework Web interface
+  - Improve style
+  - Render error messages in the Web interface
+  - Add federation selector in the Web interface
+  - Rework query plan visualization
+  - Use `FederationConfig` and metadata service in the app
+  - Restart metadata service instead of DeTrusty workers
+  - Update dependencies
+    - Drop jQuery
+    - Change from `@triply/yasgui` to `@zazuko/yasgui`
+- Update documentation
+
 # v0.23.0 - 25 Feb 2026
 - Improve error handling
 - Replace prefixes only if `not None`
