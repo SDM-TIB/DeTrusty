@@ -377,7 +377,7 @@ class RDFConfig(Config):
             The URL of the token server providing access tokens, the default is None.
 
         """
-        self.src_desc.add_endpoint(endpoint, federation, username, password, keycloak)
+        self.src_desc.add_endpoint(endpoint, federation or DEFAULT_GRAPH, username, password, keycloak)
         self.endpoints = self.getEndpoints()
 
     def delete_endpoint(self, endpoint: str, federation: str = None):
@@ -394,7 +394,7 @@ class RDFConfig(Config):
             If omitted, the default federation is considered.
 
         """
-        self.src_desc.delete_endpoint(endpoint, federation)
+        self.src_desc.delete_endpoint(endpoint, federation or DEFAULT_GRAPH)
         self.endpoints = self.getEndpoints()
 
     def getAll(self):
