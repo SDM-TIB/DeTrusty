@@ -6,22 +6,38 @@ document.addEventListener('DOMContentLoaded', function () {
     // -------------------------------------------------------------------------
     // Network-level federation injection
     //
-    // YASGUI builds and fires its XHR internally, bypassing any public API we
-    // can wrap.  The only reliable injection point is XMLHttpRequest.prototype.open.
-    // We intercept every request whose URL starts with our SPARQL endpoint and
-    // append the current federation value as a query parameter if one is selected.
+    // @zazuko/yasgui uses fetch() internally.  We wrap window.fetch to append
+    // the current federation value to any POST body destined for our endpoint.
     // -------------------------------------------------------------------------
     (function () {
-        let _open = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function (method, url) {
-            if (typeof url === 'string' && url.indexOf(BASE_ENDPOINT) !== -1) {
+        let _fetch = window.fetch;
+        window.fetch = function (url, options) {
+            let urlStr = (url instanceof Request) ? url.url : String(url);
+            if (urlStr.indexOf(BASE_ENDPOINT) !== -1) {
                 let federation = federationSelect ? federationSelect.value : '';
                 if (federation) {
-                    let sep = url.indexOf('?') === -1 ? '?' : '&';
-                    url = url + sep + 'federation=' + encodeURIComponent(federation);
+                    if (url instanceof Request) {
+                        let _this = this;
+                        return url.text().then(function (bodyText) {
+                            let newBody = bodyText
+                                ? bodyText + '&federation=' + encodeURIComponent(federation)
+                                : 'federation=' + encodeURIComponent(federation);
+                            return _fetch.call(_this, new Request(url, { body: newBody }));
+                        });
+                    }
+                    options = options ? Object.assign({}, options) : {};
+                    if (options.body instanceof URLSearchParams) {
+                        let params = new URLSearchParams(options.body);
+                        params.set('federation', federation);
+                        options.body = params;
+                    } else if (options.body instanceof FormData) {
+                        options.body.append('federation', federation);
+                    } else if (typeof options.body === 'string') {
+                        options.body += '&federation=' + encodeURIComponent(federation);
+                    }
                 }
             }
-            return _open.apply(this, [method, url].concat(Array.prototype.slice.call(arguments, 2)));
+            return _fetch.call(this, url, options);
         };
     })();
 
