@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Service &mdash; DeTrusty 0.23.0 documentation</title>
+  <title>DeTrusty as a Service &mdash; DeTrusty 0.24.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d5dae34"></script>
+        <script src="_static/documentation_options.js?v=f10f1a72"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.23.0
+                0.24.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -76,6 +76,13 @@
 <li class="toctree-l2"><a class="reference internal" href="#restful-api">RESTful API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#api-detrusty-version">API: DeTrusty Version</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#api-executing-queries">API: Executing Queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-listing-federations">API: Listing Federations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#restful-api-administration">RESTful API: Administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-adding-an-endpoint-to-a-federation">API: Adding an Endpoint to a Federation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-removing-an-endpoint-from-a-federation">API: Removing an Endpoint from a Federation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-querying-the-metadata-store">API: Querying the Metadata Store</a></li>
 </ul>
 </li>
 </ul>
@@ -123,7 +130,8 @@
 DeTrusty uses the <code class="docutils literal notranslate"><span class="pre">requests</span></code> library for managing the HTTP(S) requests to the SPARQL endpoints.
 The SPARQL parser uses <code class="docutils literal notranslate"><span class="pre">ply</span></code>.
 The generation of the source descriptions from RML mappings is enabled by <code class="docutils literal notranslate"><span class="pre">rdflib</span></code>.
-The Web interface is powered by <code class="docutils literal notranslate"><span class="pre">flask</span></code> and the JavaScript library <code class="docutils literal notranslate"><span class="pre">YASGUI</span></code>.
+The source descriptions are stored and queried using <code class="docutils literal notranslate"><span class="pre">pyoxigraph</span></code>, an embedded RDF store.
+The Web interface is powered by <code class="docutils literal notranslate"><span class="pre">flask</span></code>, the JavaScript library <code class="docutils literal notranslate"><span class="pre">YASGUI</span></code>, and <code class="docutils literal notranslate"><span class="pre">d3</span></code> for rendering query plans.
 DeTrusty uses <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code> as a Web server.
 In order to run DeTrusty as a service, you need to have <a class="reference external" href="https://docs.docker.com/engine/install/">Docker</a> installed.</p>
 </section>
@@ -160,10 +168,11 @@ If all that is true, you can start your own instance of DeTrusty by executing th
 <p>The example loaded the source descriptions for the K4COVID federation.
 If you want to update the source descriptions, you need to update the file <code class="docutils literal notranslate"><span class="pre">/DeTrusty/Config/rdfmts.ttl</span></code> inside your Docker container.
 See <a class="reference internal" href="source_description.html#creating-source-descriptions"><span class="std std-ref">Creating Source Descriptions</span></a> for how to create said file.
-After the new source description file was generated as <code class="docutils literal notranslate"><span class="pre">/DeTrusty/Config/rdfmts.ttl</span></code>, you need to restart the <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code> workers in order for the changes to take effect.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>DeTrusty<span class="w"> </span>restart_workers.sh
+After the new source description file was generated as <code class="docutils literal notranslate"><span class="pre">/DeTrusty/Config/rdfmts.ttl</span></code>, you need to reload the metadata service in order for the changes to take effect.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>detrusty<span class="w"> </span>restart_metadata_service.sh
 </pre></div>
 </div>
+<p>This sends a <code class="docutils literal notranslate"><span class="pre">SIGHUP</span></code> to the metadata service’s <code class="docutils literal notranslate"><span class="pre">gunicorn</span></code> process, which triggers a graceful reload of its workers without dropping any in-flight requests.</p>
 </section>
 </section>
 <section id="web-interface">
@@ -178,6 +187,9 @@ In this example, the interface is accessible with the base URL <a class="referen
 <h3>Web Interface: Executing Queries<a class="headerlink" href="#web-interface-executing-queries" title="Link to this heading"></a></h3>
 <p>Thanks to <code class="docutils literal notranslate"><span class="pre">YASGUI</span></code>, you can post your queries to DeTrusty from your favorite Web browser by navigating to <code class="docutils literal notranslate"><span class="pre">https://your_domain.tld/sparql</span></code>, i.e., in this example, use <a class="reference external" href="localhost:5000/sparql">localhost:5000/sparql</a>.
 Just enter your query and hit the button.</p>
+<p>If more than one federation is available, a federation selector bar will appear automatically above the query editor.
+Selecting a federation restricts source selection to the endpoints registered under that named graph.
+If no federation is selected, DeTrusty queries across all available endpoints.</p>
 </section>
 <section id="web-interface-plotting-query-plans">
 <h3>Web Interface: Plotting Query Plans<a class="headerlink" href="#web-interface-plotting-query-plans" title="Link to this heading"></a></h3>
@@ -186,6 +198,7 @@ The path is <code class="docutils literal notranslate"><span class="pre">https:/
 Simply enter your query and hit the button.
 The current version of the interface does not allow to specify the decomposition type.
 A star-shaped decomposition is assumed for the query plan generation.</p>
+<p>As with the query editor, a federation selector bar is shown automatically when more than one federation is available.</p>
 </section>
 </section>
 <section id="restful-api">
@@ -207,8 +220,16 @@ The base URL in this example is <a class="reference external" href="localhost:50
 <section id="api-executing-queries">
 <h3>API: Executing Queries<a class="headerlink" href="#api-executing-queries" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">/sparql</span></code> executes the posted SPARQL query and returns the result as a JSON response.</p>
-<p>Example call:</p>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">federation</span></code> parameter restricts source selection to the endpoints registered under the given named graph URI.
+If omitted, DeTrusty queries across all available endpoints.</p>
+<p>Example call (all federations):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3&quot;</span><span class="w"> </span>localhost:5000/sparql
+</pre></div>
+</div>
+<p>Example call (specific federation):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;federation=https://research.tib.eu/semantic-source-description#K4COVID&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>localhost:5000/sparql
 </pre></div>
 </div>
 <p>Example result:</p>
@@ -264,6 +285,91 @@ The base URL in this example is <a class="reference external" href="localhost:50
 metadata about the result verification is included in the key <code class="docutils literal notranslate"><span class="pre">__meta__</span></code>.
 The current version returns all results as verified as can be seen in the key <code class="docutils literal notranslate"><span class="pre">is_verified</span></code> of the metadata.</p></li>
 </ul>
+</section>
+<section id="api-listing-federations">
+<h3>API: Listing Federations<a class="headerlink" href="#api-listing-federations" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">/federations</span></code> returns the named graphs (federations) registered in the metadata store.
+The response is used by the Web interface to populate the federation selector, but can also be called directly.</p>
+<p>Example call:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span>localhost:5000/federations
+</pre></div>
+</div>
+<p>Example output:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;federations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;https://research.tib.eu/semantic-source-description#CoyPu&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;https://research.tib.eu/semantic-source-description#K4COVID&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="restful-api-administration">
+<h2>RESTful API: Administration<a class="headerlink" href="#restful-api-administration" title="Link to this heading"></a></h2>
+<p>The following endpoints allow managing the federations and their endpoints at runtime.
+They require an admin Bearer token to be set via the <code class="docutils literal notranslate"><span class="pre">FEDERATION_ADMIN_KEY</span></code> environment variable.
+All requests must carry the header <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span> <span class="pre">&lt;FEDERATION_ADMIN_KEY&gt;</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">FEDERATION_ADMIN_KEY</span></code> is not configured, all administration endpoints return <code class="docutils literal notranslate"><span class="pre">403</span> <span class="pre">Forbidden</span></code> and federation management is disabled.</p>
+</div>
+<section id="api-adding-an-endpoint-to-a-federation">
+<h3>API: Adding an Endpoint to a Federation<a class="headerlink" href="#api-adding-an-endpoint-to-a-federation" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/federation/endpoint</span></code> registers a new SPARQL endpoint with the metadata service.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">endpoint</span></code> <em>(required)</em> — URL of the SPARQL endpoint to add.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">federation</span></code> <em>(optional)</em> — Named graph URI to add the endpoint to. If omitted, the endpoint is added to the default (global) configuration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code> <em>(optional)</em> — Username for authenticated endpoints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password</span></code> <em>(optional)</em> — Password for authenticated endpoints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keycloak</span></code> <em>(optional)</em> — Token server URL for Keycloak-protected endpoints.</p></li>
+</ul>
+<p>Example call:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer mysecretkey&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;endpoint=https://example.org/sparql&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;federation=https://research.tib.eu/semantic-source-description#K4COVID&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>localhost:5000/federation/endpoint
+</pre></div>
+</div>
+<p>Example output:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://example.org/sparql&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="api-removing-an-endpoint-from-a-federation">
+<h3>API: Removing an Endpoint from a Federation<a class="headerlink" href="#api-removing-an-endpoint-from-a-federation" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/federation/endpoint</span></code> removes a SPARQL endpoint from the metadata service.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">endpoint</span></code> <em>(required)</em> — URL of the SPARQL endpoint to remove.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">federation</span></code> <em>(optional)</em> — Named graph URI from which to remove the endpoint. If omitted, the endpoint is removed from the default (global) configuration.</p></li>
+</ul>
+<p>Example call:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer mysecretkey&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;endpoint=https://example.org/sparql&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;federation=https://research.tib.eu/semantic-source-description#K4COVID&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>localhost:5000/federation/endpoint
+</pre></div>
+</div>
+<p>Example output:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://example.org/sparql&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="api-querying-the-metadata-store">
+<h3>API: Querying the Metadata Store<a class="headerlink" href="#api-querying-the-metadata-store" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">/federation/sparql</span></code> forwards a SPARQL query directly to the metadata service, allowing inspection of the stored source descriptions.
+Both <code class="docutils literal notranslate"><span class="pre">GET</span></code> and <code class="docutils literal notranslate"><span class="pre">POST</span></code> are supported.</p>
+<p>Example call:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer mysecretkey&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>localhost:5000/federation/sparql
+</pre></div>
+</div>
 </section>
 </section>
 </section>

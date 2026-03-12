@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Changelog &mdash; DeTrusty 0.23.0 documentation</title>
+  <title>Changelog &mdash; DeTrusty 0.24.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d5dae34"></script>
+        <script src="_static/documentation_options.js?v=f10f1a72"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.23.0
+                0.24.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -95,6 +95,32 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<section id="v0-24-0-12-mar-2026">
+<h2>v0.24.0 - 12 Mar 2026<a class="headerlink" href="#v0-24-0-12-mar-2026" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add capability to parse <code class="docutils literal notranslate"><span class="pre">;</span></code> and <code class="docutils literal notranslate"><span class="pre">,</span></code> shorthand</p></li>
+<li><p>Fix endpoint list in <code class="docutils literal notranslate"><span class="pre">FederationConfig</span></code></p></li>
+<li><p>Fix default graph for adding and deleting endpoints from a federation</p></li>
+<li><p>Fix insert query for <code class="docutils literal notranslate"><span class="pre">SPARQLMTEndpoint</span></code></p></li>
+<li><p>Rework Web interface</p>
+<ul>
+<li><p>Improve style</p></li>
+<li><p>Render error messages in the Web interface</p></li>
+<li><p>Add federation selector in the Web interface</p></li>
+<li><p>Rework query plan visualization</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">FederationConfig</span></code> and metadata service in the app</p></li>
+<li><p>Restart metadata service instead of DeTrusty workers</p></li>
+<li><p>Update dependencies</p>
+<ul>
+<li><p>Drop jQuery</p></li>
+<li><p>Change from <code class="docutils literal notranslate"><span class="pre">&#64;triply/yasgui</span></code> to <code class="docutils literal notranslate"><span class="pre">&#64;zazuko/yasgui</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Update documentation</p></li>
+</ul>
+</section>
 <section id="v0-23-0-25-feb-2026">
 <h2>v0.23.0 - 25 Feb 2026<a class="headerlink" href="#v0-23-0-25-feb-2026" title="Link to this heading"></a></h2>
 <ul class="simple">
