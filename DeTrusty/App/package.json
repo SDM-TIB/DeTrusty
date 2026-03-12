@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@triply/yasgui": "4.2.28",
+    "@zazuko/yasgui": "4.6.1",
     "d3": "7.9.0"
   }
 }

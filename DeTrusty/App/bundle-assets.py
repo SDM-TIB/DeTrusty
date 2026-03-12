@@ -71,12 +71,12 @@ CSS_PATH = 'css/'
 
 bundles = {
     'yasgui_js': Bundle(
-        NPM_PATH + '@triply/yasgui/build/yasgui.min.js',
+        NPM_PATH + '@zazuko/yasgui/build/yasgui.min.js',
         filters='rjsmin',
         output=JS_PATH + 'yasgui.min.js'
     ),
     'yasgui_css': Bundle(
-        NPM_PATH + '@triply/yasgui/build/yasgui.min.css',
+        NPM_PATH + '@zazuko/yasgui/build/yasgui.min.css',
         filters='cssmin',
         output=CSS_PATH + 'yasgui.min.css'
     ),
