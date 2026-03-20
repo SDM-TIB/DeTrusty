@@ -257,5 +257,51 @@ def federations():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/classes', methods=['GET'])
+def classes():
+    """Return all RDF Molecule classes known to the federation.
+
+    Calls :meth:`~DeTrusty.Molecule.MTManager.RDFConfig.get_molecules` on the
+    already-initialised ``SPARQLConfig``, which in turn queries the metadata
+    service.  No extra HTTP round-trip through the metadata service is needed.
+
+    Query parameters
+    ----------------
+    federation : str, optional
+        URI of the named graph (federation) to scope the lookup.
+        If omitted, classes across all federations are returned.
+    """
+    federation = request.values.get('federation') or None
+    try:
+        molecules = app.config['CONFIG'].get_molecules(federation)
+        return jsonify({'classes': molecules})
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/predicates', methods=['GET'])
+def predicates():
+    """Return all predicates known to the federation.
+
+    Calls :meth:`~DeTrusty.Molecule.MTManager.RDFConfig.get_predicates` on the
+    already-initialised ``SPARQLConfig``, which in turn queries the metadata
+    service.  No extra HTTP round-trip through the metadata service is needed.
+
+    Query parameters
+    ----------------
+    federation : str, optional
+        URI of the named graph (federation) to scope the lookup.
+        If omitted, predicates across all federations are returned.
+    """
+    federation = request.values.get('federation') or None
+    try:
+        preds = app.config['CONFIG'].get_predicates(federation)
+        return jsonify({'predicates': preds})
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

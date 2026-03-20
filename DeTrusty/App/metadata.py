@@ -68,6 +68,44 @@ def sparql_endpoint():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/classes', methods=['GET'])
+def classes():
+    """Return all RDF Molecule classes (rdfs:Class subjects) in the metadata graph.
+
+    Query parameters
+    ----------------
+    federation : str, optional
+        URI of the named graph (federation) to scope the lookup.
+        If omitted, all federations are considered.
+    """
+    federation = request.args.get('federation') or None
+    try:
+        molecules = _config.get_molecules(federation)
+        return jsonify({'classes': molecules})
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/predicates', methods=['GET'])
+def predicates():
+    """Return all predicates (semsd:hasProperty values) in the metadata graph.
+
+    Query parameters
+    ----------------
+    federation : str, optional
+        URI of the named graph (federation) to scope the lookup.
+        If omitted, all federations are considered.
+    """
+    federation = request.args.get('federation') or None
+    try:
+        preds = _config.get_predicates(federation)
+        return jsonify({'predicates': preds})
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/sparql-update', methods=['POST'])
 def sparql_update():
     """Execute a SPARQL Update and persist to disk via TTLConfig.saveToFile()."""
