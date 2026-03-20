@@ -102,6 +102,10 @@ class Config(object):
     def getAll(self):
         return
 
+    @abc.abstractmethod
+    def get_predicates(self):
+        return
+
     def getEndpoints(self):
         endpoints = {}
         for m in self.metadata:
@@ -259,6 +263,9 @@ class ConfigFile(Config):
     def getAll(self):
         return self.read_json_file(self.configfile)
 
+    def get_predicates(self):
+        raise NotImplementedError
+
     @staticmethod
     def read_json_file(configfile):
         try:
@@ -329,6 +336,9 @@ class MTCreationConfig(Config):
     def getAll(self):
         return None
 
+    def get_predicates(self):
+        raise NotImplementedError
+
 
 class JSONConfig(Config):
     def __init__(self, json_data):
@@ -343,6 +353,9 @@ class JSONConfig(Config):
         for m in self.metadata:
             meta[m['rootType']] = m
         return meta
+
+    def get_predicates(self):
+        raise NotImplementedError
 
 
 class RDFConfig(Config):
@@ -399,6 +412,36 @@ class RDFConfig(Config):
 
     def getAll(self):
         return None
+
+    def get_predicates(self, federation: str = None):
+        """Gets the predicates for a given federation.
+
+                The list of predicates is extracted from the source description RDF graph via a SPARQL query.
+
+                Parameters
+                ----------
+                federation : str, optional
+                    The federation (named graph) to be considered. If omitted, all federations are considered.
+
+                Returns
+                -------
+                list
+                    The list of predicates for the given federation or all federations.
+
+                """
+        preds = []
+        query = (
+                'SELECT DISTINCT ?pred WHERE { '
+                + (f'GRAPH <{federation}> {{ ' if federation else '')
+                + f'\n ?mt a {RDFS.Class.n3()} .'
+                + f'\n ?mt {SEMSD.hasProperty.n3()} ?pred .'
+                + ('\n} ' if federation else '\n')
+                + '}'
+        )
+        result = self.src_desc.query(query)
+        for res in result:
+            preds.append(res['pred'])
+        return preds
 
     def get_molecules(self, federation: str = None):
         """Gets all RDF Molecules of the federation.
