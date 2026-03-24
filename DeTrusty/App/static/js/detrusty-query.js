@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
         yasqe: {
             tabSize: 2,
             indentUnit: 2,
+            autocompleters: ['variables', 'prefixes', 'customClassCompleter', 'customPropertyCompleter'],
             value: "SELECT DISTINCT ?concept\nWHERE {\n\t?s a ?concept\n} LIMIT 10"
         },
         extraKeys: {

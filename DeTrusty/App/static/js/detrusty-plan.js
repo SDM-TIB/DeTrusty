@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
               persistenceId: null,
               tabSize: 2,
               indentUnit: 2,
+              autocompleters: ['variables', 'prefixes', 'customClassCompleter', 'customPropertyCompleter'],
               extraKeys: {
                   Tab: function(cm) {
                       cm.replaceSelection(new Array(cm.getOption('indentUnit') + 1).join(' '));
