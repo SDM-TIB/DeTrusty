@@ -733,7 +733,11 @@ class IndependentOperator(object):
     def __repr__(self):
         return str(self.tree)
 
-    def json(self, triples, sub_queries):
+    def json(self, triples=None, sub_queries=None):
+        if triples is None:
+            triples = {}
+        if sub_queries is None:
+            sub_queries = [0]
         sub_queries[0] += 1
         name = 'SSQ' + str(sub_queries[0])
 
@@ -747,7 +751,7 @@ class IndependentOperator(object):
             'endpoint': self.server,
             'triples': triples_str
         }
-        return {'name': name, 'endpoint': self.server}, None
+        return {'name': name, 'endpoint': self.server}, triples
 
     def instantiate(self, d):
         new_tree = self.tree.instantiate(d)
