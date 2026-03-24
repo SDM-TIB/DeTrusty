@@ -1,18 +1,9 @@
-{% extends "base.jinja2" %}
+{% extends "query.jinja2" %}
 
-{% block head %}
-  <link href="{{ url_for('static', filename='css/yasgui.min.css') }}" rel="stylesheet" type="text/css" />
-  <script src="{{ url_for('static', filename='js/yasgui.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/detrusty-autocompleters.js') }}"></script>
+{% block query_head %}
   <script src="{{ url_for('static', filename='js/detrusty-query.js') }}"></script>
 {% endblock %}
 
-{% block content %}
-  <div id="federation-bar">
-    <label for="federation-select">Federation:</label>
-    <select id="federation-select">
-      <option value="">All federations</option>
-    </select>
-  </div>
+{% block editor %}
   <div id="yasgui" data-endpoint="{{ url_for('sparql') }}" data-federations-endpoint="{{ url_for('federations') }}"></div>
 {% endblock %}
