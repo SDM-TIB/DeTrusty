@@ -303,5 +303,75 @@ def predicates():
         return jsonify({'error': str(e)}), 500
 
 
+def get_federation_namespaces(federation: str = None) -> list[str]:
+    """Return all namespace URIs used in the federation's source descriptions.
+
+    Queries the metadata service via SPARQL for all class and predicate URIs,
+    then extracts their namespace portion (everything up to and including the
+    last ``#`` or ``/``).  The intersection with prefix.cc and the split into
+    "known" vs "unknown" entries is left to the frontend, which already fetches
+    prefix.cc independently.
+
+    Parameters
+    ----------
+    federation : str, optional
+        Named graph URI to scope the lookup.  When omitted, all named graphs
+        are searched (same behaviour as the rest of the federation-aware routes).
+    """
+    if federation:
+        where = (
+            f'GRAPH <{federation}> {{'
+            f' {{ ?uri a <http://www.w3.org/2000/01/rdf-schema#Class> }}'
+            f' UNION'
+            f' {{ ?c <https://research.tib.eu/semantic-source-description#hasProperty> ?uri }}'
+            f' }}'
+        )
+    else:
+        where = (
+            '{ ?uri a <http://www.w3.org/2000/01/rdf-schema#Class> }'
+            ' UNION'
+            ' { ?c <https://research.tib.eu/semantic-source-description#hasProperty> ?uri }'
+        )
+
+    query = f'SELECT DISTINCT ?uri WHERE {{ {where} }}'
+
+    resp = http_client.get(_METADATA_URL + '/sparql', params={'query': query})
+    resp.raise_for_status()
+    bindings = resp.json().get('results', {}).get('bindings', [])
+
+    federation_namespaces = set()
+    for b in bindings:
+        if 'uri' in b:
+            uri = b['uri']['value']
+            sep = max(uri.rfind('#'), uri.rfind('/'))
+            if sep > 0:
+                federation_namespaces.add(uri[:sep + 1])
+
+    return sorted(federation_namespaces)
+
+
+@app.route('/namespaces', methods=['GET'])
+def namespaces():
+    """Return all namespace URIs present in the federation's source descriptions.
+
+    The frontend uses this list to (a) filter the prefix.cc autocomplete
+    suggestions down to only those whose namespace URI appears in the federation,
+    and (b) offer any remaining federation namespaces not covered by prefix.cc
+    as unnamed (": <uri>") suggestions.
+
+    Query parameters
+    ----------------
+    federation : str, optional
+        Named graph URI to scope the lookup.
+    """
+    federation = request.values.get('federation') or None
+    try:
+        return jsonify(get_federation_namespaces(federation))
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
