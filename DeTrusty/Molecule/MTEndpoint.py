@@ -352,6 +352,107 @@ class MTEndpoint(object):
         }}
         '''.format(graph=graph, semsd=SEMSD, url=endpoint_url)
 
+    @staticmethod
+    def get_query_insert_prefix_declaration(prefix_name: str, namespace_uri: str,
+                                            graph: str = DEFAULT_GRAPH) -> str:
+        """Returns a SPARQL UPDATE query that inserts a prefix declaration.
+
+        The declaration is represented as a blank node with type
+        ``semsd:PrefixDeclaration`` carrying ``semsd:prefixName`` and
+        ``semsd:namespaceURI`` predicates.  If a declaration for the same
+        prefix name already exists in the given graph it is replaced first
+        (see :meth:`get_query_delete_prefix_declaration`).
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label (e.g. ``"k4covid"``).
+        namespace_uri : str
+            The full namespace URI (e.g. ``"http://research.tib.eu/covid-19/vocab/"``).
+        graph : str, optional
+            The named graph into which the declaration is inserted.
+
+        Returns
+        -------
+        str
+            The SPARQL UPDATE query string.
+
+        """
+        return '''
+        PREFIX semsd: <{semsd}>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        INSERT DATA {{
+          GRAPH <{graph}> {{
+            <{ns}> a semsd:PrefixDeclaration ;
+              semsd:prefixName "{name}" ;
+              semsd:namespaceURI "{ns}"^^xsd:anyURI .
+          }}
+        }}
+        '''.format(graph=graph, semsd=SEMSD, name=prefix_name, ns=namespace_uri)
+
+    @staticmethod
+    def get_query_delete_prefix_declaration(prefix_name: str,
+                                            graph: str = DEFAULT_GRAPH) -> str:
+        """Returns a SPARQL UPDATE query that deletes a prefix declaration by name.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label to remove (e.g. ``"k4covid"``).
+        graph : str, optional
+            The named graph from which the declaration is removed.
+
+        Returns
+        -------
+        str
+            The SPARQL UPDATE query string.
+
+        """
+        return '''
+        PREFIX semsd: <{semsd}>
+        WITH <{graph}>
+        DELETE {{
+          ?decl ?p ?o .
+        }} WHERE {{
+          ?decl a semsd:PrefixDeclaration ;
+            semsd:prefixName "{name}" ;
+            ?p ?o .
+        }}
+        '''.format(graph=graph, semsd=SEMSD, name=prefix_name)
+
+    @abc.abstractmethod
+    def add_prefix_declaration(self, prefix_name: str, namespace_uri: str,
+                                graph: str = DEFAULT_GRAPH):
+        """Adds or replaces a user-declared prefix suggestion.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label (e.g. ``"k4covid"``).
+        namespace_uri : str
+            The full namespace URI.
+        graph : str, optional
+            The named graph (federation) to scope the declaration to.
+            Defaults to the global default graph so the prefix is available
+            across all federations.
+
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_prefix_declaration(self, prefix_name: str, graph: str = DEFAULT_GRAPH):
+        """Removes a user-declared prefix suggestion.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label to remove.
+        graph : str, optional
+            The named graph from which to remove the declaration.
+
+        """
+        pass
+
 
 class SPARQLEndpoint(MTEndpoint):
     """A class representing the RDF graph containing the source descriptions implemented as a Virtuoso SPARQL endpoint."""
@@ -515,6 +616,15 @@ class SPARQLEndpoint(MTEndpoint):
         self._update(self.get_query_delete_class_no_source(graph))
         self._update(self.get_query_delete_source(endpoint, graph))
 
+    def add_prefix_declaration(self, prefix_name: str, namespace_uri: str,
+                                graph: str = DEFAULT_GRAPH):
+        # Delete any existing declaration for this prefix name first to avoid duplicates.
+        self._update(self.get_query_delete_prefix_declaration(prefix_name, graph))
+        self._update(self.get_query_insert_prefix_declaration(prefix_name, namespace_uri, graph))
+
+    def delete_prefix_declaration(self, prefix_name: str, graph: str = DEFAULT_GRAPH):
+        self._update(self.get_query_delete_prefix_declaration(prefix_name, graph))
+
 
 class PyOxigraphEndpoint(MTEndpoint):
     """A class representing the RDF graph containing the source descriptions implemented as a Pyoxigraph graph."""
@@ -539,6 +649,9 @@ class PyOxigraphEndpoint(MTEndpoint):
         """Saves the source descriptions to a file.
 
         This method makes use of the serialization method provided by Pyoxigraph.
+        User-declared ``semsd:PrefixDeclaration`` triples are also passed as
+        Turtle ``@prefix`` shorthands so the output file is easier to read and
+        can be loaded back without losing the prefix information.
 
         Parameters
         ----------
@@ -546,9 +659,26 @@ class PyOxigraphEndpoint(MTEndpoint):
             The path where to save the source descriptions.
 
         """
+        # Collect user-declared prefixes stored as semsd:PrefixDeclaration triples.
+        extra_prefixes = {'semsd': str(SEMSD)}
+        try:
+            query = (
+                f'SELECT DISTINCT ?name ?ns WHERE {{'
+                f' ?decl a <{SEMSD.PrefixDeclaration}> .'
+                f' ?decl <{SEMSD.prefixName}> ?name .'
+                f' ?decl <{SEMSD.namespaceURI}> ?ns .'
+                f'}}'
+            )
+            for res in self.ttl.query(query, use_default_graph_as_union=True):
+                name = res['name'].value if res['name'] is not None else None
+                ns = res['ns'].value if res['ns'] is not None else None
+                if name and ns:
+                    extra_prefixes[name] = ns
+        except Exception:
+            pass
         oxi_serialize(self.ttl, path,
                       format=RdfFormat.TRIG,
-                      prefixes={'semsd': SEMSD})
+                      prefixes=extra_prefixes)
 
     def delete_endpoint(self, endpoint: str, graph: str = DEFAULT_GRAPH):
         self.ttl.update(self.get_query_delete_property_range(endpoint, graph))
@@ -571,3 +701,14 @@ class PyOxigraphEndpoint(MTEndpoint):
             self.ttl.optimize()
         else:
             logger.warning('{kg} is not accessible and, hence, cannot be added to the federation.'.format(kg=endpoint.url))
+
+    def add_prefix_declaration(self, prefix_name: str, namespace_uri: str,
+                                graph: str = DEFAULT_GRAPH):
+        # Delete any existing declaration for this prefix name first to avoid duplicates.
+        self.ttl.update(self.get_query_delete_prefix_declaration(prefix_name, graph))
+        self.ttl.update(self.get_query_insert_prefix_declaration(prefix_name, namespace_uri, graph))
+        self.ttl.optimize()
+
+    def delete_prefix_declaration(self, prefix_name: str, graph: str = DEFAULT_GRAPH):
+        self.ttl.update(self.get_query_delete_prefix_declaration(prefix_name, graph))
+        self.ttl.optimize()

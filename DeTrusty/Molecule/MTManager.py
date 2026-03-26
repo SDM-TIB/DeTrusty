@@ -443,7 +443,109 @@ class RDFConfig(Config):
             preds.append(res['pred'])
         return preds
 
-    def get_molecules(self, federation: str = None):
+    def get_prefixes(self, federation: str = None) -> dict[str, str]:
+        """Gets the user-declared prefix suggestions for the federation.
+
+        Prefix mappings are stored in the source description as
+        ``semsd:PrefixDeclaration`` triples (written by :func:`create_rdfmts`
+        or inserted manually into the TTL / SPARQL endpoint).  They are
+        returned to the query editor so it can offer named autocomplete
+        suggestions in addition to the entries from prefix.cc.
+
+        Declarations are collected from two places and merged, with
+        federation-specific declarations taking priority over global ones:
+
+        * **Global declarations** live outside any named graph (i.e. in the
+          default graph).  They apply to every federation and are always
+          included, regardless of whether a specific federation is requested.
+        * **Federation-scoped declarations** live inside the named graph
+          identified by *federation*.  They override global declarations with
+          the same prefix name.
+
+        Parameters
+        ----------
+        federation : str, optional
+            The federation (named graph) to be considered.  When omitted,
+            only global declarations are returned.
+
+        Returns
+        -------
+        dict[str, str]
+            A mapping of prefix name → namespace URI.
+
+        """
+        prefixes = {}
+        decl_pattern = (
+            f'\n ?decl a {SEMSD.PrefixDeclaration.n3()} .'
+            f'\n ?decl {SEMSD.prefixName.n3()} ?name .'
+            f'\n ?decl {SEMSD.namespaceURI.n3()} ?ns .'
+        )
+
+        # 1. Global declarations (no GRAPH clause — found in the default graph
+        #    via use_default_graph_as_union=True in PyOxigraphEndpoint.query).
+        global_query = (
+            'SELECT DISTINCT ?name ?ns WHERE {'
+            + decl_pattern
+            + '\n}'
+        )
+        for res in self.src_desc.query(global_query):
+            if res['name'] is not None and res['ns'] is not None:
+                prefixes[res['name']] = res['ns']
+
+        # 2. Federation-scoped declarations override global ones.
+        if federation:
+            scoped_query = (
+                f'SELECT DISTINCT ?name ?ns WHERE {{'
+                f' GRAPH <{federation}> {{'
+                + decl_pattern
+                + '\n} }'
+            )
+            for res in self.src_desc.query(scoped_query):
+                if res['name'] is not None and res['ns'] is not None:
+                    prefixes[res['name']] = res['ns']
+
+        return prefixes
+
+    def add_prefix_declaration(self, prefix_name: str, namespace_uri: str,
+                                federation: str = None):
+        """Adds or replaces a user-declared prefix suggestion.
+
+        If a declaration for *prefix_name* already exists in the target graph
+        it is replaced atomically (delete then insert).
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label (e.g. ``"k4covid"``).
+        namespace_uri : str
+            The full namespace URI.
+        federation : str, optional
+            The named graph to scope the declaration to.  When omitted the
+            declaration is written to the default (global) graph and applies
+            to every federation.
+
+        """
+        from DeTrusty.Molecule import DEFAULT_GRAPH
+        self.src_desc.add_prefix_declaration(
+            prefix_name, namespace_uri, federation or DEFAULT_GRAPH
+        )
+
+    def delete_prefix_declaration(self, prefix_name: str, federation: str = None):
+        """Removes a user-declared prefix suggestion.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label to remove.
+        federation : str, optional
+            The named graph from which to remove the declaration.  When
+            omitted the declaration is removed from the default (global) graph.
+
+        """
+        from DeTrusty.Molecule import DEFAULT_GRAPH
+        self.src_desc.delete_prefix_declaration(
+            prefix_name, federation or DEFAULT_GRAPH
+        )
         """Gets all RDF Molecules of the federation.
 
         The list of molecules is extracted from the source description RDF graph via a SPARQL query.
@@ -1088,3 +1190,48 @@ class FederationConfig(Config):
 
         """
         return self.__config.findbypred(pred, self.graph)
+
+    def get_prefixes(self) -> dict[str, str]:
+        """Gets the user-declared prefix suggestions for this federation.
+
+        Delegates to the underlying :class:`RDFConfig`, scoping the lookup to
+        this federation's named graph.  Prefix declarations outside any named
+        graph (global declarations) are also included because
+        :meth:`RDFConfig.get_prefixes` queries with ``use_default_graph_as_union=True``.
+
+        Returns
+        -------
+        dict[str, str]
+            A mapping of prefix name → namespace URI.
+
+        """
+        return self.__config.get_prefixes(self.graph)
+
+    def add_prefix_declaration(self, prefix_name: str, namespace_uri: str):
+        """Adds or replaces a user-declared prefix suggestion for this federation.
+
+        The declaration is scoped to this federation's named graph.  Use
+        :meth:`RDFConfig.add_prefix_declaration` directly with
+        ``federation=None`` if you want a global declaration that applies to
+        all federations.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label (e.g. ``"k4covid"``).
+        namespace_uri : str
+            The full namespace URI.
+
+        """
+        self.__config.add_prefix_declaration(prefix_name, namespace_uri, self.graph)
+
+    def delete_prefix_declaration(self, prefix_name: str):
+        """Removes a user-declared prefix suggestion from this federation.
+
+        Parameters
+        ----------
+        prefix_name : str
+            The short prefix label to remove.
+
+        """
+        self.__config.delete_prefix_declaration(prefix_name, self.graph)

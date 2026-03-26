@@ -40,6 +40,22 @@ def require_admin(f):
     return wrapper
 
 
+def _proxy(method: str, path: str, **kwargs):
+    """Forward a request to the metadata service and return its response verbatim.
+
+    Parameters
+    ----------
+    method : str
+        HTTP method (``'GET'``, ``'POST'``, ``'DELETE'``).
+    path : str
+        Path on the metadata service, e.g. ``'/federation/endpoint'``.
+    **kwargs
+        Passed directly to :func:`requests.request` (e.g. ``params=``, ``data=``).
+    """
+    resp = http_client.request(method, _METADATA_URL + path, **kwargs)
+    return jsonify(resp.json()), resp.status_code
+
+
 def _build_config() -> SPARQLConfig:
     """Instantiate SPARQLConfig directly against the metadata service."""
     cfg = SPARQLConfig(_METADATA_URL + '/sparql')
@@ -162,215 +178,64 @@ def query_plan():
     return {'tree': tree, 'details': details}
 
 
+@app.route('/federations', methods=['GET'])
+def federations():
+    """Return the list of named graphs (federations) — proxied from metadata service."""
+    return _proxy('GET', '/federations')
+
+
+@app.route('/classes', methods=['GET'])
+def classes():
+    """Return all RDF Molecule classes — proxied from metadata service."""
+    return _proxy('GET', '/classes', params=request.args)
+
+
+@app.route('/predicates', methods=['GET'])
+def predicates():
+    """Return all predicates — proxied from metadata service."""
+    return _proxy('GET', '/predicates', params=request.args)
+
+
+@app.route('/namespaces', methods=['GET'])
+def namespaces():
+    """Return namespace URIs and declared prefixes — proxied from metadata service."""
+    return _proxy('GET', '/namespaces', params=request.args)
+
 @app.route('/federation/sparql', methods=['GET', 'POST'])
 @require_admin
 def federation_sparql():
     """Forward a read SPARQL query to the metadata service."""
-    try:
-        if request.method == 'POST':
-            resp = http_client.post(_METADATA_URL + '/sparql', data=request.form)
-        else:
-            resp = http_client.get(_METADATA_URL + '/sparql', params=request.args)
-        return jsonify(resp.json()), resp.status_code
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
+    if request.method == 'POST':
+        return _proxy('POST', '/sparql', data=request.form)
+    return _proxy('GET', '/sparql', params=request.args)
 
 
 @app.route('/federation/endpoint', methods=['POST'])
 @require_admin
 def federation_add_endpoint():
-    """Add a SPARQL endpoint to the federation.
-
-    Form parameters
-    ---------------
-    endpoint : str
-        URL of the SPARQL endpoint to add.
-    federation : str, optional
-        Named graph (federation) to add the endpoint to.
-    username : str, optional
-    password : str, optional
-    keycloak : str, optional
-        URL of the token server providing access tokens.
-    """
-    endpoint_url = request.values.get('endpoint')
-    if not endpoint_url:
-        return jsonify({'error': 'No endpoint URL provided.'}), 400
-
-    fed_cfg = _federation_config(request.values.get('federation'))
-    try:
-        fed_cfg.add_endpoint(
-            endpoint_url,
-            username=request.values.get('username') or None,
-            password=request.values.get('password') or None,
-            keycloak=request.values.get('keycloak') or None,
-        )
-        return jsonify({'status': 'ok', 'endpoint': endpoint_url})
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
+    """Add a SPARQL endpoint to the federation — proxied to metadata service."""
+    return _proxy('POST', '/federation/endpoint', data=request.form)
 
 
 @app.route('/federation/endpoint', methods=['DELETE'])
 @require_admin
 def federation_delete_endpoint():
-    """Remove a SPARQL endpoint from the federation.
-
-    Form parameters
-    ---------------
-    endpoint : str
-        URL of the SPARQL endpoint to remove.
-    federation : str, optional
-        Named graph (federation) from which to remove the endpoint.
-    """
-    endpoint_url = request.values.get('endpoint')
-    if not endpoint_url:
-        return jsonify({'error': 'No endpoint URL provided.'}), 400
-
-    fed_cfg = _federation_config(request.values.get('federation'))
-    try:
-        fed_cfg.delete_endpoint(endpoint_url)
-        return jsonify({'status': 'ok', 'endpoint': endpoint_url})
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
+    """Remove a SPARQL endpoint from the federation — proxied to metadata service."""
+    return _proxy('DELETE', '/federation/endpoint', data=request.form)
 
 
-@app.route('/federations', methods=['GET'])
-def federations():
-    """Return the list of named graphs (federations) available in the metadata store.
-
-    No authentication required — this is read-only and needed by the UI to
-    populate the federation selector on the query pages.
-    """
-    try:
-        resp = http_client.get(
-            _METADATA_URL + '/sparql',
-            params={'query': 'SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }'}
-        )
-        resp.raise_for_status()
-        bindings = resp.json().get('results', {}).get('bindings', [])
-        graphs = [b['g']['value'] for b in bindings if 'g' in b]
-        return jsonify({'federations': graphs})
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
+@app.route('/federation/prefix', methods=['POST'])
+@require_admin
+def federation_add_prefix():
+    """Add or replace a user-declared prefix suggestion — proxied to metadata service."""
+    return _proxy('POST', '/federation/prefix', data=request.form)
 
 
-@app.route('/classes', methods=['GET'])
-def classes():
-    """Return all RDF Molecule classes known to the federation.
-
-    Calls :meth:`~DeTrusty.Molecule.MTManager.RDFConfig.get_molecules` on the
-    already-initialised ``SPARQLConfig``, which in turn queries the metadata
-    service.  No extra HTTP round-trip through the metadata service is needed.
-
-    Query parameters
-    ----------------
-    federation : str, optional
-        URI of the named graph (federation) to scope the lookup.
-        If omitted, classes across all federations are returned.
-    """
-    federation = request.values.get('federation') or None
-    try:
-        molecules = app.config['CONFIG'].get_molecules(federation)
-        return jsonify({'classes': molecules})
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/predicates', methods=['GET'])
-def predicates():
-    """Return all predicates known to the federation.
-
-    Calls :meth:`~DeTrusty.Molecule.MTManager.RDFConfig.get_predicates` on the
-    already-initialised ``SPARQLConfig``, which in turn queries the metadata
-    service.  No extra HTTP round-trip through the metadata service is needed.
-
-    Query parameters
-    ----------------
-    federation : str, optional
-        URI of the named graph (federation) to scope the lookup.
-        If omitted, predicates across all federations are returned.
-    """
-    federation = request.values.get('federation') or None
-    try:
-        preds = app.config['CONFIG'].get_predicates(federation)
-        return jsonify({'predicates': preds})
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
-
-
-def get_federation_namespaces(federation: str = None) -> list[str]:
-    """Return all namespace URIs used in the federation's source descriptions.
-
-    Queries the metadata service via SPARQL for all class and predicate URIs,
-    then extracts their namespace portion (everything up to and including the
-    last ``#`` or ``/``).  The intersection with prefix.cc and the split into
-    "known" vs "unknown" entries is left to the frontend, which already fetches
-    prefix.cc independently.
-
-    Parameters
-    ----------
-    federation : str, optional
-        Named graph URI to scope the lookup.  When omitted, all named graphs
-        are searched (same behaviour as the rest of the federation-aware routes).
-    """
-    if federation:
-        where = (
-            f'GRAPH <{federation}> {{'
-            f' {{ ?uri a <http://www.w3.org/2000/01/rdf-schema#Class> }}'
-            f' UNION'
-            f' {{ ?c <https://research.tib.eu/semantic-source-description#hasProperty> ?uri }}'
-            f' }}'
-        )
-    else:
-        where = (
-            '{ ?uri a <http://www.w3.org/2000/01/rdf-schema#Class> }'
-            ' UNION'
-            ' { ?c <https://research.tib.eu/semantic-source-description#hasProperty> ?uri }'
-        )
-
-    query = f'SELECT DISTINCT ?uri WHERE {{ {where} }}'
-
-    resp = http_client.get(_METADATA_URL + '/sparql', params={'query': query})
-    resp.raise_for_status()
-    bindings = resp.json().get('results', {}).get('bindings', [])
-
-    federation_namespaces = set()
-    for b in bindings:
-        if 'uri' in b:
-            uri = b['uri']['value']
-            sep = max(uri.rfind('#'), uri.rfind('/'))
-            if sep > 0:
-                federation_namespaces.add(uri[:sep + 1])
-
-    return sorted(federation_namespaces)
-
-
-@app.route('/namespaces', methods=['GET'])
-def namespaces():
-    """Return all namespace URIs present in the federation's source descriptions.
-
-    The frontend uses this list to (a) filter the prefix.cc autocomplete
-    suggestions down to only those whose namespace URI appears in the federation,
-    and (b) offer any remaining federation namespaces not covered by prefix.cc
-    as unnamed (": <uri>") suggestions.
-
-    Query parameters
-    ----------------
-    federation : str, optional
-        Named graph URI to scope the lookup.
-    """
-    federation = request.values.get('federation') or None
-    try:
-        return jsonify(get_federation_namespaces(federation))
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({'error': str(e)}), 500
-
+@app.route('/federation/prefix', methods=['DELETE'])
+@require_admin
+def federation_delete_prefix():
+    """Remove a user-declared prefix suggestion — proxied to metadata service."""
+    return _proxy('DELETE', '/federation/prefix', data=request.form)
 
 
 if __name__ == '__main__':

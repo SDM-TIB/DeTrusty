@@ -75,7 +75,8 @@ class Endpoint:
 
 
 def create_rdfmts(endpoints: list | dict,
-                  output: Optional[str] = DEFAULT_OUTPUT_PATH) -> Optional[TTLConfig]:
+                  output: Optional[str] = DEFAULT_OUTPUT_PATH,
+                  prefixes: Optional[dict[str, str]] = None) -> Optional[TTLConfig]:
 
     """Generating rdfmts.ttl, which need to be supplied during query execution using run_query
 
@@ -88,6 +89,13 @@ def create_rdfmts(endpoints: list | dict,
 
         * If not provided: default path will be used, i.e. path/to/DeTrusty-installation/Config/rdfmts.ttl'
         * In case of None: the config will not be saved, instead a TTLConfig object is returned.
+    prefixes : dict[str, str], optional
+        User-defined prefix suggestions for the query editor.  Keys are short
+        prefix names (e.g. ``"k4covid"``), values are the corresponding
+        namespace URIs (e.g. ``"http://research.tib.eu/covid-19/vocab/"``).
+        Each entry is written as a ``semsd:PrefixDeclaration`` triple in the
+        source description so that it survives serialisation round-trips and is
+        also returned by the ``/namespaces`` API endpoint.
 
     Return
     ------
@@ -114,6 +122,17 @@ def create_rdfmts(endpoints: list | dict,
 
     graph = Graph()
     graph.bind('semsd', SEMSD)
+
+    # Write user-declared prefix suggestions as semsd:PrefixDeclaration triples.
+    # Binding them on the rdflib graph also causes them to appear as @prefix
+    # shorthands in the serialised Turtle file, keeping it human-readable.
+    if prefixes:
+        for prefix_name, ns_uri in prefixes.items():
+            decl = BNode()
+            graph.add((decl, RDF.type, SEMSD.PrefixDeclaration))
+            graph.add((decl, SEMSD.prefixName, Literal(prefix_name)))
+            graph.add((decl, SEMSD.namespaceURI, Literal(ns_uri, datatype=XSD.anyURI)))
+            graph.bind(prefix_name, ns_uri)
     eoffs = {}
     epros = []
     start = time()
