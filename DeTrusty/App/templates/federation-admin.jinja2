@@ -1,0 +1,242 @@
+{% extends "base.jinja2" %}
+
+{% block head %}
+  <link href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}" rel="stylesheet" type="text/css" />
+  <link href="{{ url_for('static', filename='css/yasgui.min.css') }}" rel="stylesheet" type="text/css" />
+  <link href="{{ url_for('static', filename='css/detrusty-admin.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %}
+
+{# ── Login wall ─────────────────────────────────────────────────────── #}
+<div id="login-wall">
+  <div class="login-card">
+    <p class="login-brand">DeTrusty</p>
+    <h2 class="login-title">Federation Admin</h2>
+    <p class="login-sub">Enter your admin bearer token to continue.</p>
+    <div class="login-row">
+      <input id="wall-token" type="password" class="admin-input login-input"
+             placeholder="Bearer token…" autocomplete="current-password" />
+      <button id="btn-wall-login" class="btn btn-primary">Sign in →</button>
+    </div>
+    <p id="wall-error" class="wall-error" role="alert"></p>
+  </div>
+</div>
+
+{# ── Admin app (revealed after auth) ───────────────────────────────── #}
+<div id="admin-app" style="display:none" aria-hidden="true">
+  <div class="admin-layout">
+
+    {# ── Sidebar ──────────────────────────────────────────────────── #}
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Admin</span>
+        <button id="btn-logout" class="btn-logout" title="Sign out">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+
+      <nav class="admin-nav" role="tablist">
+        <button class="admin-tab active" data-panel="panel-federations" role="tab">
+          <i class="fa-solid fa-circle-nodes tab-icon"></i>
+          Federations
+        </button>
+        <button class="admin-tab" data-panel="panel-endpoints" role="tab">
+          <i class="fa-solid fa-server tab-icon"></i>
+          Endpoints
+        </button>
+        <button class="admin-tab" data-panel="panel-prefixes" role="tab">
+          <i class="fa-solid fa-tags tab-icon"></i>
+          Prefixes
+        </button>
+        <button class="admin-tab" data-panel="panel-sparql" role="tab">
+          <i class="fa-solid fa-code tab-icon"></i>
+          SPARQL
+        </button>
+      </nav>
+    </aside>
+
+    {# ── Main content ─────────────────────────────────────────────── #}
+    <main class="admin-main" role="main">
+      <div id="admin-banner" class="admin-banner" role="alert" style="display:none"></div>
+
+      {# ── Federations ─────────────────────────────────────────── #}
+      <section id="panel-federations" class="admin-panel active" role="tabpanel">
+        <div class="panel-header">
+          <h3>Federations</h3>
+          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="federations" title="Refresh">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+
+        <div class="card">
+          <h4 class="card-title">Create new federation</h4>
+          <p class="card-hint">
+            Federations come into existence once their first endpoint is saved.
+            Enter a URI here and you will be taken straight to the add-endpoint form.
+          </p>
+          <div class="form-row">
+            <input id="new-fed-uri" type="url" class="admin-input flex-grow"
+                   placeholder="https://example.org/fed/my-federation"
+                   spellcheck="false" autocomplete="off" />
+            <button id="btn-new-federation" class="btn btn-primary">
+              Add first endpoint →
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 class="card-title">Existing federations</h4>
+          <div id="fed-list" class="item-list"><p class="list-empty">Loading…</p></div>
+        </div>
+      </section>
+
+      {# ── Endpoints ───────────────────────────────────────────── #}
+      <section id="panel-endpoints" class="admin-panel" role="tabpanel">
+        <div class="panel-header">
+          <h3>Endpoints</h3>
+          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="endpoints" title="Refresh">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="fed-selector-row">
+            <label class="admin-label" for="ep-fed-filter">View federation</label>
+            <select id="ep-fed-filter" class="admin-select fed-select">
+              <option value="">All federations</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 class="card-title">Add endpoint</h4>
+          <div class="form-row">
+            <input id="ep-url" type="url" class="admin-input flex-grow"
+                   placeholder="https://example.org/sparql" />
+          </div>
+          {# Shown only when the filter has a specific federation selected #}
+          <div id="ep-fed-filter-note" class="form-row ep-target-note" style="display:none;margin-top:10px">
+            <i class="fa-solid fa-circle-info" style="opacity:.6;font-size:13px;flex-shrink:0"></i>
+            Will be added to the selected federation.
+          </div>
+          {# Hidden when a specific federation is selected in the filter #}
+          <div id="ep-fed-mode-row" class="form-row" style="margin-top:10px;gap:16px">
+            <label class="admin-label-inline">
+              <input type="radio" name="ep-fed-mode" value="existing" checked />
+              Add to existing federation
+            </label>
+            <label class="admin-label-inline">
+              <input type="radio" name="ep-fed-mode" value="new" />
+              Create new federation
+            </label>
+          </div>
+          <div id="ep-fed-existing-row" class="form-row" style="margin-top:8px">
+            <select id="ep-fed-existing-select" class="admin-select flex-grow">
+              <option value="">— select federation —</option>
+            </select>
+          </div>
+          <div id="ep-fed-new-row" class="form-row" style="margin-top:8px;display:none">
+            <input id="ep-fed-new-uri" type="url" class="admin-input flex-grow"
+                   placeholder="New federation URI, e.g. https://example.org/fed/research" />
+          </div>
+          <div class="form-row form-row-end" style="margin-top:10px">
+            <button id="btn-add-endpoint" class="btn btn-primary">Add endpoint</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 class="card-title">
+            Registered endpoints
+            <span id="ep-count" class="count-badge"></span>
+          </h4>
+          <div id="endpoint-list" class="item-list">
+            <p class="list-empty">Select a federation above to load its endpoints.</p>
+          </div>
+        </div>
+      </section>
+
+      {# ── Prefixes ────────────────────────────────────────────── #}
+      <section id="panel-prefixes" class="admin-panel" role="tabpanel">
+        <div class="panel-header">
+          <h3>Prefixes</h3>
+          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="prefixes" title="Refresh">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="fed-selector-row">
+            <label class="admin-label" for="pfx-fed-select">Federation</label>
+            <select id="pfx-fed-select" class="admin-select fed-select">
+              <option value="">All federations</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 class="card-title">Add / update prefix</h4>
+          <div class="form-row">
+            <input id="pfx-name" type="text" class="admin-input pfx-name-input"
+                   placeholder="rdf" spellcheck="false" autocomplete="off" />
+            <span class="form-sep">:</span>
+            <input id="pfx-uri" type="url" class="admin-input flex-grow"
+                   placeholder="https://…" spellcheck="false" autocomplete="off" />
+            <button id="btn-add-prefix" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+
+        <div class="card" id="pfx-named-card">
+          <h4 class="card-title">
+            Named prefixes
+            <span id="pfx-count" class="count-badge"></span>
+          </h4>
+          <div id="prefix-list" class="item-list"><p class="list-empty">Loading…</p></div>
+        </div>
+
+        <div class="card" id="pfx-unnamed-card" style="display:none">
+          <div class="card-title-row">
+            <h4 class="card-title">
+              Unnamed prefixes
+              <span id="unnamed-count" class="count-badge count-badge--warn"></span>
+            </h4>
+            <button id="btn-cleanup-unnamed" class="btn btn-secondary btn-sm">
+              Remove known namespaces
+            </button>
+          </div>
+          <p class="card-hint">
+            These URIs are registered without a shorthand. Ones already
+            known to <a href="https://prefix.cc" target="_blank" rel="noopener">prefix.cc</a>
+            are redundant and can be removed. Truly custom ones can be named below.
+          </p>
+          <div id="unnamed-list" class="item-list"></div>
+        </div>
+      </section>
+
+      {# ── SPARQL console ──────────────────────────────────────── #}
+      <section id="panel-sparql" class="admin-panel sparql-panel" role="tabpanel">
+        <div class="panel-header">
+          <h3>Metadata SPARQL Console</h3>
+          <span class="panel-hint">Queries run against the metadata service with admin credentials.</span>
+        </div>
+        {#
+          Mirrors the pattern from query-editor.jinja2.
+          detrusty-admin.js initialises Yasgui on this div with the
+          admin Authorization header and semsd ontology autocompleters
+          pointing at /classes, /predicates, /namespaces.
+        #}
+        <div id="admin-yasgui"
+             data-endpoint="{{ url_for('federation_sparql') }}"
+             data-classes-endpoint="{{ url_for('classes') }}"
+             data-predicates-endpoint="{{ url_for('predicates') }}"
+             data-namespaces-endpoint="{{ url_for('namespaces') }}">
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/yasgui.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/detrusty-admin.js') }}"></script>
+{% endblock %}

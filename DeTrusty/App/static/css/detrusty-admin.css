@@ -1,0 +1,694 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LOGIN WALL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+#login-wall {
+  position: fixed;
+  inset: 0;
+  top: 48px; /* below navbar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  z-index: 200;
+  animation: wall-in .2s ease;
+}
+
+@keyframes wall-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 36px 40px 32px;
+  width: 380px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.45);
+  text-align: center;
+}
+
+.login-brand {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9ACD32;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.login-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 6px;
+}
+
+.login-sub {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 22px;
+}
+
+.login-row {
+  display: flex;
+  gap: 8px;
+}
+
+.login-input {
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.wall-error {
+  font-size: 12px;
+  color: #c0392b;
+  min-height: 16px;
+  margin: 10px 0 0;
+  text-align: center;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LAYOUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+#admin-app {
+  height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+.admin-layout {
+  display: flex;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIDEBAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.admin-sidebar {
+  flex: 0 0 200px;
+  background: #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px 20px;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ACD32;
+}
+
+.btn-logout {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  transition: color .12s;
+}
+
+.btn-logout:hover { color: #ccc; }
+.btn-logout i { font-size: 14px; }
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #aaa;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  border-left: 3px solid transparent;
+}
+
+.admin-tab:hover {
+  background: #383838;
+  color: #ddd;
+}
+
+.admin-tab.active {
+  background: #343434;
+  color: #fff;
+  font-weight: 600;
+  border-left-color: #9ACD32;
+  padding-left: 7px;
+}
+
+.tab-icon {
+  font-size: 13px;
+  width: 14px;
+  text-align: center;
+  flex: 0 0 14px;
+  opacity: .7;
+}
+
+.admin-tab.active .tab-icon { opacity: 1; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MAIN AREA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.admin-main {
+  flex: 1 1 0;
+  overflow-y: auto;
+  padding: 20px 24px;
+  background: #efefef;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-panel {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-panel.active { display: flex; }
+
+/* SPARQL panel fills height */
+.sparql-panel {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.panel-hint {
+  font-size: 12px;
+  color: #888;
+  margin-left: auto;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BANNER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.admin-banner {
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid transparent;
+  animation: banner-in .15s ease;
+}
+
+@keyframes banner-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.admin-banner.success {
+  background: #eaf4d3;
+  border-color: #9ACD32;
+  color: #3a5c00;
+}
+
+.admin-banner.error {
+  background: #f2dede;
+  border-color: #ebccd1;
+  color: #a94442;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+.card-title {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #888;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.card-title-row .card-title {
+  margin: 0;
+  flex: 1 1 0;
+}
+
+.card-hint {
+  font-size: 12px;
+  color: #999;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.card-hint a { color: #2980b9; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FEDERATION SELECTOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.fed-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fed-selector-row .admin-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #888;
+  white-space: nowrap;
+}
+
+.fed-select {
+  flex: 1 1 0;
+  max-width: 540px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FORM CONTROLS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.admin-input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fafafa;
+  color: #222;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: #9ACD32;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(154,205,50,.18);
+}
+
+.admin-select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fafafa;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+
+.admin-select:focus {
+  outline: none;
+  border-color: #9ACD32;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.form-row-end { justify-content: flex-end; }
+
+.form-sep {
+  font-weight: 700;
+  color: #aaa;
+  flex: 0 0 auto;
+}
+
+.admin-label-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.admin-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #888;
+  white-space: nowrap;
+}
+
+.flex-grow {
+  flex: 1 1 180px;
+  min-width: 100px;
+}
+
+.pfx-name-input {
+  width: 100px;
+  flex: 0 0 100px;
+  font-family: monospace;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUTTONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .12s, opacity .12s;
+  white-space: nowrap;
+}
+
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+.btn-primary { background: #9ACD32; color: #111; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: #83b026; }
+
+.btn-secondary { background: #e4e4e4; color: #333; }
+.btn-secondary:hover:not(:disabled) { background: #d0d0d0; }
+
+.btn-danger {
+  background: none;
+  border: 1px solid #ddd;
+  color: #c0392b;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+.btn-danger:hover:not(:disabled) { background: #fdf0f0; border-color: #c0392b; }
+
+.btn-ghost {
+  background: none;
+  border: 1px solid #ddd;
+  color: #555;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+.btn-ghost:hover:not(:disabled) { background: #f5f5f5; border-color: #bbb; }
+
+.icon-btn i { font-size: 13px; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ITEM LISTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.list-empty {
+  font-size: 13px;
+  color: #bbb;
+  margin: 4px 0;
+}
+
+/* federation row */
+.fed-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  font-size: 13px;
+  transition: border-color .1s;
+}
+
+.fed-row:hover { border-color: #ddd; }
+
+.fed-dot {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #9ACD32;
+}
+
+.fed-label {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  color: #222;
+  font-size: 12px;
+}
+
+/* endpoint row */
+.ep-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  font-size: 13px;
+  transition: border-color .1s;
+}
+
+.ep-row:hover { border-color: #ddd; }
+
+.ep-dot {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ep-url {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 12px;
+  color: #222;
+}
+
+.ep-fed-tag {
+  font-size: 11px;
+  color: #888;
+  background: #f0f0f0;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: monospace;
+}
+
+.item-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PREFIX ROWS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.pfx-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 10px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: monospace;
+  transition: border-color .1s;
+}
+
+.pfx-row:hover { border-color: #ddd; }
+
+.pfx-name {
+  font-weight: 700;
+  color: #2980b9;
+  flex: 0 0 auto;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pfx-colon {
+  color: #aaa;
+  margin-right: 6px;
+  flex: 0 0 auto;
+}
+
+.pfx-uri {
+  flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #555;
+}
+
+/* ── Unnamed prefix rows ── */
+
+.unnamed-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fffbf0;
+  border: 1px solid #f0dfa0;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.unnamed-uri {
+  font-family: monospace;
+  color: #555;
+  word-break: break-all;
+}
+
+.unnamed-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* When prefix.cc suggests a known prefix */
+.prefixcc-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.prefixcc-label {
+  color: #888;
+}
+
+.prefixcc-name {
+  font-family: monospace;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+/* When the URI is genuinely unknown */
+.unnamed-name-input {
+  width: 110px;
+  flex: 0 0 110px;
+  font-family: monospace;
+  padding: 3px 7px;
+  font-size: 12px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COUNT BADGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.count-badge {
+  display: inline-block;
+  background: #e0e0e0;
+  color: #555;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  vertical-align: middle;
+  font-family: monospace;
+}
+
+.count-badge--warn {
+  background: #f0dfa0;
+  color: #7a6000;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   YASGUI PANEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.sparql-panel .card,
+#admin-yasgui {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+#admin-yasgui .yasgui {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  background-color: white;
+}
+
+/* Suppress YASGUI elements not needed in admin context */
+#admin-yasgui .autocompleteWrapper,
+#admin-yasgui .controlbar { display: none !important; }

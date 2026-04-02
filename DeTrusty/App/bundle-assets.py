@@ -1,4 +1,5 @@
 import os.path
+import shutil
 
 from cssmin import cssmin
 from rjsmin import jsmin
@@ -68,6 +69,7 @@ class Bundle(object):
 NPM_PATH = 'node_modules/'
 JS_PATH = 'js/'
 CSS_PATH = 'css/'
+WEBFONTS_PATH = os.path.join(Bundle.STATIC_FOLDER, 'webfonts/')
 
 bundles = {
     'yasgui_js': Bundle(
@@ -80,6 +82,11 @@ bundles = {
         filters='cssmin',
         output=CSS_PATH + 'yasgui.min.css'
     ),
+    'fontawesome_css': Bundle(
+        NPM_PATH + '@fortawesome/fontawesome-free/css/all.min.css',
+        filters='cssmin',
+        output=CSS_PATH + 'fontawesome.all.min.css'
+    ),
     'd3_js': Bundle(
         NPM_PATH + 'd3/dist/d3.min.js',
         filters='rjsmin',
@@ -90,3 +97,7 @@ bundles = {
 for name, bundle in bundles.items():
     print('    building bundle:', name)
     bundle.build()
+    if name == 'fontawesome_css':
+        # copy webfonts from Fontawesome
+        shutil.rmtree(WEBFONTS_PATH, ignore_errors=True)
+        shutil.copytree(os.path.join(NPM_PATH, '@fortawesome/fontawesome-free/webfonts'), WEBFONTS_PATH, dirs_exist_ok=True)

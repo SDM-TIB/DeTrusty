@@ -105,6 +105,11 @@ def query_editor_plan():
     return render_template('query-plan.jinja2', title='DeTrusty - Query Plan')
 
 
+@app.route('/admin', methods=['GET'])
+def federation_admin():
+    return render_template('federation-admin.jinja2', title='DeTrusty - Federation Admin')
+
+
 @app.route('/version', methods=['POST'])
 def version():
     """Returns the version of the running DeTrusty instance."""
@@ -201,6 +206,7 @@ def namespaces():
     """Return namespace URIs and declared prefixes — proxied from metadata service."""
     return _proxy('GET', '/namespaces', params=request.args)
 
+
 @app.route('/federation/sparql', methods=['GET', 'POST'])
 @require_admin
 def federation_sparql():
@@ -208,6 +214,14 @@ def federation_sparql():
     if request.method == 'POST':
         return _proxy('POST', '/sparql', data=request.form)
     return _proxy('GET', '/sparql', params=request.args)
+
+
+
+@app.route('/federation/endpoints', methods=['GET'])
+@require_admin
+def federation_endpoints():
+    """Return all registered endpoints for a federation — proxied from metadata service."""
+    return _proxy('GET', '/federation/endpoints', params=request.args)
 
 
 @app.route('/federation/endpoint', methods=['POST'])

@@ -100,6 +100,55 @@ def federations():
         return jsonify({'error': str(e)}), 500
 
 
+
+@app.route('/federation/endpoints', methods=['GET'])
+def federation_endpoints():
+    """Return all SPARQL endpoints registered in the metadata store.
+
+    Endpoints are stored as ``semsd:DataSource`` subjects whose URI is the
+    endpoint URL (see ``MTCreation.py``).
+
+    Query parameters
+    ----------------
+    federation : str, optional
+        Named graph URI to scope the lookup to a single federation.
+
+    Response shape::
+
+        {"endpoints": [{"url": "https://…/sparql", "federation": "https://…"}, …]}
+    """
+    federation = request.args.get('federation') or None
+    try:
+        if federation:
+            q = (
+                f'SELECT DISTINCT ?endpoint WHERE {{'
+                f'  GRAPH <{federation}> {{'
+                f'    ?endpoint a <{SEMSD.DataSource}> .'
+                f'  }}'
+                f'}} ORDER BY ?endpoint'
+            )
+        else:
+            q = (
+                f'SELECT DISTINCT ?endpoint ?fed WHERE {{'
+                f'  GRAPH ?fed {{'
+                f'    ?endpoint a <{SEMSD.DataSource}> .'
+                f'  }}'
+                f'}} ORDER BY ?fed ?endpoint'
+            )
+        results = _store.query(q, use_default_graph_as_union=True)
+        endpoints = []
+        for row in results:
+            if row['endpoint'] is None:
+                continue
+            entry = {'url': row['endpoint'].value}
+            g = row['fed'] if not federation else None
+            entry['federation'] = federation if federation else (g.value if g else None)
+            endpoints.append(entry)
+        return jsonify({'endpoints': endpoints})
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/classes', methods=['GET'])
 def classes():
     """Return all RDF Molecule classes in the metadata graph.
