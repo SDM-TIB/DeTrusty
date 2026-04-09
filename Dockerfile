@@ -1,4 +1,4 @@
-FROM python:3.12.12-slim-bookworm
+FROM python:3.12.13-slim-trixie
 MAINTAINER Philipp D. Rohde <philipp.rohde@tib.eu>
 
 # install system dependencies
