@@ -39,7 +39,7 @@ setuptools.setup(
         'DeTrusty.Wrapper',
         'DeTrusty.Wrapper.RDFWrapper'
     ],
-    install_requires=['requests>=2.32.0',
+    install_requires=['requests>=2.34.2',
                       'ply==3.11',
                       'rdflib>=6.0.0',
                       'python-dateutil>=2.8.0',
