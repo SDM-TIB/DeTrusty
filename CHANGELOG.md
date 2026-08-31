@@ -1,3 +1,10 @@
+# v0.25.0 - 31 Aug 2026
+- Fix `DecompositionType` enum for Python 3.13+
+- Update dependencies
+- Drop support for
+  - Python 3.9
+  - Python 3.10
+
 # v0.24.0 - 12 Mar 2026
 - Add capability to parse `;` and `,` shorthand
 - Fix endpoint list in `FederationConfig`
