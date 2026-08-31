@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeTrusty as a Service &mdash; DeTrusty 0.24.0 documentation</title>
+  <title>DeTrusty as a Service &mdash; DeTrusty 0.25.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=f10f1a72"></script>
+        <script src="_static/documentation_options.js?v=e3c92668"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.24.0
+                0.25.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -223,52 +223,52 @@ The base URL in this example is <a class="reference external" href="localhost:50
 <p>The optional <code class="docutils literal notranslate"><span class="pre">federation</span></code> parameter restricts source selection to the endpoints registered under the given named graph URI.
 If omitted, DeTrusty queries across all available endpoints.</p>
 <p>Example call (all federations):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3&quot;</span><span class="w"> </span>localhost:5000/sparql
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">"query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3"</span><span class="w"> </span>localhost:5000/sparql
 </pre></div>
 </div>
 <p>Example call (specific federation):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;federation=https://research.tib.eu/semantic-source-description#K4COVID&quot;</span><span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-d<span class="w"> </span><span class="s2">"query=SELECT DISTINCT ?covidDrug WHERE { ?treatment &lt;http://research.tib.eu/covid-19/vocab/hasCovidDrug&gt; ?covidDrug . } LIMIT 3"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">"federation=https://research.tib.eu/semantic-source-description#K4COVID"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>localhost:5000/sparql
 </pre></div>
 </div>
 <p>Example result:</p>
 <div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;cardinality&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;execution_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.07238245010375977</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;head&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;vars&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="s2">&quot;covidDrug&quot;</span>
+<span class="w">  </span><span class="nt">"cardinality"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"execution_time"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.07238245010375977</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"head"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"vars"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"covidDrug"</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;output_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;results&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;bindings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"output_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"results"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"bindings"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;__meta__&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;is_verified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="nt">"__meta__"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"is_verified"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;covidDrug&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uri&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://research.tib.eu/covid-19/entity/DB00207&quot;</span>
+<span class="w">        </span><span class="nt">"covidDrug"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uri"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://research.tib.eu/covid-19/entity/DB00207"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;__meta__&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;is_verified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="nt">"__meta__"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"is_verified"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;covidDrug&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uri&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://research.tib.eu/covid-19/entity/DB00381&quot;</span>
+<span class="w">        </span><span class="nt">"covidDrug"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uri"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://research.tib.eu/covid-19/entity/DB00381"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;__meta__&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;is_verified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="nt">"__meta__"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"is_verified"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;covidDrug&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uri&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://research.tib.eu/covid-19/entity/DB00503&quot;</span>
+<span class="w">        </span><span class="nt">"covidDrug"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uri"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://research.tib.eu/covid-19/entity/DB00503"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
@@ -296,9 +296,9 @@ The response is used by the Web interface to populate the federation selector, b
 </div>
 <p>Example output:</p>
 <div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;federations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;https://research.tib.eu/semantic-source-description#CoyPu&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;https://research.tib.eu/semantic-source-description#K4COVID&quot;</span>
+<span class="w">  </span><span class="nt">"federations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">"https://research.tib.eu/semantic-source-description#CoyPu"</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">"https://research.tib.eu/semantic-source-description#K4COVID"</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
@@ -327,14 +327,14 @@ All requests must carry the header <code class="docutils literal notranslate"><s
 </ul>
 <p>Example call:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer mysecretkey&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;endpoint=https://example.org/sparql&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;federation=https://research.tib.eu/semantic-source-description#K4COVID&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer mysecretkey"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">"endpoint=https://example.org/sparql"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">"federation=https://research.tib.eu/semantic-source-description#K4COVID"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>localhost:5000/federation/endpoint
 </pre></div>
 </div>
 <p>Example output:</p>
-<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://example.org/sparql&quot;</span><span class="p">}</span>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ok"</span><span class="p">,</span><span class="w"> </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://example.org/sparql"</span><span class="p">}</span>
 </pre></div>
 </div>
 </section>
@@ -348,14 +348,14 @@ All requests must carry the header <code class="docutils literal notranslate"><s
 </ul>
 <p>Example call:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer mysecretkey&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;endpoint=https://example.org/sparql&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;federation=https://research.tib.eu/semantic-source-description#K4COVID&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer mysecretkey"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">"endpoint=https://example.org/sparql"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">"federation=https://research.tib.eu/semantic-source-description#K4COVID"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>localhost:5000/federation/endpoint
 </pre></div>
 </div>
 <p>Example output:</p>
-<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://example.org/sparql&quot;</span><span class="p">}</span>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ok"</span><span class="p">,</span><span class="w"> </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://example.org/sparql"</span><span class="p">}</span>
 </pre></div>
 </div>
 </section>
@@ -365,8 +365,8 @@ All requests must carry the header <code class="docutils literal notranslate"><s
 Both <code class="docutils literal notranslate"><span class="pre">GET</span></code> and <code class="docutils literal notranslate"><span class="pre">POST</span></code> are supported.</p>
 <p>Example call:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer mysecretkey&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer mysecretkey"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">"query=SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>localhost:5000/federation/sparql
 </pre></div>
 </div>

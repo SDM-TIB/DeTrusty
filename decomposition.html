@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decomposition Types &mdash; DeTrusty 0.24.0 documentation</title>
+  <title>Decomposition Types &mdash; DeTrusty 0.25.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=f10f1a72"></script>
+        <script src="_static/documentation_options.js?v=e3c92668"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.24.0
+                0.25.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -113,13 +113,13 @@ This decomposition type may lead to very expensive query plans.</p>
 </section>
 <section id="exclusive-groups">
 <h2>Exclusive Groups<a class="headerlink" href="#exclusive-groups" title="Link to this heading"></a></h2>
-<p>When using <em>Exclusive Groups</em> <span id="id1">[<a class="reference internal" href="reference.html#id4" title="Andreas Schwarte, Peter Haase, Katja Hose, Ralf Schenkel, and Michael Schmidt. FedX: Optimization Techniques for Federated Query Processing on Linked Data. In The Semantic Web – ISWC 2011, 601–616. Berlin, Heidelberg, 2011. Springer. doi:10.1007/978-3-642-25073-6_38.">2</a>]</span>, the query is decomposed in such a way that each sub-query consists of triple patterns that can be exclusively answered by one source.
+<p>When using <em>Exclusive Groups</em> <span class="bibtex-citation" id="id1">[<a class="reference internal" href="reference.html#id4" title="Andreas Schwarte, Peter Haase, Katja Hose, Ralf Schenkel, and Michael Schmidt. FedX: Optimization Techniques for Federated Query Processing on Linked Data. In The Semantic Web – ISWC 2011, 601–616. Berlin, Heidelberg, 2011. Springer. doi:10.1007/978-3-642-25073-6_38.">2</a>]</span>, the query is decomposed in such a way that each sub-query consists of triple patterns that can be exclusively answered by one source.
 Triple patterns with predicates occurring in several sources produce single-triple-pattern sub-queries that are executed by all sources that serve the predicate.
 Hence, queries with predicates that occur in multiple sources may be expensive following this type of decomposition.</p>
 </section>
 <section id="star-shaped-sub-queries">
 <h2>Star-shaped Sub-queries<a class="headerlink" href="#star-shaped-sub-queries" title="Link to this heading"></a></h2>
-<p>Following the <em>star-shaped sub-queries</em> decomposition <span id="id2">[<a class="reference internal" href="reference.html#id5" title="Maria-Esther Vidal, Edna Ruckhaus, Tomas Lampo, Amad\'ıs Mart\'ınez, Javier Sierra, and Axel Polleres. Efficiently Joining Group Patterns in SPARQL Queries. In The Semantic Web: Research and Applications. ESWC 2010, 228–242. Berlin, Heidelberg, 2010. Springer. doi:10.1007/978-3-642-13486-9_16.">3</a>]</span>, the query is decomposed in such a way that the triple patterns with the same subject form one sub-query.
+<p>Following the <em>star-shaped sub-queries</em> decomposition <span class="bibtex-citation" id="id2">[<a class="reference internal" href="reference.html#id5" title="Maria-Esther Vidal, Edna Ruckhaus, Tomas Lampo, Amad\'ıs Mart\'ınez, Javier Sierra, and Axel Polleres. Efficiently Joining Group Patterns in SPARQL Queries. In The Semantic Web: Research and Applications. ESWC 2010, 228–242. Berlin, Heidelberg, 2010. Springer. doi:10.1007/978-3-642-13486-9_16.">3</a>]</span>, the query is decomposed in such a way that the triple patterns with the same subject form one sub-query.
 This mitigates the previously mentioned issue of predicates occurring in several sources since the combination of all predicates belonging to the sub-query is preferred.</p>
 </section>
 <section id="combined-star-shaped-sub-queries">
@@ -181,16 +181,16 @@ The statistics and execution times were collected on 2023-10-10 and are subject 
     <span class="nv">?indicator</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasCountry</span> <span class="nv">?country</span> <span class="p">.</span>
     <span class="nv">?indicator</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">hasValue</span> <span class="nv">?value</span> <span class="p">.</span>
     <span class="nv">?indicator</span> <span class="nn">time</span><span class="p">:</span><span class="nt">year</span> <span class="nv">?year</span> <span class="p">.</span>
-    <span class="nv">?country</span> <span class="nn">dc</span><span class="p">:</span><span class="nt">identifier</span> <span class="s">&#39;DEU&#39;</span> <span class="p">.</span>
+    <span class="nv">?country</span> <span class="nn">dc</span><span class="p">:</span><span class="nt">identifier</span> <span class="s">'DEU'</span> <span class="p">.</span>
 
     <span class="nv">?indicator1</span> <span class="k">a</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">AnnualIndicatorEntry</span> <span class="p">.</span>
     <span class="nv">?indicator1</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasIndicator</span> <span class="nl">&lt;http://worldbank.org/Indicator/EN.ATM.CO2E.KT&gt;</span> <span class="p">.</span>
     <span class="nv">?indicator1</span> <span class="nn">wb</span><span class="p">:</span><span class="nt">hasCountry</span> <span class="nv">?country1</span> <span class="p">.</span>
     <span class="nv">?indicator1</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">hasValue</span> <span class="nv">?value1</span> <span class="p">.</span>
     <span class="nv">?indicator1</span> <span class="nn">time</span><span class="p">:</span><span class="nt">year</span> <span class="nv">?year</span> <span class="p">.</span>
-    <span class="nv">?country</span> <span class="nn">dc</span><span class="p">:</span><span class="nt">identifier</span> <span class="s">&#39;DEU&#39;</span> <span class="p">.</span>
+    <span class="nv">?country</span> <span class="nn">dc</span><span class="p">:</span><span class="nt">identifier</span> <span class="s">'DEU'</span> <span class="p">.</span>
 
-    <span class="nv">?countryWiki</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P298</span> <span class="s">&#39;DEU&#39;</span> <span class="p">.</span>
+    <span class="nv">?countryWiki</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P298</span> <span class="s">'DEU'</span> <span class="p">.</span>
     <span class="nv">?countryWiki</span> <span class="nn">p</span><span class="p">:</span><span class="nt">P1082</span> <span class="nv">?itemP</span> <span class="p">.</span>
     <span class="nv">?itemP</span> <span class="nn">pq</span><span class="p">:</span><span class="nt">P585</span> <span class="nv">?time</span><span class="p">.</span>
     <span class="nv">?itemP</span> <span class="nn">ps</span><span class="p">:</span><span class="nt">P1082</span> <span class="nv">?population</span> <span class="p">.</span>
