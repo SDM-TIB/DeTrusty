@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@zazuko/yasgui": "4.6.1",
+    "@zazuko/yasgui": "4.6.2",
     "@fortawesome/fontawesome-free": "7.3.1",
     "d3": "7.9.0"
   }
