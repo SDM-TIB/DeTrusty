@@ -1,7 +1,7 @@
 __author__ = 'Kemele M. Endris and Philipp D. Rohde'
 
 import collections
-from enum import Enum
+from enum import Enum, member
 from functools import partial
 
 from DeTrusty.Decomposer import Tree, utils
@@ -873,9 +873,9 @@ class Decomposer(object):
 
 class DecompositionType(Enum):
 
-    STAR = partial(Decomposer.decomposeBGP)
-    EG = partial(Decomposer.decompose_exclusive_groups)
-    TRIPLE = partial(Decomposer.decompose_triple_wise)
+    STAR = member(partial(Decomposer.decomposeBGP))
+    EG = member(partial(Decomposer.decompose_exclusive_groups))
+    TRIPLE = member(partial(Decomposer.decompose_triple_wise))
 
     def decompose(self, decomposer, tl):
         return self.value(decomposer, tl)
