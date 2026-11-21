@@ -4,4 +4,4 @@ Werkzeug==3.1.9
 ply==3.11
 rdflib==6.3.2
 python-dateutil==2.9.0.post0
-pyoxigraph==0.5.11
+pyoxigraph==0.5.13
