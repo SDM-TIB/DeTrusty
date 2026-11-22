@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Source Descriptions &mdash; DeTrusty 0.14.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=ade8e72c" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2dee5df9"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Decomposition Types" href="decomposition.html" />
+    <link rel="prev" title="DeTrusty" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Source Descriptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decomposition.html">Decomposition Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="library.html">DeTrusty as a Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">DeTrusty as a Service</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeTrusty</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Source Descriptions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="source-descriptions">
+<h1>Source Descriptions<a class="headerlink" href="#source-descriptions" title="Link to this heading"></a></h1>
+<p>In distributed systems, queries are answered by more than one source.
+The system needs to decide which source or sources contribute to which part of the query.
+Throughout this text the information the distributed system has about the different sources is called <em>source descriptions</em>.
+There are several approaches when it comes to source descriptions in federations of knowledge graphs.
+Some of these approaches are as simple as an index tracking which source is serving which RDF properties.
+DeTrusty follows the <em>RDF Molecule Template</em> <span class="bibtex-citation" id="id1">[<a class="reference internal" href="reference.html#id2" title="Kemele M. Endris, Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. Querying Interlinked Data by Bridging RDF Molecule Templates. In Transactions on Large-Scale Data- and Knowledge-Centered Systems XXXIX, volume 11310, pages 1–42. Springer, Berlin, Heidelberg, 11 2018. doi:10.1007/978-3-662-58415-6_1.">1</a>]</span> approach as proposed by Endris et al.</p>
+<p>RDF Molecule Templates are a fine-grained description of an RDF dataset as well as its connections with other datasets.
+An RDF Molecule corresponds to an RDF class and keeps track which RDF properties are related to the instances of said RDF class.
+While this inherently records the domain of the property, the range of the properties is also recorded.
+Since an RDF class can be served by more than just one dataset, this information is also encoded in the RDF Molecule Template.
+For more information and a formal definition, we refer the reader to <span class="bibtex-citation" id="id2">[<a class="reference internal" href="reference.html#id2" title="Kemele M. Endris, Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. Querying Interlinked Data by Bridging RDF Molecule Templates. In Transactions on Large-Scale Data- and Knowledge-Centered Systems XXXIX, volume 11310, pages 1–42. Springer, Berlin, Heidelberg, 11 2018. doi:10.1007/978-3-662-58415-6_1.">1</a>]</span>.
+See below for an example based on FOAF.</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"rootType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://xmlns.com/foaf/0.1/Person"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"predicates"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"predicate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://xmlns.com/foaf/0.1/interest"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"http://xmlns.com/foaf/0.1/Document"</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"predicate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://xmlns.com/foaf/0.1/knows"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"http://xmlns.com/foaf/0.1/Person"</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"predicate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://xmlns.com/foaf/0.1/name"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"linkedTo"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"http://xmlns.com/foaf/0.1/Document"</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">"http://xmlns.com/foaf/0.1/Person"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"wrappers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://example.com/sparql"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"predicates"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"http://xmlns.com/foaf/0.1/interest"</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"urlparam"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://private.example.com/sparql"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"predicates"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"http://xmlns.com/foaf/0.1/knows"</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">"http://xmlns.com/foaf/0.1/name"</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"urlparam"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example_user"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"rootType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://xmlns.com/foaf/0.1/Document"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"predicates"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"predicate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://xmlns.com/foaf/0.1/topic"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"range"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">"linkedTo"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">"wrappers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://example.com/sparql"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"predicates"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"http://xmlns.com/foaf/0.1/topic"</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"urlparam"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="DeTrusty" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decomposition.html" class="btn btn-neutral float-right" title="Decomposition Types" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Philipp D. Rohde, Avellino and Mazen Bechara.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> DeTrusty</span>
+    v0.14.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>Releases</dt>
+      <dd><a href="../v0.25.0/source_description.html">v0.25.0 (latest)</a></dd>
+      <dd><a href="../v0.24.0/source_description.html">v0.24.0</a></dd>
+      <dd><a href="../v0.23.0/source_description.html">v0.23.0</a></dd>
+      <dd><a href="../v0.22.0/source_description.html">v0.22.0</a></dd>
+      <dd><a href="../v0.21.2/source_description.html">v0.21.2</a></dd>
+      <dd><a href="../v0.20.2/source_description.html">v0.20.2</a></dd>
+      <dd><a href="../v0.19.1/source_description.html">v0.19.1</a></dd>
+      <dd><a href="../v0.18.3/source_description.html">v0.18.3</a></dd>
+      <dd><a href="../v0.17.0/source_description.html">v0.17.0</a></dd>
+      <dd><a href="../v0.16.1/source_description.html">v0.16.1</a></dd>
+      <dd><a href="../v0.15.6/source_description.html">v0.15.6</a></dd>
+      <dd><a href="source_description.html">v0.14.0</a></dd>
+      <dd><a href="../v0.13.2/source_description.html">v0.13.2</a></dd>
+      <dd><a href="../v0.12.3/index.html">v0.12.3</a></dd>
+    </dl>
+  </div>
+</div>
+
+<style>.wy-side-nav-search > div.version { display: none; }</style><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
