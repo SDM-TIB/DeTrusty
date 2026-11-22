@@ -28,7 +28,7 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) build/html
 
 multiversion:
-	sphinx-multiversion $(SPHINXOPTS) . build/html
+	sphinx-multiversion $(SPHINXOPTS) -D html_context.release_order=$$(python3 -c 'import conf; print(conf.RELEASE_ORDER)') . build/html
 	python3 build_root.py
 	@echo
 	@echo "Build finished. The HTML pages are in build/html."

@@ -103,7 +103,7 @@ intersphinx_mapping = {
 
 # -- Options for sphinx-multiversion ------------------------------------------
 # Docs exist from v0.12.2 on. Only the latest patch release of each minor series
-# is built (e.g., v0.15.6 for 0.15.x), published as /v0.15/.
+# is built (e.g., v0.15.6 for 0.15.x) and published as /v0.15.6/.
 FIRST_DOCUMENTED = (0, 12, 2)
 
 
@@ -122,7 +122,10 @@ def _latest_patch_tags():
     return ['v%d.%d.%d' % v for v in best.values()]
 
 
-_TAGS = _latest_patch_tags()
+_TAGS = sorted(_latest_patch_tags(), key=lambda t: tuple(int(x) for x in t[1:].split('.')), reverse=True)
+# sphinx-multiversion sorts the refs alphabetically (e.g., v0.100.0 < v0.99.0). The Makefile hands
+# this newest-first order to the templates via `-D html_context.release_order=...`.
+RELEASE_ORDER = ','.join(_TAGS)
 smv_tag_whitelist = r'^(%s)$' % '|'.join(re.escape(t) for t in _TAGS) if _TAGS else r'^$'
 smv_branch_whitelist = r'^$'
 smv_remote_whitelist = None
