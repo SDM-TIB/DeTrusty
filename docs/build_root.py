@@ -2,6 +2,8 @@
 """Post-processing of the multi-version build in build/html.
 
 * Finds the newest release (e.g., v0.25.0).
+* Publishes a copy of it as /latest/, a stable URL that always serves the newest release
+  (also for future releases, as the copy is regenerated on every build).
 * For every HTML page of that release, writes a redirect stub at the same path
   in the site root, so that old, unversioned URLs (e.g., /changelog.html) keep working
   and always point to the latest release -- also for future releases, as the stubs
@@ -28,6 +30,12 @@ if not tags:
     raise SystemExit('No release docs found in build/html')
 latest = tags[-1]
 
+# stable URL for the newest release
+latest_dir = root / "latest"
+if latest_dir.exists():
+    shutil.rmtree(latest_dir)
+shutil.copytree(root / latest, latest_dir)
+
 count = 0
 for page in (root / latest).rglob('*.html'):
     rel = page.relative_to(root / latest)
@@ -43,4 +51,4 @@ for page in (root / latest).rglob('*.html'):
 if (root / latest / 'objects.inv').exists():
     shutil.copy(root / latest / 'objects.inv', root / 'objects.inv')
 (root / '.nojekyll').touch()
-print(f'Latest release: {latest}; {count} redirect stubs written; versions: {", ".join(tags)}')
+print(f'Latest release: {latest} (also copied to latest/); {count} redirect stubs written; versions: {", ".join(tags)}')

@@ -20,6 +20,7 @@ The docs are built with [sphinx-multiversion](https://holzhaus.github.io/sphinx-
 Documentation exists from v0.12.2 on; older tags are skipped automatically.
 Which tags are built is decided in `conf.py` (`_latest_patch_tags()`).
 `index.html` at the root redirects to the newest release.
+The newest release is additionally served at the stable URL `/latest/` (a copy that is refreshed on every build).
 A version switcher is rendered by `_templates/versions.html`.
 
 When a release is published, the `Deploy Docs` workflow rebuilds all versions and replaces the content of `gh-pages`.
