@@ -5,6 +5,8 @@
 
 # -- Path setup --------------------------------------------------------------
 import os
+import re
+import subprocess
 import sys
 sys.path.insert(0, os.path.abspath('../'))
 from DeTrusty import __version__
@@ -25,6 +27,7 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_multiversion',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
@@ -76,7 +79,7 @@ autosummary_generate = True
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'logo_only': True,
-    'display_version': True,
+    'display_version': False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -96,3 +99,36 @@ html_copy_source = False
 intersphinx_mapping = {
     'python': ('https://docs.python.org/{.major}'.format(sys.version_info), None),
 }
+
+
+# -- Options for sphinx-multiversion ------------------------------------------
+# Docs exist from v0.12.2 on. Only the latest patch release of each minor series
+# is built (e.g., v0.15.6 for 0.15.x), published as /v0.15/.
+FIRST_DOCUMENTED = (0, 12, 2)
+
+
+def _latest_patch_tags():
+    out = subprocess.run(['git', 'tag'], capture_output=True, text=True, cwd=os.path.dirname(__file__) or '.').stdout
+    best = {}
+    for tag in out.split():
+        m = re.fullmatch(r'v(\d+)\.(\d+)\.(\d+)', tag)
+        if not m:
+            continue
+        ver = tuple(int(g) for g in m.groups())
+        if ver < FIRST_DOCUMENTED:
+            continue
+        if ver[:2] not in best or ver > best[ver[:2]]:
+            best[ver[:2]] = ver
+    return ['v%d.%d.%d' % v for v in best.values()]
+
+
+_TAGS = _latest_patch_tags()
+smv_tag_whitelist = r'^(%s)$' % '|'.join(re.escape(t) for t in _TAGS) if _TAGS else r'^$'
+smv_branch_whitelist = r'^$'
+smv_remote_whitelist = None
+smv_latest_version = 'latest'
+smv_outputdir_format = '{ref.name}'
+
+# Render the version switcher on every page (and in all versions, since
+# sphinx-multiversion uses the templates of the ref it is run from).
+html_sidebars = {'**': ['versions.html']}

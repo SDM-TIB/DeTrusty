@@ -17,6 +17,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v6
+      with:
+        fetch-depth: 0  # full history and all tags; needed to build the docs of older releases
+        fetch-tags: true
     - name: Checkout gh-pages
       uses: actions/checkout@v6
       with:
