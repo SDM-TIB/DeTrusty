@@ -106,3 +106,20 @@
     max-width: 100%;
   }
 }
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: #fff;
+  color: #222;
+  font-family: sans-serif;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.skip-link:focus {
+  top: 8px;
+}

@@ -9,13 +9,16 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-<nav class="navbar">
-    <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active"{% endif %}>Home</a>
-    <a href="{{ url_for('query_editor') }}" {% if request.endpoint == 'query_editor' %}class="active"{% endif %}>Query Editor</a>
-    <a href="{{ url_for('query_editor_plan') }}" {% if request.endpoint == 'query_editor_plan' %}class="active"{% endif %}>Query Plan</a>
-    <a href="{{ url_for('federation_admin') }}" {% if request.endpoint == 'federation_admin' %}class="active"{% endif %}>Admin</a>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar" aria-label="Main">
+    <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active" aria-current="page"{% endif %}>Home</a>
+    <a href="{{ url_for('query_editor') }}" {% if request.endpoint == 'query_editor' %}class="active" aria-current="page"{% endif %}>Query Editor</a>
+    <a href="{{ url_for('query_editor_plan') }}" {% if request.endpoint == 'query_editor_plan' %}class="active" aria-current="page"{% endif %}>Query Plan</a>
+    <a href="{{ url_for('federation_admin') }}" {% if request.endpoint == 'federation_admin' %}class="active" aria-current="page"{% endif %}>Admin</a>
     <span class="navbar-version">{{ version_string }}</span>
 </nav>
+<div id="main-content" tabindex="-1">
 {% block content %}{% endblock %}
+</div>
 </body>
 </html>
