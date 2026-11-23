@@ -2,6 +2,7 @@
 
 {% block head %}
   <link href="{{ url_for('static', filename='css/detrusty-home.css') }}" rel="stylesheet" type="text/css" />
+  <script src="{{ url_for('static', filename='js/detrusty-home.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -11,5 +12,40 @@
   <p class="home-description">DeTrusty enables querying across multiple SPARQL endpoints simultaneously.
   It decomposes queries based on molecule templates that describe the data available at each
   endpoint, produces an optimized execution plan, and federates the sub-queries accordingly.</p>
+
+  <p id="home-status" class="home-status" data-federations-endpoint="{{ url_for('federations') }}" hidden></p>
+
+  <ul class="home-actions">
+    <li>
+      <a class="home-action" href="{{ url_for('query_editor') }}">
+        <span class="home-action-title">Run a query</span>
+        <span class="home-action-text">Write SPARQL and see results from all endpoints in the federation.</span>
+      </a>
+    </li>
+    <li>
+      <a class="home-action" href="{{ url_for('query_editor_plan') }}">
+        <span class="home-action-title">Inspect a query plan</span>
+        <span class="home-action-text">See how a query is decomposed and which endpoint answers each part.</span>
+      </a>
+    </li>
+    <li>
+      <a class="home-action" href="{{ url_for('federation_admin') }}">
+        <span class="home-action-title">Manage the federation</span>
+        <span class="home-action-text">Add or remove endpoints and prefixes (requires an admin token).</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="home-example">
+    New here?
+    <button type="button" id="btn-example" class="home-link-button"
+            data-editor-url="{{ url_for('query_editor') }}">Open an example query in the editor</button>
+    to list the classes available in your federation.
+  </p>
+
+  <p class="home-links">
+    <a href="https://sdm-tib.github.io/DeTrusty/">Documentation</a>
+    <a href="https://github.com/SDM-TIB/DeTrusty">Source code on GitHub</a>
+  </p>
 </div>
 {% endblock %}
