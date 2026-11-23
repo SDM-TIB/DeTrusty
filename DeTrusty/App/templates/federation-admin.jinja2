@@ -237,6 +237,19 @@
   </div>
 </div>
 
+{# ── Confirmation dialog (used instead of window.confirm) ────────────── #}
+<dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+  <form method="dialog">
+    <h3 id="confirm-title" class="confirm-title"></h3>
+    <p id="confirm-message" class="confirm-message"></p>
+    <pre id="confirm-detail" class="confirm-detail"></pre>
+    <div class="confirm-actions">
+      <button type="submit" value="cancel" class="btn btn-secondary" autofocus>Cancel</button>
+      <button type="submit" value="confirm" id="confirm-ok" class="btn btn-danger-solid"></button>
+    </div>
+  </form>
+</dialog>
+
 <script src="{{ url_for('static', filename='js/yasgui.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/detrusty-admin.js') }}"></script>
 {% endblock %}

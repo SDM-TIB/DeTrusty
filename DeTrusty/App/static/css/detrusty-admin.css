@@ -430,6 +430,9 @@
 .btn-secondary { background: #e4e4e4; color: #333; }
 .btn-secondary:hover:not(:disabled) { background: #d0d0d0; }
 
+.btn-danger-solid { background: #c0392b; color: #fff; font-weight: 600; }
+.btn-danger-solid:hover:not(:disabled) { background: #a93226; }
+
 .btn-danger {
   background: none;
   border: 1px solid #ddd;
@@ -738,4 +741,53 @@
   .login-row {
     flex-direction: column;
   }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CONFIRMATION DIALOG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.confirm-dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 24px 28px 20px;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  font-family: sans-serif;
+  box-shadow: 0 8px 40px rgba(0,0,0,.45);
+}
+
+.confirm-dialog::backdrop { background: rgba(0,0,0,.5); }
+
+.confirm-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  color: #222;
+}
+
+.confirm-message {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.confirm-message:empty { display: none; }
+
+.confirm-detail {
+  margin: 0 0 18px;
+  padding: 8px 10px;
+  background: #f4f4f4;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.confirm-detail[hidden] { display: none; }
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }

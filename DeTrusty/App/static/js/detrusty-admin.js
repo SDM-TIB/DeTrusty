@@ -506,8 +506,40 @@ async function addEndpoint() {
   loadEndpoints();
 }
 
+// ── Confirmation dialog ──────────────────────────────────────────────────────
+// Replaces window.confirm(). Resolves to true only if the user explicitly
+// confirms; Escape, Cancel, and clicking the backdrop all resolve to false.
+function confirmDialog({ title, message = '', detail = '', confirmLabel = 'Remove' }) {
+  const dlg = document.getElementById('confirm-dialog');
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+  const $detail = document.getElementById('confirm-detail');
+  $detail.textContent = detail;
+  $detail.hidden = !detail;
+  document.getElementById('confirm-ok').textContent = confirmLabel;
+
+  return new Promise(resolve => {
+    const onClose = () => {
+      dlg.removeEventListener('close', onClose);
+      dlg.removeEventListener('click', onBackdrop);
+      resolve(dlg.returnValue === 'confirm');
+    };
+    const onBackdrop = e => { if (e.target === dlg) dlg.close('cancel'); };
+    dlg.returnValue = '';
+    dlg.addEventListener('close', onClose);
+    dlg.addEventListener('click', onBackdrop);
+    dlg.showModal();
+  });
+}
+
 async function deleteEndpoint(url, graph, rowEl) {
-  if (!confirm(`Remove endpoint:\n${url}${graph ? '\nfrom federation: ' + graph : ''}?`)) return;
+  const confirmed = await confirmDialog({
+    title: 'Remove endpoint?',
+    message: graph ? `It will be removed from the federation ${graph}.` : 'It will be removed from the federation.',
+    detail: url,
+    confirmLabel: 'Remove endpoint'
+  });
+  if (!confirmed) return;
 
   const form = new FormData();
   form.append('endpoint', url);
@@ -791,7 +823,14 @@ async function savePrefix(name, uri, federation) {
 }
 
 async function deletePrefix(name, uri, federation, rowEl) {
-  if (rowEl && !confirm(`Remove prefix${name ? ' "' + name + ':"' : ''}?\n${uri}`)) return false;
+  if (rowEl) {
+    const confirmed = await confirmDialog({
+      title: name ? `Remove prefix "${name}:"?` : 'Remove namespace?',
+      detail: uri,
+      confirmLabel: 'Remove prefix'
+    });
+    if (!confirmed) return false;
+  }
 
   const form = new FormData();
   if (name) form.append('name', name);
@@ -835,7 +874,12 @@ document.getElementById('btn-cleanup-unnamed').addEventListener('click', async (
   const toRemove = rows.filter(r => r.querySelector('.prefixcc-name'));
   if (!toRemove.length) { showBanner('No redundant namespaces to remove.', 'success'); return; }
 
-  if (!confirm(`Remove ${toRemove.length} namespace(s) already covered by prefix.cc?`)) return;
+  const confirmed = await confirmDialog({
+    title: `Remove ${toRemove.length} namespace(s)?`,
+    message: 'These namespaces are already covered by prefix.cc.',
+    confirmLabel: 'Remove all'
+  });
+  if (!confirmed) return;
 
   let removed = 0;
   for (const r of toRemove) {
