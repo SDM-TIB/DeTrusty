@@ -24,6 +24,7 @@
   border-radius: 8px;
   padding: 36px 40px 32px;
   width: 380px;
+  max-width: calc(100vw - 32px);
   box-shadow: 0 8px 40px rgba(0,0,0,.45);
   text-align: center;
 }
@@ -692,3 +693,49 @@
 /* Suppress YASGUI elements not needed in admin context */
 #admin-yasgui .autocompleteWrapper,
 #admin-yasgui .controlbar { display: none !important; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NARROW SCREENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@media (max-width: 720px) {
+  #admin-app {
+    height: auto;
+    min-height: calc(100vh - 48px);
+    overflow: visible;
+  }
+
+  .admin-layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .admin-sidebar {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    flex: 1 1 auto;
+    overflow-x: auto;
+  }
+
+  .admin-tab {
+    white-space: nowrap;
+  }
+
+  .admin-main {
+    overflow-y: visible;
+    padding: 16px 12px;
+  }
+
+  .login-row {
+    flex-direction: column;
+  }
+}
