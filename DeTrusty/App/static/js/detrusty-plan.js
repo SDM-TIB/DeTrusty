@@ -122,11 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dot.className = 'endpoint-dot';
             dot.style.background = endpointColor(details[ssq]['endpoint'], endpoints_list);
             const label = document.createElement('span');
-            label.innerHTML = '<b>' + ssq + '</b><br>'
-                + '<span class="detail-label">Endpoint:</span> '
-                + '<code>' + details[ssq]['endpoint'] + '</code><br>'
-                + '<span class="detail-label">Triples:</span><br>'
-                + '<pre>' + details[ssq]['triples'] + '</pre>';
+            appendDetails(label, ssq, details[ssq], 'detail-label', true);
             li.appendChild(dot);
             li.appendChild(label);
             ssq_list.appendChild(li);
@@ -207,11 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     tooltip.style.display = 'block';
                     tooltip.style.left = (event.pageX + 14) + 'px';
                     tooltip.style.top = (event.pageY - 28) + 'px';
-                    tooltip.innerHTML = '<strong>' + d.data.name + '</strong><br>'
-                        + '<span class="tt-label">Endpoint:</span> '
-                        + ssqDetails['endpoint'] + '<br>'
-                        + '<span class="tt-label">Triples:</span><br><pre>'
-                        + ssqDetails['triples'] + '</pre>';
+                    tooltip.textContent = '';
+                    appendDetails(tooltip, d.data.name, ssqDetails, 'tt-label', false);
                 })
                 .on('mouseleave', function () {
                     tooltip.style.display = 'none';
@@ -455,6 +448,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 toolbar.appendChild(btn);
             });
         }
+    }
+
+    /**
+     * Append the details of a sub-query to a container using DOM nodes only.
+     * Endpoint URLs, sub-query names and triple patterns originate from the
+     * query and the data sources, so they must never be parsed as HTML.
+     */
+    function appendDetails(container, name, info, labelClass, endpointAsCode) {
+        const title = document.createElement(endpointAsCode ? 'b' : 'strong');
+        title.textContent = name;
+        container.appendChild(title);
+        container.appendChild(document.createElement('br'));
+
+        const epLabel = document.createElement('span');
+        epLabel.className = labelClass;
+        epLabel.textContent = 'Endpoint:';
+        container.appendChild(epLabel);
+        container.appendChild(document.createTextNode(' '));
+        if (endpointAsCode) {
+            const code = document.createElement('code');
+            code.textContent = info['endpoint'];
+            container.appendChild(code);
+        } else {
+            container.appendChild(document.createTextNode(info['endpoint']));
+        }
+        container.appendChild(document.createElement('br'));
+
+        const trLabel = document.createElement('span');
+        trLabel.className = labelClass;
+        trLabel.textContent = 'Triples:';
+        container.appendChild(trLabel);
+        container.appendChild(document.createElement('br'));
+        const pre = document.createElement('pre');
+        pre.textContent = info['triples'];
+        container.appendChild(pre);
     }
 
     function buildLegend(endpoints_list) {
