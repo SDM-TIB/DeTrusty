@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
               pluginButtons: function() { return btn_query_plan }
           }),
           errorEl = document.getElementById('plan-error'),
+          placeholderEl = document.getElementById('plan-placeholder'),
+          loadingEl = document.getElementById('plan-loading'),
           endpoint = document.getElementById('yasqe').dataset.endpoint,
           nativeBtn = document.querySelector('.yasqe_queryButton:not(#btn_query_plan)');
 
@@ -47,6 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
         canvas.innerHTML = '';
         queryPlanDetails.innerHTML = '';
         clearError();
+        placeholderEl.hidden = true;
+        loadingEl.hidden = false;
         btn_query_plan.classList.add('busy');
         btn_query_plan.disabled = true;
 
@@ -81,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderError('The server returned status ' + err.status + '. Message: ' + err.message);
             })
             .finally(function () {
+                loadingEl.hidden = true;
                 btn_query_plan.classList.remove('busy');
                 btn_query_plan.disabled = false;
             });

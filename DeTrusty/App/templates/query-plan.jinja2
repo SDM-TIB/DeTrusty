@@ -8,7 +8,14 @@
 
 {% block editor %}
   <div id="yasqe" data-endpoint="{{ url_for('query_plan') }}"></div>
-  <div id="plan-error"></div>
+  <div id="plan-error" role="alert"></div>
+  <p id="plan-placeholder" class="plan-status">
+    Write a query above and press the plan button to see how it is decomposed
+    and which endpoint answers each part.
+  </p>
+  <div id="plan-loading" class="plan-status" role="status" hidden>
+    <span class="spinner" aria-hidden="true"></span> Creating plan&hellip;
+  </div>
   <div id="plan-container">
     <div id="canvas-wrapper">
       <div id="canvas"></div>
