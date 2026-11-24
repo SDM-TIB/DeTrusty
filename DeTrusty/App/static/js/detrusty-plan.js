@@ -160,6 +160,33 @@ document.addEventListener('DOMContentLoaded', function () {
         update(root);
         fitTree(0); /* instant fit on first render */
 
+        function toggleNode(d) {
+            if (!d.children && !d._children) return; // leaves cannot be collapsed
+            if (d.children) { d._children = d.children; d.children = null; }
+            else            { d.children  = d._children; d._children = null; }
+            update(d);
+        }
+
+        function showTooltip(d, left, top) {
+            if (!d.data.name) return;
+            const ssqDetails = details[d.data.name];
+            if (!ssqDetails) return;
+            tooltip.style.display = 'block';
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+            tooltip.textContent = '';
+            appendDetails(tooltip, d.data.name, ssqDetails, 'tt-label', false);
+        }
+
+        function nodeAriaLabel(d) {
+            const kind = (d.children || d._children) ? 'Join' : 'Sub-query';
+            let label = kind + (d.data.name ? ' ' + d.data.name : '');
+            if (d.data.endpoint) label += ', endpoint ' + d.data.endpoint;
+            if (d.children) label += ', expanded';
+            else if (d._children) label += ', collapsed';
+            return label;
+        }
+
         function update(source) {
             const layout = treemap(root),
                   nodes = layout.descendants(),
@@ -177,22 +204,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('class', d => 'node' + (d.children || d._children ? ' node--internal' : ' node--leaf'))
                 .attr('transform', () => 'translate(' + source.x0 + ',' + source.y0 + ')')
                 .style('opacity', 0)
-                .on('click', function (event, d) {
-                    if (d.children) { d._children = d.children; d.children = null; }
-                    else            { d.children  = d._children; d._children = null; }
-                    update(d);
+                .attr('tabindex', 0)
+                .attr('role', 'button')
+                .attr('aria-label', d => nodeAriaLabel(d))
+                .on('click', function (event, d) { toggleNode(d); })
+                .on('keydown', function (event, d) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        toggleNode(d);
+                    } else if (event.key === 'Escape') {
+                        tooltip.style.display = 'none';
+                    }
                 })
                 .on('mousemove', function (event, d) {
-                    if (!d.data.name) return;
-                    const ssqDetails = details[d.data.name];
-                    if (!ssqDetails) return;
-                    tooltip.style.display = 'block';
-                    tooltip.style.left = (event.pageX + 14) + 'px';
-                    tooltip.style.top = (event.pageY - 28) + 'px';
-                    tooltip.textContent = '';
-                    appendDetails(tooltip, d.data.name, ssqDetails, 'tt-label', false);
+                    showTooltip(d, event.pageX + 14, event.pageY - 28);
                 })
                 .on('mouseleave', function () {
+                    tooltip.style.display = 'none';
+                })
+                .on('focus', function (event, d) {
+                    const r = this.getBoundingClientRect();
+                    showTooltip(d, r.right + 8, r.top);
+                })
+                .on('blur', function () {
                     tooltip.style.display = 'none';
                 });
 
@@ -250,6 +284,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const nodeAll = nodeEnter.merge(node);
 
             /* '+' visible only when node IS collapsed (_children set, children null) */
+            nodeAll.attr('aria-label', d => nodeAriaLabel(d))
+                .attr('aria-expanded', d => (d.children || d._children) ? String(!!d.children) : null);
             nodeAll.select('.collapse-indicator')
                 .style('display', d => d._children ? null : 'none');
             nodeAll.select('.node-endpoint-number')
@@ -441,7 +477,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const btn = document.createElement('button');
                 btn.className = 'toolbar-btn';
                 btn.title     = b.title;
+                btn.type      = 'button';
+                btn.setAttribute('aria-label', b.title);
                 btn.innerHTML = b.svg;
+                btn.firstElementChild.setAttribute('aria-hidden', 'true');
                 btn.addEventListener('click', b.action);
                 toolbar.appendChild(btn);
             });

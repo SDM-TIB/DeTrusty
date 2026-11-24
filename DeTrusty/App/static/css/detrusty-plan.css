@@ -116,6 +116,20 @@
   pointer-events: none;
 }
 
+.node:focus {
+  outline: none;
+}
+
+.node:focus-visible .node-shape {
+  stroke: var(--dt-text);
+  stroke-width: 4px;
+}
+
+.toolbar-btn:focus-visible {
+  outline: 2px solid var(--dt-text);
+  outline-offset: 1px;
+}
+
 .node-endpoint-number {
   font: bold 11px sans-serif;
   pointer-events: none;
