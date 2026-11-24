@@ -36,24 +36,24 @@
         </button>
       </div>
 
-      <nav class="admin-nav" role="tablist">
-        <button class="admin-tab active" data-panel="panel-federations" role="tab">
-          <i class="fa-solid fa-circle-nodes tab-icon"></i>
+      <div class="admin-nav" role="tablist" aria-label="Administration">
+        <button class="admin-tab active" id="tab-federations" data-panel="panel-federations" role="tab" aria-selected="true" aria-controls="panel-federations" tabindex="0">
+          <i class="fa-solid fa-circle-nodes tab-icon" aria-hidden="true"></i>
           Federations
         </button>
-        <button class="admin-tab" data-panel="panel-endpoints" role="tab">
-          <i class="fa-solid fa-server tab-icon"></i>
+        <button class="admin-tab" id="tab-endpoints" data-panel="panel-endpoints" role="tab" aria-selected="false" aria-controls="panel-endpoints" tabindex="-1">
+          <i class="fa-solid fa-server tab-icon" aria-hidden="true"></i>
           Endpoints
         </button>
-        <button class="admin-tab" data-panel="panel-prefixes" role="tab">
-          <i class="fa-solid fa-tags tab-icon"></i>
+        <button class="admin-tab" id="tab-prefixes" data-panel="panel-prefixes" role="tab" aria-selected="false" aria-controls="panel-prefixes" tabindex="-1">
+          <i class="fa-solid fa-tags tab-icon" aria-hidden="true"></i>
           Prefixes
         </button>
-        <button class="admin-tab" data-panel="panel-sparql" role="tab">
-          <i class="fa-solid fa-code tab-icon"></i>
+        <button class="admin-tab" id="tab-sparql" data-panel="panel-sparql" role="tab" aria-selected="false" aria-controls="panel-sparql" tabindex="-1">
+          <i class="fa-solid fa-code tab-icon" aria-hidden="true"></i>
           SPARQL
         </button>
-      </nav>
+      </div>
     </aside>
 
     {# ── Main content ─────────────────────────────────────────────── #}
@@ -61,7 +61,7 @@
       <div id="admin-banner" class="admin-banner" role="alert" style="display:none"></div>
 
       {# ── Federations ─────────────────────────────────────────── #}
-      <section id="panel-federations" class="admin-panel active" role="tabpanel">
+      <section id="panel-federations" class="admin-panel active" role="tabpanel" aria-labelledby="tab-federations" tabindex="0">
         <div class="panel-header">
           <h3>Federations</h3>
           <button class="btn btn-secondary btn-sm icon-btn" data-refresh="federations" title="Refresh">
@@ -92,7 +92,7 @@
       </section>
 
       {# ── Endpoints ───────────────────────────────────────────── #}
-      <section id="panel-endpoints" class="admin-panel" role="tabpanel">
+      <section id="panel-endpoints" class="admin-panel" role="tabpanel" aria-labelledby="tab-endpoints" tabindex="0">
         <div class="panel-header">
           <h3>Endpoints</h3>
           <button class="btn btn-secondary btn-sm icon-btn" data-refresh="endpoints" title="Refresh">
@@ -157,7 +157,7 @@
       </section>
 
       {# ── Prefixes ────────────────────────────────────────────── #}
-      <section id="panel-prefixes" class="admin-panel" role="tabpanel">
+      <section id="panel-prefixes" class="admin-panel" role="tabpanel" aria-labelledby="tab-prefixes" tabindex="0">
         <div class="panel-header">
           <h3>Prefixes</h3>
           <button class="btn btn-secondary btn-sm icon-btn" data-refresh="prefixes" title="Refresh">
@@ -214,7 +214,7 @@
       </section>
 
       {# ── SPARQL console ──────────────────────────────────────── #}
-      <section id="panel-sparql" class="admin-panel sparql-panel" role="tabpanel">
+      <section id="panel-sparql" class="admin-panel sparql-panel" role="tabpanel" aria-labelledby="tab-sparql" tabindex="0">
         <div class="panel-header">
           <h3>Metadata SPARQL Console</h3>
           <span class="panel-hint">Queries run against the metadata service with admin credentials.</span>

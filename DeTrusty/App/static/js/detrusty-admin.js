@@ -133,7 +133,12 @@ const $tabs   = document.querySelectorAll('.admin-tab');
 const $panels = document.querySelectorAll('.admin-panel');
 
 function activatePanel(panelId) {
-  $tabs.forEach(t   => t.classList.toggle('active', t.dataset.panel === panelId));
+  $tabs.forEach(t => {
+    const selected = t.dataset.panel === panelId;
+    t.classList.toggle('active', selected);
+    t.setAttribute('aria-selected', String(selected));
+    t.tabIndex = selected ? 0 : -1;  // roving tabindex: one tab stop for the tablist
+  });
   $panels.forEach(p => p.classList.toggle('active', p.id === panelId));
 
   // Lazy-init YASGUI when SPARQL tab is first shown
@@ -144,6 +149,22 @@ function activatePanel(panelId) {
 }
 
 $tabs.forEach(tab => tab.addEventListener('click', () => activatePanel(tab.dataset.panel)));
+
+// Arrow keys, Home, and End move between tabs (WAI-ARIA tabs pattern).
+const _tabList = [...$tabs];
+_tabList.forEach((tab, i) => tab.addEventListener('keydown', e => {
+  let next;
+  switch (e.key) {
+    case 'ArrowDown': case 'ArrowRight': next = (i + 1) % _tabList.length; break;
+    case 'ArrowUp':   case 'ArrowLeft':  next = (i - 1 + _tabList.length) % _tabList.length; break;
+    case 'Home': next = 0; break;
+    case 'End':  next = _tabList.length - 1; break;
+    default: return;
+  }
+  e.preventDefault();
+  _tabList[next].focus();
+  activatePanel(_tabList[next].dataset.panel);
+}));
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    Refresh buttons
