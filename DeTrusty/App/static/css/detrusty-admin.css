@@ -33,7 +33,7 @@
   font-family: monospace;
   font-size: 13px;
   font-weight: 700;
-  color: var(--dt-accent);
+  color: var(--dt-accent-text);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin: 0 0 10px;
@@ -48,7 +48,7 @@
 
 .login-sub {
   font-size: 13px;
-  color: #888;
+  color: var(--dt-text-subtle);
   margin: 0 0 22px;
 }
 
@@ -119,7 +119,7 @@
 .btn-logout {
   background: none;
   border: none;
-  color: #666;
+  color: #a8a8a8;
   cursor: pointer;
   padding: 3px;
   border-radius: 3px;
@@ -220,7 +220,7 @@
 
 .panel-hint {
   font-size: 12px;
-  color: #888;
+  color: var(--dt-text-subtle);
   margin-left: auto;
 }
 
@@ -271,7 +271,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #888;
+  color: var(--dt-text-subtle);
 }
 
 .card-title-row {
@@ -288,12 +288,12 @@
 
 .card-hint {
   font-size: 12px;
-  color: #999;
+  color: var(--dt-text-subtle);
   margin: 0 0 10px;
   line-height: 1.5;
 }
 
-.card-hint a { color: #2980b9; }
+.card-hint a { color: var(--dt-link); }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    FEDERATION SELECTOR
@@ -310,7 +310,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #888;
+  color: var(--dt-text-subtle);
   white-space: nowrap;
 }
 
@@ -368,7 +368,7 @@
 
 .form-sep {
   font-weight: 700;
-  color: #aaa;
+  color: var(--dt-text-subtle);
   flex: 0 0 auto;
 }
 
@@ -386,7 +386,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #888;
+  color: var(--dt-text-subtle);
   white-space: nowrap;
 }
 
@@ -465,7 +465,7 @@
 
 .list-empty {
   font-size: 13px;
-  color: #bbb;
+  color: var(--dt-text-subtle);
   margin: 4px 0;
 }
 
@@ -539,7 +539,7 @@
 
 .ep-fed-tag {
   font-size: 11px;
-  color: #888;
+  color: var(--dt-text-subtle);
   background: #f0f0f0;
   border: 1px solid #e0e0e0;
   border-radius: 3px;
@@ -578,7 +578,7 @@
 
 .pfx-name {
   font-weight: 700;
-  color: #2980b9;
+  color: var(--dt-link);
   flex: 0 0 auto;
   max-width: 120px;
   overflow: hidden;
@@ -587,7 +587,7 @@
 }
 
 .pfx-colon {
-  color: #aaa;
+  color: var(--dt-text-subtle);
   margin-right: 6px;
   flex: 0 0 auto;
 }
@@ -635,13 +635,13 @@
 }
 
 .prefixcc-label {
-  color: #888;
+  color: var(--dt-text-subtle);
 }
 
 .prefixcc-name {
   font-family: monospace;
   font-weight: 700;
-  color: #27ae60;
+  color: var(--dt-success-text);
 }
 
 /* When the URI is genuinely unknown */

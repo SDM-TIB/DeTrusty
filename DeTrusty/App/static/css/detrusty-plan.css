@@ -213,7 +213,7 @@
 }
 
 .detail-label {
-  color: #888;
+  color: var(--dt-text-subtle);
   font-weight: 600;
 }
 
