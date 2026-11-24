@@ -1,3 +1,19 @@
+# v0.26.0 - 24 Nov 2026
+- Improve Web interface
+  - Make the layout usable on narrow screens
+  - Turn the home page into a starting point
+  - Always show the active federation
+  - Use toasts for admin notifications
+- Improve query plan visualization
+  - Show endpoint numbers in addition to colors
+  - Add empty and loading states
+  - Add `Ctrl`+`Enter` shortcut to create the plan
+- Improve accessibility
+  - Make the query plan keyboard accessible
+  - Add visible keyboard focus indicators
+  - Fix low-contrast text colors
+- Escape data in the query plan view
+
 # v0.25.0 - 31 Aug 2026
 - Fix `DecompositionType` enum for Python 3.13+
 - Update dependencies
