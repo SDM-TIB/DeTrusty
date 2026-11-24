@@ -9,9 +9,10 @@
 {% endblock %}
 
 {% block content %}
-  <div id="federation-bar">
-    <label for="federation-select">Federation:</label>
-    <select id="federation-select">
+  <div id="federation-bar" data-federations-endpoint="{{ url_for('federations') }}">
+    <span id="federation-name" hidden></span>
+    <label for="federation-select" id="federation-select-label" hidden>Federation:</label>
+    <select id="federation-select" hidden>
       <option value="">All federations</option>
     </select>
   </div>

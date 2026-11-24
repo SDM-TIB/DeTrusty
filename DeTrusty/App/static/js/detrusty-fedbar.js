@@ -1,42 +1,40 @@
 document.addEventListener('DOMContentLoaded', function () {
-    let bar = document.getElementById('federation-bar');
+    const bar = document.getElementById('federation-bar');
     if (!bar) return;
 
-    function applyYasguiStyle() {
-        // YASGUI's tab bar / control toolbar — try several selectors
-        // in order of specificity so we match any YASGUI version.
-        let source = document.querySelector('.yasgui .tabBar')
-            || document.querySelector('.yasgui .tab')
-            || document.querySelector('.yasqe')
-            || document.querySelector('.yasgui');
-        if (!source) return false;
+    const select = document.getElementById('federation-select'),
+          selectLabel = document.getElementById('federation-select-label'),
+          nameEl = document.getElementById('federation-name');
 
-        let s = window.getComputedStyle(source),
-            bg = s.backgroundColor,
-            color = s.color,
-            border = s.borderBottomColor !== 'rgba(0, 0, 0, 0)'
-                ? s.borderBottomColor
-                : s.borderColor;
-
-        bar.style.background = bg;
-        bar.style.color = color;
-        bar.style.borderBottom = '1px solid ' + border;
-
-        let sel = bar.querySelector('select');
-        if (sel) {
-            sel.style.background = bg;
-            sel.style.color = color;
-            sel.style.border = '1px solid ' + border;
-        }
-        return true;
+    function shortName(uri) {
+        return uri.split(/[#\/]/).filter(Boolean).pop() || uri;
     }
 
-    // Try immediately in case YASGUI rendered synchronously.
-    if (!applyYasguiStyle()) {
-        // Otherwise observe the DOM until YASGUI's toolbar appears.
-        let observer = new MutationObserver(function () {
-            if (applyYasguiStyle()) observer.disconnect();
+    fetch(bar.dataset.federationsEndpoint)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            const federations = data.federations || [];
+            if (federations.length === 0) return;
+
+            if (federations.length === 1) {
+                // Nothing to choose, but users should still see what they query.
+                nameEl.textContent = 'Federation: ' + shortName(federations[0]);
+                nameEl.title = federations[0];
+                nameEl.hidden = false;
+            } else {
+                federations.forEach(function (uri) {
+                    const opt = document.createElement('option');
+                    opt.value = uri;
+                    opt.textContent = shortName(uri);
+                    opt.title = uri;
+                    select.appendChild(opt);
+                });
+                selectLabel.hidden = false;
+                select.hidden = false;
+            }
+            bar.classList.add('is-visible');
+        })
+        .catch(function (err) {
+            console.warn('Could not load federation list:', err);
         });
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
 });

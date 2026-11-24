@@ -41,25 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     })();
 
-    // Populate the federation dropdown from the backend.
-    fetch(yasguiEl.dataset.federationsEndpoint)
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            let federations = data.federations || [];
-            if (federations.length < 2) return;
-            federations.forEach(function (uri) {
-                let opt = document.createElement('option');
-                opt.value = uri;
-                opt.textContent = uri.split(/[#\/]/).filter(Boolean).pop() || uri;
-                opt.title = uri;
-                federationSelect.appendChild(opt);
-            });
-            document.getElementById('federation-bar').style.display = 'flex';
-        })
-        .catch(function (err) {
-            console.warn('Could not load federation list:', err);
-        });
-
     const yasgui = new Yasgui(yasguiEl, {
         persistenceId: null,
         yasqe: {

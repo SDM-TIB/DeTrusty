@@ -60,22 +60,39 @@
 }
 
 #federation-bar {
-  display: none; /* shown by JS only when 2+ federations exist */
+  --federation-bar-bg: #f5f5f5;
+  --federation-bar-fg: #333;
+  --federation-bar-border: #d1d1d1;
+
+  display: none; /* shown once the federation list has loaded */
   align-items: center;
   gap: 0.6rem;
   padding: 0.35rem 0.75rem;
   font-size: 0.8125rem;
-  border-bottom: 1px solid transparent; /* coloured at runtime */
+  background: var(--federation-bar-bg);
+  color: var(--federation-bar-fg);
+  border-bottom: 1px solid var(--federation-bar-border);
   box-sizing: border-box;
 }
 
-#federation-bar label {
+#federation-bar.is-visible {
+  display: flex;
+}
+
+#federation-bar [hidden] {
+  display: none;
+}
+
+#federation-bar label,
+#federation-name {
   font-weight: 600;
   white-space: nowrap;
-  opacity: 0.75;
 }
 
 #federation-bar select {
+  background: var(--federation-bar-bg);
+  color: var(--federation-bar-fg);
+  border: 1px solid var(--federation-bar-border);
   border-radius: 3px;
   padding: 0.15rem 0.4rem;
   font-size: inherit;
@@ -83,11 +100,6 @@
   cursor: pointer;
   min-width: 14rem;
   max-width: 40rem;
-  border: 1px solid transparent; /* coloured at runtime */
-}
-
-#federation-bar select:focus {
-  outline: none;
 }
 
 @media (max-width: 600px) {
