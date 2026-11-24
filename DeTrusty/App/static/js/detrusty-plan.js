@@ -104,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
                   dot = document.createElement('span');
             dot.className = 'endpoint-dot';
             dot.style.background = endpointColor(details[ssq]['endpoint'], endpoints_list);
+            dot.style.color = readableOn(endpointColor(details[ssq]['endpoint'], endpoints_list));
+            dot.textContent = endpointNumber(details[ssq]['endpoint'], endpoints_list);
+            dot.setAttribute('aria-hidden', 'true');
             const label = document.createElement('span');
             appendDetails(label, ssq, details[ssq], 'detail-label', true);
             li.appendChild(dot);
@@ -215,6 +218,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style('fill', color);
                 }
 
+                /* endpoint number: identifies the endpoint without relying on colour */
+                if (d.data.endpoint) {
+                    sel.append('text')
+                        .attr('class', 'node-endpoint-number')
+                        .attr('dy', '0.35em')
+                        .attr('text-anchor', 'middle')
+                        .style('fill', readableOn(color))
+                        .text(endpointNumber(d.data.endpoint, endpoints_list));
+                }
+
                 /* collapse indicator — always in DOM, shown/hidden via merge below */
                 sel.append('text')
                     .attr('class', 'collapse-indicator')
@@ -239,6 +252,8 @@ document.addEventListener('DOMContentLoaded', function () {
             /* '+' visible only when node IS collapsed (_children set, children null) */
             nodeAll.select('.collapse-indicator')
                 .style('display', d => d._children ? null : 'none');
+            nodeAll.select('.node-endpoint-number')
+                .style('display', d => d._children ? 'none' : null);
 
             /* --- transitions --- */
             nodeEnter.transition().duration(400)
@@ -480,6 +495,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const swatch = document.createElement('span');
             swatch.className        = 'legend-swatch';
             swatch.style.background = COLORS[i % COLORS.length];
+            swatch.style.color      = readableOn(COLORS[i % COLORS.length]);
+            swatch.textContent      = String(i + 1);
             const label  = document.createElement('code');
             label.textContent = ep;
             row.appendChild(swatch);
@@ -487,6 +504,22 @@ document.addEventListener('DOMContentLoaded', function () {
             wrap.appendChild(row);
         });
         return wrap;
+    }
+
+    /** 1-based number shown on nodes, in the legend, and in the details list. */
+    function endpointNumber(ep, list) {
+        const idx = list.indexOf(ep);
+        return idx >= 0 ? String(idx + 1) : '';
+    }
+
+    /** Black or white, whichever is more readable on the given #rrggbb colour. */
+    function readableOn(hex) {
+        const m = /^#([0-9a-f]{6})$/i.exec(hex);
+        if (!m) return '#000';
+        const n = parseInt(m[1], 16),
+              lin = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); },
+              L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+        return L > 0.179 ? '#000' : '#fff';
     }
 
     function endpointColor(ep, list) {

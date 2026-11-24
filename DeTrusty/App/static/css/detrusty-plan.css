@@ -116,6 +116,11 @@
   pointer-events: none;
 }
 
+.node-endpoint-number {
+  font: bold 11px sans-serif;
+  pointer-events: none;
+}
+
 .collapse-indicator {
   font: bold 13px sans-serif;
   fill: #555;
@@ -185,11 +190,17 @@
 }
 
 .endpoint-dot {
-  flex: 0 0 12px;
-  width: 12px;
-  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  margin-top: 3px;
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 #subqueries code {
@@ -230,11 +241,16 @@
 }
 
 .legend-swatch {
-  flex: 0 0 14px;
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .legend-row code {
