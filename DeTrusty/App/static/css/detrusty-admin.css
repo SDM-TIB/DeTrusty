@@ -228,29 +228,68 @@
    BANNER
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-.admin-banner {
-  padding: 10px 14px;
-  border-radius: 4px;
-  font-size: 13px;
-  border: 1px solid transparent;
-  animation: banner-in .15s ease;
+.admin-toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
 }
 
-@keyframes banner-in {
-  from { opacity: 0; transform: translateY(-4px); }
+.admin-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px 10px 14px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  pointer-events: auto;
+  animation: toast-in .15s ease;
+}
+
+.admin-toast-text { flex: 1 1 auto; word-break: break-word; }
+
+.admin-toast-close {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  opacity: .7;
+}
+
+.admin-toast-close:hover { opacity: 1; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.admin-banner.success {
+.admin-toast.success {
   background: #eaf4d3;
   border-color: var(--dt-accent);
   color: #3a5c00;
 }
 
-.admin-banner.error {
+.admin-toast.error {
   background: #f2dede;
   border-color: #ebccd1;
   color: #a94442;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-toast { animation: none; }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

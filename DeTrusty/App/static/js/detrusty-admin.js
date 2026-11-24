@@ -109,20 +109,33 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 });
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Banner notifications
+   Toast notifications
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-const $banner = document.getElementById('admin-banner');
-let   _bannerTimer = null;
+const $toasts = document.getElementById('admin-toasts');
 
-function showBanner(msg, type /* 'success'|'error' */, duration = 5000) {
-  $banner.textContent  = msg;
-  $banner.className    = 'admin-banner ' + type;
-  $banner.style.display = 'block';
-  clearTimeout(_bannerTimer);
-  if (duration > 0) {
-    _bannerTimer = setTimeout(() => { $banner.style.display = 'none'; }, duration);
-  }
+// Toasts float over the page, so they never push the content down. Successes
+// disappear after `duration` ms; errors stay (duration 0) until dismissed.
+function showToast(msg, type /* 'success'|'error' */, duration = type === 'error' ? 0 : 5000) {
+  const toast = document.createElement('div');
+  toast.className = 'admin-toast ' + type;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
+  const text = document.createElement('span');
+  text.className = 'admin-toast-text';
+  text.textContent = msg;
+
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'admin-toast-close';
+  close.setAttribute('aria-label', 'Dismiss notification');
+  close.textContent = '×';
+  close.addEventListener('click', () => toast.remove());
+
+  toast.append(text, close);
+  $toasts.appendChild(toast);
+  while ($toasts.children.length > 4) $toasts.firstElementChild.remove();
+  if (duration > 0) setTimeout(() => toast.remove(), duration);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -188,7 +201,7 @@ document.querySelectorAll('[data-refresh]').forEach(btn => {
 async function adminFetch(method, path, body = null) {
   const token = getToken();
   if (!token) {
-    showBanner('No admin token. Please sign in again.', 'error');
+    showToast('No admin token. Please sign in again.', 'error');
     return { ok: false, status: 401, data: null };
   }
   const init = { method, headers: { 'Authorization': 'Bearer ' + token } };
@@ -199,7 +212,7 @@ async function adminFetch(method, path, body = null) {
     const data = ct.includes('application/json') ? await resp.json() : await resp.text();
     return { ok: resp.ok, status: resp.status, data };
   } catch (err) {
-    showBanner('Network error: ' + err.message, 'error');
+    showToast('Network error: ' + err.message, 'error');
     return { ok: false, status: 0, data: null };
   }
 }
@@ -371,7 +384,7 @@ async function loadFederations() {
     btnCopy.className = 'btn btn-ghost btn-sm';
     btnCopy.textContent = 'Copy URI';
     btnCopy.addEventListener('click', () => {
-      navigator.clipboard.writeText(uri).then(() => showBanner('URI copied to clipboard.', 'success', 2000));
+      navigator.clipboard.writeText(uri).then(() => showToast('URI copied to clipboard.', 'success', 2000));
     });
 
     // Navigate to endpoints for this federation
@@ -480,6 +493,7 @@ async function loadEndpoints() {
     const btnDel = document.createElement('button');
     btnDel.className = 'btn btn-danger btn-sm';
     btnDel.textContent = 'Remove';
+    btnDel.setAttribute('aria-label', 'Remove endpoint ' + url);
     btnDel.addEventListener('click', () => deleteEndpoint(url, graph, row));
     actions.appendChild(btnDel);
 
@@ -490,7 +504,7 @@ async function loadEndpoints() {
 
 async function addEndpoint() {
   const url = $epUrl.value.trim();
-  if (!url) { showBanner('Please enter an endpoint URL.', 'error'); return; }
+  if (!url) { showToast('Please enter an endpoint URL.', 'error'); return; }
 
   const mode = document.querySelector('input[name="ep-fed-mode"]:checked').value;
   const graph = mode === 'new'
@@ -498,7 +512,7 @@ async function addEndpoint() {
     : $epFedExSel.value;
 
   if (!graph) {
-    showBanner(mode === 'new' ? 'Please enter a URI for the new federation.' : 'Please select a federation.', 'error');
+    showToast(mode === 'new' ? 'Please enter a URI for the new federation.' : 'Please select a federation.', 'error');
     return;
   }
 
@@ -511,14 +525,14 @@ async function addEndpoint() {
   $btnAddEp.disabled = false;
 
   if (!ok) {
-    showBanner(
+    showToast(
       (data?.error) || (status === 401 ? 'Unauthorized – check your token.' : 'Failed to add endpoint.'),
       'error'
     );
     return;
   }
 
-  showBanner('Endpoint added.', 'success');
+  showToast('Endpoint added.', 'success');
   $epUrl.value = '';
   document.getElementById('ep-fed-new-uri').value = '';
   // Refresh federations in case a new one was created, then reload endpoints
@@ -568,14 +582,14 @@ async function deleteEndpoint(url, graph, rowEl) {
 
   const { ok, status, data } = await adminFetch('DELETE', '/federation/endpoint', form);
   if (!ok) {
-    showBanner(
+    showToast(
       (data?.error) || (status === 401 ? 'Unauthorized.' : 'Failed to remove endpoint.'),
       'error'
     );
     return;
   }
 
-  showBanner('Endpoint removed.', 'success');
+  showToast('Endpoint removed.', 'success');
   rowEl.remove();
   const remaining = $endpointList.querySelectorAll('.ep-row').length;
   $epCount.textContent = remaining || '';
@@ -735,6 +749,7 @@ function buildPfxRow({ prefix, uri }, federation) {
   const btnDel = document.createElement('button');
   btnDel.className = 'btn btn-danger btn-sm';
   btnDel.textContent = 'Remove';
+  btnDel.setAttribute('aria-label', 'Remove prefix ' + (prefix ? prefix + ':' : uri));
   btnDel.addEventListener('click', () => deletePrefix(prefix, uri, federation, row));
   actions.appendChild(btnDel);
 
@@ -833,13 +848,13 @@ async function savePrefix(name, uri, federation) {
 
   const { ok, status, data } = await adminFetch('POST', '/federation/prefix', form);
   if (!ok) {
-    showBanner(
+    showToast(
       data?.error || (status === 401 ? 'Unauthorized.' : 'Failed to save prefix.'),
       'error'
     );
     return false;
   }
-  showBanner(`Prefix "${name}:" saved.`, 'success');
+  showToast(`Prefix "${name}:" saved.`, 'success');
   return true;
 }
 
@@ -859,13 +874,13 @@ async function deletePrefix(name, uri, federation, rowEl) {
 
   const { ok, status, data } = await adminFetch('DELETE', '/federation/prefix', form);
   if (!ok) {
-    showBanner(
+    showToast(
       data?.error || (status === 401 ? 'Unauthorized.' : 'Failed to remove prefix.'),
       'error'
     );
     return false;
   }
-  showBanner('Prefix removed.', 'success');
+  showToast('Prefix removed.', 'success');
   if (rowEl) rowEl.remove();
   return true;
 }
@@ -874,7 +889,7 @@ async function addPrefix() {
   const name = $pfxName.value.trim().replace(/:$/, '');
   const uri  = $pfxUri.value.trim();
   if (!name || !uri) {
-    showBanner('Please enter both a prefix name and a URI.', 'error');
+    showToast('Please enter both a prefix name and a URI.', 'error');
     return;
   }
   $btnAddPrefix.disabled = true;
@@ -893,7 +908,7 @@ document.getElementById('btn-cleanup-unnamed').addEventListener('click', async (
   if (!rows.length) return;
 
   const toRemove = rows.filter(r => r.querySelector('.prefixcc-name'));
-  if (!toRemove.length) { showBanner('No redundant namespaces to remove.', 'success'); return; }
+  if (!toRemove.length) { showToast('No redundant namespaces to remove.', 'success'); return; }
 
   const confirmed = await confirmDialog({
     title: `Remove ${toRemove.length} namespace(s)?`,
@@ -908,7 +923,7 @@ document.getElementById('btn-cleanup-unnamed').addEventListener('click', async (
     const ok  = await deletePrefix('', uri, $pfxFedSelect.value, null);
     if (ok) { r.remove(); removed++; }
   }
-  showBanner(`Removed ${removed} redundant namespace(s).`, 'success');
+  showToast(`Removed ${removed} redundant namespace(s).`, 'success');
   loadPrefixes();
 });
 

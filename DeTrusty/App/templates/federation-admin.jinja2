@@ -17,13 +17,15 @@
     <div class="login-row">
       <input id="wall-token" type="password" class="admin-input login-input"
              placeholder="Bearer token…" autocomplete="current-password" />
-      <button id="btn-wall-login" class="btn btn-primary">Sign in →</button>
+      <button id="btn-wall-login" class="btn btn-primary">Sign in <span aria-hidden="true">→</span></button>
     </div>
     <p id="wall-error" class="wall-error" role="alert"></p>
   </div>
 </div>
 
 {# ── Admin app (revealed after auth) ───────────────────────────────── #}
+<div id="admin-toasts" class="admin-toasts" aria-live="polite"></div>
+
 <div id="admin-app" style="display:none" aria-hidden="true">
   <div class="admin-layout">
 
@@ -31,8 +33,8 @@
     <aside class="admin-sidebar">
       <div class="sidebar-header">
         <span class="sidebar-title">Admin</span>
-        <button id="btn-logout" class="btn-logout" title="Sign out">
-          <i class="fa-solid fa-right-from-bracket"></i>
+        <button id="btn-logout" class="btn-logout" title="Sign out" aria-label="Sign out">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
         </button>
       </div>
 
@@ -58,14 +60,12 @@
 
     {# ── Main content ─────────────────────────────────────────────── #}
     <main class="admin-main" role="main">
-      <div id="admin-banner" class="admin-banner" role="alert" style="display:none"></div>
-
       {# ── Federations ─────────────────────────────────────────── #}
       <section id="panel-federations" class="admin-panel active" role="tabpanel" aria-labelledby="tab-federations" tabindex="0">
         <div class="panel-header">
           <h3>Federations</h3>
-          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="federations" title="Refresh">
-            <i class="fa-solid fa-arrows-rotate"></i>
+          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="federations" title="Refresh" aria-label="Refresh federations">
+            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
           </button>
         </div>
 
@@ -95,8 +95,8 @@
       <section id="panel-endpoints" class="admin-panel" role="tabpanel" aria-labelledby="tab-endpoints" tabindex="0">
         <div class="panel-header">
           <h3>Endpoints</h3>
-          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="endpoints" title="Refresh">
-            <i class="fa-solid fa-arrows-rotate"></i>
+          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="endpoints" title="Refresh" aria-label="Refresh endpoints">
+            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
           </button>
         </div>
 
@@ -160,8 +160,8 @@
       <section id="panel-prefixes" class="admin-panel" role="tabpanel" aria-labelledby="tab-prefixes" tabindex="0">
         <div class="panel-header">
           <h3>Prefixes</h3>
-          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="prefixes" title="Refresh">
-            <i class="fa-solid fa-arrows-rotate"></i>
+          <button class="btn btn-secondary btn-sm icon-btn" data-refresh="prefixes" title="Refresh" aria-label="Refresh prefixes">
+            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
           </button>
         </div>
 
