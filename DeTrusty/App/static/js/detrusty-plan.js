@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
               extraKeys: {
                   Tab: function(cm) {
                       cm.replaceSelection(new Array(cm.getOption('indentUnit') + 1).join(' '));
-                  }
+                  },
+                  'Ctrl-Enter': function() { btn_query_plan.click(); },
+                  'Cmd-Enter': function() { btn_query_plan.click(); }
               },
               pluginButtons: function() { return btn_query_plan }
           }),

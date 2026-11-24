@@ -154,3 +154,26 @@ body {
 .admin-sidebar :focus-visible {
   outline-color: var(--dt-focus-on-dark);
 }
+
+#editor-hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--dt-text-muted);
+}
+
+#editor-hints a {
+  color: var(--dt-link);
+}
+
+#editor-hints kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--dt-border);
+  border-radius: 3px;
+  background: var(--dt-surface);
+  color: var(--dt-text);
+  font: 11px var(--dt-font-mono);
+}

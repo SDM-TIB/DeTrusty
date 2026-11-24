@@ -4,6 +4,8 @@
   <script src="{{ url_for('static', filename='js/detrusty-query.js') }}"></script>
 {% endblock %}
 
+{% block hint_run %}Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run the query.{% endblock %}
+
 {% block editor %}
   <div id="yasgui" data-endpoint="{{ url_for('sparql') }}"></div>
 {% endblock %}
