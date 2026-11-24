@@ -142,3 +142,15 @@ body {
 .skip-link:focus {
   top: 8px;
 }
+
+/* Visible keyboard focus everywhere (pointer clicks do not trigger it). */
+:focus-visible {
+  outline: 2px solid var(--dt-focus);
+  outline-offset: 2px;
+}
+
+/* Dark bars need a light ring. */
+.navbar :focus-visible,
+.admin-sidebar :focus-visible {
+  outline-color: var(--dt-focus-on-dark);
+}
