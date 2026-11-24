@@ -1,3 +1,10 @@
+body {
+  margin: 0;
+  background-color: var(--dt-page-bg);
+  color: var(--dt-text);
+  font-family: var(--dt-font);
+}
+
 .yasgui .autocompleteWrapper,
 .yasgui .controlbar,
 .yasqe .yasqe_buttons .yasqe_share {
@@ -29,7 +36,7 @@
 .navbar {
   display: flex;
   align-items: center;
-  background-color: #222;
+  background-color: var(--dt-nav-bg);
   padding: 0 20px;
   height: 48px;
   gap: 24px;
@@ -49,7 +56,7 @@
 .navbar a:hover,
 .navbar a.active {
   color: #fff;
-  border-bottom-color: #9ACD32;
+  border-bottom-color: var(--dt-accent);
 }
 
 .navbar .navbar-version {

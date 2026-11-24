@@ -1,8 +1,3 @@
-body {
-  background-color: #e8e8e8;
-  font-family: sans-serif;
-}
-
 #plan-container {
   display: none;
   flex-direction: row;
@@ -21,7 +16,7 @@ body {
   width: 100%;
   height: 640px;
   background: #fff;
-  border: 1px solid #ccc;
+  border: 1px solid var(--dt-border);
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   overflow: hidden;
@@ -31,7 +26,7 @@ body {
   flex: 0 0 400px;
   max-width: 400px;
   background: #fff;
-  border: 1px solid #ccc;
+  border: 1px solid var(--dt-border);
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   padding: 14px 16px;
@@ -151,7 +146,7 @@ body {
 #plan-tooltip pre {
   margin: 4px 0 0 0;
   font-size: 11px;
-  color: #9ACD32;
+  color: var(--dt-accent);
   white-space: pre-wrap;
 }
 

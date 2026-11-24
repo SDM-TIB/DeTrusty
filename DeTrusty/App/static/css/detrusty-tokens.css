@@ -1,0 +1,20 @@
+/* Design tokens shared by all DeTrusty pages. */
+:root {
+  --dt-accent: #9ACD32;
+  --dt-accent-hover: #83b026;
+  --dt-danger: #c0392b;
+  --dt-danger-hover: #a93226;
+  --dt-link: #0b5cad;
+
+  --dt-page-bg: #e8e8e8;
+  --dt-surface: #fff;
+  --dt-nav-bg: #222;
+  --dt-border: #ccc;
+  --dt-text: #222;
+  --dt-text-muted: #555;
+
+  --dt-radius: 4px;
+  --dt-radius-lg: 6px;
+  --dt-font: sans-serif;
+  --dt-font-mono: monospace;
+}
